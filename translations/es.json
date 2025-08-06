@@ -1,0 +1,22 @@
+{
+  "strings": [
+    { "key": "nav-services", "value": "Servicios" },
+    { "key": "nav-about", "value": "Sobre mí" },
+    { "key": "nav-process", "value": "Proceso" },
+    { "key": "nav-resources", "value": "Recursos" },
+    { "key": "nav-testimonials", "value": "Historias de Éxito" },
+    { "key": "nav-get-started", "value": "Comenzar" },
+    { "key": "feature-rapid", "value": "Implementación Rápida de IA" },
+    { "key": "feature-personalized", "value": "Soluciones Personalizadas" },
+    { "key": "stat-speed", "value": "90% Más Rápido" },
+    { "key": "stat-speed-label", "value": "Implementación de IA" },
+    { "key": "values-cta-title", "value": "¿Listo para Experimentar Estos Valores en Acción?" },
+    { "key": "values-cta-subtitle", "value": "Hablemos de cómo nuestro enfoque puede transformar tu negocio con IA." },
+    { "key": "stat-projects", "value": "Proyectos de IA Entregados" },
+    { "key": "stat-satisfaction", "value": "Tasa de Satisfacción del Cliente" },
+    { "key": "stat-efficiency", "value": "Promedio de Mejora de Eficiencia" },
+    { "key": "newsletter-placeholder", "value": "Introduce tu correo empresarial" },
+    { "key": "newsletter-join", "value": "Únete Gratis" },
+    { "key": "newsletter-note", "value": "Gratis para siempre. Sin spam. Cancelar suscripción en cualquier momento. Más de 2.000 líderes de PyMEs confían en nosotros." }
+  ]
+}

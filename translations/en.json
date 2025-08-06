@@ -1,0 +1,22 @@
+{
+  "strings": [
+    { "key": "nav-services", "value": "Services" },
+    { "key": "nav-about", "value": "About" },
+    { "key": "nav-process", "value": "Process" },
+    { "key": "nav-resources", "value": "Resources" },
+    { "key": "nav-testimonials", "value": "Success Stories" },
+    { "key": "nav-get-started", "value": "Get Started" },
+    { "key": "feature-rapid", "value": "Rapid AI Implementation" },
+    { "key": "feature-personalized", "value": "Personalized Solutions" },
+    { "key": "stat-speed", "value": "90% Faster" },
+    { "key": "stat-speed-label", "value": "AI Implementation" },
+    { "key": "values-cta-title", "value": "Ready to Experience These Values in Action?" },
+    { "key": "values-cta-subtitle", "value": "Let's discuss how our approach can transform your business operations with AI." },
+    { "key": "stat-projects", "value": "AI Projects Delivered" },
+    { "key": "stat-satisfaction", "value": "Client Satisfaction Rate" },
+    { "key": "stat-efficiency", "value": "Average Efficiency Gain" },
+    { "key": "newsletter-placeholder", "value": "Enter your business email" },
+    { "key": "newsletter-join", "value": "Join Free" },
+    { "key": "newsletter-note", "value": "Free forever. No spam. Unsubscribe anytime. 2,000+ SME leaders trust us." }
+  ]
+}

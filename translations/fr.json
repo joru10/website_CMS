@@ -1,0 +1,22 @@
+{
+  "strings": [
+    { "key": "nav-services", "value": "Services" },
+    { "key": "nav-about", "value": "À propos" },
+    { "key": "nav-process", "value": "Processus" },
+    { "key": "nav-resources", "value": "Ressources" },
+    { "key": "nav-testimonials", "value": "Histoires de Réussite" },
+    { "key": "nav-get-started", "value": "Commencer" },
+    { "key": "feature-rapid", "value": "Mise en œuvre IA Rapide" },
+    { "key": "feature-personalized", "value": "Solutions Personnalisées" },
+    { "key": "stat-speed", "value": "90 % Plus Rapide" },
+    { "key": "stat-speed-label", "value": "Mise en œuvre IA" },
+    { "key": "values-cta-title", "value": "Prêt à Découvrir Ces Valeurs en Action ?" },
+    { "key": "values-cta-subtitle", "value": "Discutons de la façon dont notre approche peut transformer vos opérations avec l'IA." },
+    { "key": "stat-projects", "value": "Projets IA Livrés" },
+    { "key": "stat-satisfaction", "value": "Taux de Satisfaction Client" },
+    { "key": "stat-efficiency", "value": "Gain d'Efficacité Moyen" },
+    { "key": "newsletter-placeholder", "value": "Entrez votre email professionnel" },
+    { "key": "newsletter-join", "value": "Rejoindre Gratuitement" },
+    { "key": "newsletter-note", "value": "Gratuit pour toujours. Pas de spam. Désabonnement à tout moment. Plus de 2 000 dirigeants de PME nous font confiance." }
+  ]
+}

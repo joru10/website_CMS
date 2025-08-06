@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RapidAI - Empowering Businesses with Artificial Intelligence | Jose Ruiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-white shadow-sm z-50 transition-all duration-300" id="navbar">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-rocket text-3xl gradient-text"></i>
+                    <span class="text-xl font-bold text-gray-800">RapidAI</span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#services" class="text-gray-600 hover:text-blue-600 transition-colors" data-translate="nav-services">Services</a>
+                    <a href="#about" class="text-gray-600 hover:text-blue-600 transition-colors" data-translate="nav-about">About</a>
+                    <a href="#process" class="text-gray-600 hover:text-blue-600 transition-colors" data-translate="nav-process">Process</a>
+                    <a href="#resources" class="text-gray-600 hover:text-blue-600 transition-colors" data-translate="nav-resources">Resources</a>
+                    <a href="#testimonials" class="text-gray-600 hover:text-blue-600 transition-colors" data-translate="nav-testimonials">Success Stories</a>
+                    
+                    <!-- Language Switcher -->
+                    <div class="relative" id="languageSwitcher">
+                        <button onclick="toggleLanguageMenu()" class="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors">
+                            <i class="fas fa-globe text-lg"></i>
+                            <span id="currentLang">EN</span>
+                            <i class="fas fa-chevron-down text-sm"></i>
+                        </button>
+                        
+                        <!-- Language Dropdown -->
+                        <div id="languageMenu" class="hidden absolute right-0 mt-2 bg-white rounded-lg shadow-lg border py-2 z-50 min-w-[120px]">
+                            <a href="#" onclick="setLanguage('en')" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                                <span class="fi fi-us mr-3"></span>
+                                <span>English</span>
+                            </a>
+                            <a href="#" onclick="setLanguage('fr')" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                                <span class="fi fi-fr mr-3"></span>
+                                <span>Français</span>
+                            </a>
+                            <a href="#" onclick="setLanguage('es')" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                                <span class="fi fi-es mr-3"></span>
+                                <span>Español</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <button onclick="scrollToContact()" class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors" data-translate="nav-get-started">
+                        Get Started
+                    </button>
+                </div>
+                
+                <button class="md:hidden text-gray-600" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t">
+            <div class="px-6 py-4 space-y-3">
+                <a href="#services" class="block text-gray-600 hover:text-blue-600 transition-colors" data-translate="nav-services">Services</a>
+                <a href="#about" class="block text-gray-600 hover:text-blue-600 transition-colors" data-translate="nav-about">About</a>
+                <a href="#process" class="block text-gray-600 hover:text-blue-600 transition-colors" data-translate="nav-process">Process</a>
+                <a href="#resources" class="block text-gray-600 hover:text-blue-600 transition-colors" data-translate="nav-resources">Resources</a>
+                <a href="#testimonials" class="block text-gray-600 hover:text-blue-600 transition-colors" data-translate="nav-testimonials">Success Stories</a>
+                <button onclick="scrollToContact()" class="w-full bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors" data-translate="nav-get-started">
+                    Get Started
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient pt-24 pb-20">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h1 class="text-5xl font-bold text-gray-800 mb-6 fade-in" data-translate="hero-title">
+                        AI Implementation <span class="gradient-text">Doesn't Have to Be Overwhelming</span>
+                    </h1>
+                    <p class="text-xl text-gray-600 mb-8 fade-in" data-translate="hero-subtitle">
+                        When competitive pressure mounts and efficiency demands grow, AI adoption may feel impossible. However, with the right approach, AI implementation can be simple, fast, and highly effective.
+                    </p>
+                    <div class="bg-blue-50 border-l-4 border-blue-600 p-4 mb-8 rounded-r-lg fade-in">
+                        <p class="text-blue-800 font-medium mb-2" data-translate="hero-quote">"<em>Are we falling behind? Will we stay competitive? Are we using our time wisely?</em>"</p>
+                        <p class="text-blue-700" data-translate="hero-signature"><strong>We get it. And we're here to help.</strong> — Jose Ruiz, RapidAI</p>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-4 mb-8 fade-in">
+                        <div class="bg-white px-6 py-3 rounded-full shadow-sm flex items-center space-x-2">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            <span data-translate="feature-rapid">Rapid AI Implementation</span>
+                        </div>
+                        <div class="bg-white px-6 py-3 rounded-full shadow-sm flex items-center space-x-2">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            <span data-translate="feature-personalized">Personalized Solutions</span>
+                        </div>
+                    </div>
+                    
+                    <button onclick="scrollToContact()" class="bg-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-blue-700 transition-all transform hover:scale-105 fade-in" data-translate="hero-cta">
+                        Start Your AI Journey
+                    </button>
+                </div>
+                
+                <div class="relative fade-in">
+                    <img src="https://picsum.photos/seed/rapidai/600/400" alt="AI Business Transformation" class="rounded-2xl shadow-2xl">
+                    <div class="absolute -bottom-6 -left-6 bg-white p-4 rounded-xl shadow-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-chart-line text-blue-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-800" data-translate="stat-speed">90% Faster</p>
+                                <p class="text-sm text-gray-600" data-translate="stat-speed-label">AI Implementation</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-20">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4" data-translate="services-title">RapidAI Services</h2>
+                <p class="text-xl text-gray-600" data-translate="services-subtitle">Fast, effective AI solutions tailored to your business needs</p>
+            </div>
+            
+            <div id="services-container" class="grid md:grid-cols-3 gap-8">
+                <!-- Services will be loaded here dynamically -->
+                <div class="col-span-3 text-center py-8">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+                    <p class="mt-4 text-gray-600" data-translate="loading-services">Loading services...</p>
+                </div>
+            </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-gray-100">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="fade-in">
+                    <img src="https://picsum.photos/seed/jose/500/400" alt="Jose Ruiz - AI Expert" class="rounded-2xl shadow-lg">
+                </div>
+                <div>
+                    <h2 class="text-4xl font-bold text-gray-800 mb-6 fade-in" data-translate="about-title">Meet Jose Ruiz</h2>
+                    <p class="text-xl text-gray-600 mb-6 fade-in" data-translate="about-description">
+                        With years of experience in artificial intelligence and business transformation, I specialize in helping companies rapidly implement AI solutions that deliver measurable results.
+                    </p>
+                    <div class="space-y-4 fade-in">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-graduation-cap text-blue-600"></i>
+                            <span class="text-gray-700" data-translate="about-expertise">Expert in Machine Learning & AI Implementation</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-briefcase text-blue-600"></i>
+                            <span class="text-gray-700" data-translate="about-experience">Proven track record with businesses of all sizes</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-rocket text-blue-600"></i>
+                            <span class="text-gray-700" data-translate="about-focus">Focus on rapid implementation and quick wins</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources Section -->
+    <section id="resources" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4" data-translate="resources-title">AI Resources & Insights</h2>
+                <p class="text-xl text-gray-600" data-translate="resources-subtitle">Practical AI implementation guides, tools, and case studies for SME leaders</p>
+            </div>
+            
+            <!-- Resource Categories -->
+            <div class="grid md:grid-cols-3 gap-8 mb-16">
+                <!-- Newsletter Issues -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg card-hover fade-in">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-newspaper text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4" data-translate="resources-newsletter-title">Weekly Newsletter</h3>
+                    <p class="text-gray-600 mb-6" data-translate="resources-newsletter-desc">Get practical AI insights delivered to your inbox every Tuesday. No fluff, just actionable strategies.</p>
+                    
+                    <!-- Latest Issues Preview -->
+                    <div class="space-y-3 mb-6">
+                        <div class="border-l-4 border-blue-600 pl-4 py-2 bg-blue-50 rounded-r">
+                            <h4 class="font-semibold text-gray-800 text-sm" data-translate="resources-issue12-title">Issue #12</h4>
+                            <p class="text-gray-600 text-sm" data-translate="resources-issue12-desc">5 AI Tools That Save SMEs 20+ Hours Weekly</p>
+                        </div>
+                        <div class="border-l-4 border-gray-300 pl-4 py-2">
+                            <h4 class="font-semibold text-gray-800 text-sm" data-translate="resources-issue11-title">Issue #11</h4>
+                            <p class="text-gray-600 text-sm" data-translate="resources-issue11-desc">ChatGPT vs Claude: Which Is Better for Business?</p>
+                        </div>
+                        <div class="border-l-4 border-gray-300 pl-4 py-2">
+                            <h4 class="font-semibold text-gray-800 text-sm" data-translate="resources-issue10-title">Issue #10</h4>
+                            <p class="text-gray-600 text-sm" data-translate="resources-issue10-desc">AI ROI Calculator: Measure Your Success</p>
+                        </div>
+                    </div>
+                    
+                    <a href="#newsletter" class="text-blue-600 font-semibold hover:text-blue-700 transition-colors" data-translate="resources-view-all">View All Issues →</a>
+                </div>
+                
+                <!-- Implementation Guides -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg card-hover fade-in">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-book text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4" data-translate="resources-guides-title">Implementation Guides</h3>
+                    <p class="text-gray-600 mb-6" data-translate="resources-guides-desc">Step-by-step guides for implementing AI solutions in your business operations.</p>
+                    
+                    <!-- Guide Topics -->
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                            <span class="text-gray-700" data-translate="resources-guide1">AI Readiness Assessment</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                            <span class="text-gray-700" data-translate="resources-guide2">Customer Service Automation</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                            <span class="text-gray-700" data-translate="resources-guide3">Process Optimization Framework</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                            <span class="text-gray-700" data-translate="resources-guide4">ROI Measurement Templates</span>
+                        </div>
+                    </div>
+                    
+                    <a href="#contact" class="text-green-600 font-semibold hover:text-green-700 transition-colors" data-translate="resources-access-guides">Access Guides →</a>
+                </div>
+                
+                <!-- Case Studies -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg card-hover fade-in">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-chart-line text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4" data-translate="resources-stories-title">Success Stories</h3>
+                    <p class="text-gray-600 mb-6" data-translate="resources-stories-desc">Real SME case studies with detailed ROI metrics and implementation timelines.</p>
+                    
+                    <!-- Case Study Examples -->
+                    <div class="space-y-3 mb-6">
+                        <div class="border border-gray-200 rounded-lg p-3">
+                            <h4 class="font-semibold text-gray-800 text-sm" data-translate="resources-case1-title">Manufacturing AI</h4>
+                            <p class="text-gray-600 text-sm" data-translate="resources-case1-desc">45% waste reduction in 30 days</p>
+                        </div>
+                        <div class="border border-gray-200 rounded-lg p-3">
+                            <h4 class="font-semibold text-gray-800 text-sm" data-translate="resources-case2-title">Customer Support</h4>
+                            <p class="text-gray-600 text-sm" data-translate="resources-case2-desc">80% faster response times</p>
+                        </div>
+                        <div class="border border-gray-200 rounded-lg p-3">
+                            <h4 class="font-semibold text-gray-800 text-sm" data-translate="resources-case3-title">Data Analytics</h4>
+                            <p class="text-gray-600 text-sm" data-translate="resources-case3-desc">$200K+ annual savings</p>
+                        </div>
+                    </div>
+                    
+                    <button onclick="showDemo()" class="text-purple-600 font-semibold hover:text-purple-700 transition-colors" data-translate="resources-view-cases">View Case Studies →</button>
+                </div>
+            </div>
+            
+            <!-- Featured Content -->
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-8 md:p-12 text-white fade-in">
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4" data-translate="assessment-title">🚀 Free AI Readiness Assessment</h3>
+                        <p class="text-blue-100 mb-6" data-translate="assessment-desc">
+                            Discover your AI implementation potential in 5 minutes. Get a personalized roadmap with specific recommendations and ROI projections.
+                        </p>
+                        <div class="flex flex-wrap gap-3 mb-6">
+                            <span class="bg-blue-500 bg-opacity-50 px-3 py-1 rounded-full text-sm" data-translate="assessment-feature1">✓ Industry-specific insights</span>
+                            <span class="bg-blue-500 bg-opacity-50 px-3 py-1 rounded-full text-sm" data-translate="assessment-feature2">✓ Cost-benefit analysis</span>
+                            <span class="bg-blue-500 bg-opacity-50 px-3 py-1 rounded-full text-sm" data-translate="assessment-feature3">✓ Implementation timeline</span>
+                        </div>
+                        <button onclick="scrollToContact()" class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors transform hover:scale-105" data-translate="assessment-button">
+                            Start Assessment
+                        </button>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-white bg-opacity-10 rounded-2xl p-6 backdrop-blur-sm">
+                            <i class="fas fa-clipboard-check text-4xl mb-4"></i>
+                            <h4 class="text-xl font-semibold mb-2" data-translate="assessment-preview-title">Assessment Preview</h4>
+                            <p class="text-blue-100 text-sm mb-4" data-translate="assessment-preview-quote">"Takes 5 minutes, saves months of planning"</p>
+                            <div class="text-2xl font-bold" data-translate="assessment-completed">500+ completed</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section id="process" class="py-20">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4" data-translate="process-title">Implement AI with Speed, Precision, and Confidence</h2>
+                <p class="text-xl text-gray-600" data-translate="process-subtitle">A clear 4-step process that takes you from uncertainty to results</p>
+            </div>
+            
+            <div class="max-w-4xl mx-auto">
+                <div class="relative">
+                    <!-- Timeline line -->
+                    <div class="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-blue-200"></div>
+                    
+                    <!-- Process steps -->
+                    <div class="space-y-12">
+                        <!-- Step 1 -->
+                        <div class="flex items-center fade-in">
+                            <div class="w-1/2 text-right pr-8">
+                                <h3 class="text-xl font-semibold text-gray-800 mb-2" data-translate="process-step1-title">Schedule AI Readiness Consultation</h3>
+                                <p class="text-gray-600" data-translate="process-step1-desc">We analyze your business needs and identify the highest-impact AI opportunities. Clear assessment, no overwhelm.</p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold relative z-10">
+                                1
+                            </div>
+                            <div class="w-1/2 pl-8"></div>
+                        </div>
+                        
+                        <!-- Step 2 -->
+                        <div class="flex items-center fade-in">
+                            <div class="w-1/2 pr-8"></div>
+                            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold relative z-10">
+                                2
+                            </div>
+                            <div class="w-1/2 pl-8">
+                                <h3 class="text-xl font-semibold text-gray-800 mb-2" data-translate="process-step2-title">Assess Your AI Opportunities</h3>
+                                <p class="text-gray-600" data-translate="process-step2-desc">We understand your business needs and see exactly how AI can help. Tailored roadmap, clear next steps.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 3 -->
+                        <div class="flex items-center fade-in">
+                            <div class="w-1/2 text-right pr-8">
+                                <h3 class="text-xl font-semibold text-gray-800 mb-2" data-translate="process-step3-title">Review Implementation Plan</h3>
+                                <p class="text-gray-600" data-translate="process-step3-desc">We review our detailed roadmap and agree on next steps. Clear timeline, transparent process, no surprises.</p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold relative z-10">
+                                3
+                            </div>
+                            <div class="w-1/2 pl-8"></div>
+                        </div>
+                        
+                        <!-- Step 4 -->
+                        <div class="flex items-center fade-in">
+                            <div class="w-1/2 pr-8"></div>
+                            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold relative z-10">
+                                4
+                            </div>
+                            <div class="w-1/2 pl-8">
+                                <h3 class="text-xl font-semibold text-gray-800 mb-2" data-translate="process-step4-title">Implement with Speed, Precision, and Confidence</h3>
+                                <p class="text-gray-600" data-translate="process-step4-desc">Transform your business operations with AI solutions that deliver measurable results from day one.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Values Section -->
+    <section class="py-20 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4" data-translate="values-title">Our AI Implementation Values</h2>
+                <p class="text-xl text-gray-600" data-translate="values-subtitle">The principles that guide every RapidAI project</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Value 1 -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg card-hover fade-in">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-bullseye text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4" data-translate="value1-title">SME Focus</h3>
+                    <p class="text-gray-600" data-translate="value1-description">
+                        We prioritize the unique needs of small and medium enterprises. We understand your challenges, resource constraints, and growth ambitions. Every solution is designed specifically for SME success.
+                    </p>
+                </div>
+                
+                <!-- Value 2 -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg card-hover fade-in">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-shield-alt text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4" data-translate="value2-title">Technical Excellence</h3>
+                    <p class="text-gray-600" data-translate="value2-description">
+                        We uphold the highest standards of technical implementation and AI best practices. We stay current with industry trends and deliver solutions that are robust, scalable, and future-ready.
+                    </p>
+                </div>
+                
+                <!-- Value 3 -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg card-hover fade-in">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-comments text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4" data-translate="value3-title">Clear Communication</h3>
+                    <p class="text-gray-600" data-translate="value3-description">
+                        We believe in transparent, jargon-free communication. We explain complex AI concepts in business terms you understand, keeping you informed every step of the way.
+                    </p>
+                </div>
+                
+                <!-- Value 4 -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg card-hover fade-in">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-handshake text-indigo-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4" data-translate="value4-title">Long-Term Partnership</h3>
+                    <p class="text-gray-600" data-translate="value4-description">
+                        We aim to be your trusted AI advisor for the long term. We provide guidance and support throughout your AI journey, fostering lasting relationships based on mutual success.
+                    </p>
+                </div>
+                
+                <!-- Value 5 -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg card-hover fade-in">
+                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-rocket text-red-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4" data-translate="value5-title">Rapid Results</h3>
+                    <p class="text-gray-600" data-translate="value5-description">
+                        We are committed to delivering value quickly. We focus on implementations that show measurable ROI in weeks, not months, ensuring your AI investment pays off fast.
+                    </p>
+                </div>
+                
+                <!-- Value 6 -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg card-hover fade-in">
+                    <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-chart-line text-orange-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4" data-translate="value6-title">Measurable Impact</h3>
+                    <p class="text-gray-600" data-translate="value6-description">
+                        We take responsibility for delivering quantifiable results. We track metrics, measure ROI, and ensure your AI solutions create real business value you can see and measure.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Values CTA -->
+            <div class="text-center mt-16 fade-in">
+                <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 text-white">
+                    <h3 class="text-2xl font-bold mb-4" data-translate="values-cta-title">Ready to Experience These Values in Action?</h3>
+                    <p class="text-blue-100 mb-6" data-translate="values-cta-subtitle">Let's discuss how our approach can transform your business operations with AI.</p>
+                    <button onclick="scrollToContact()" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors transform hover:scale-105" data-translate="cta-journey">
+                        Start Your AI Journey
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-20 bg-gray-100">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4" data-translate="testimonials-title">Client Success Stories</h2>
+                <p class="text-xl text-gray-600" data-translate="testimonials-subtitle">See how businesses are thriving with RapidAI solutions</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg fade-in">
+                    <!-- Company Badge -->
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-blue-100 px-3 py-1 rounded-full">
+                            <span class="text-blue-800 text-xs font-semibold">SaaS • 50+ employees</span>
+                        </div>
+                        <div class="text-green-600 text-sm font-semibold">2 weeks delivery</div>
+                    </div>
+                    
+                    <div class="flex items-center mb-4">
+                        <img src="https://picsum.photos/seed/client1/60/60" alt="Client" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-semibold text-gray-800">Sarah Martinez</h4>
+                            <p class="text-sm text-gray-600">CEO, TechFlow Solutions</p>
+                            <div class="flex items-center mt-1">
+                                <i class="fab fa-linkedin text-blue-600 text-xs mr-1"></i>
+                                <span class="text-xs text-gray-500">Verified on LinkedIn</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex mb-4">
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                    </div>
+                    
+                    <p class="text-gray-600 mb-4" data-translate="testimonial1-quote">"Jose delivered our AI chatbot in just 2 weeks. Our customer response time improved by 80% and customer satisfaction scores are at an all-time high."</p>
+                    
+                    <!-- Results Metrics -->
+                    <div class="border-t pt-4 grid grid-cols-2 gap-4 text-center">
+                        <div>
+                            <div class="text-2xl font-bold text-green-600">80%</div>
+                            <div class="text-xs text-gray-500" data-translate="testimonial1-metric1">Faster Response</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-blue-600">95%</div>
+                            <div class="text-xs text-gray-500" data-translate="testimonial1-metric2">Satisfaction</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg fade-in">
+                    <!-- Company Badge -->
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-green-100 px-3 py-1 rounded-full">
+                            <span class="text-green-800 text-xs font-semibold">Retail • 100+ employees</span>
+                        </div>
+                        <div class="text-green-600 text-sm font-semibold">3 weeks delivery</div>
+                    </div>
+                    
+                    <div class="flex items-center mb-4">
+                        <img src="https://picsum.photos/seed/client2/60/60" alt="Client" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-semibold text-gray-800">David Chen</h4>
+                            <p class="text-sm text-gray-600">Operations Manager, SmartRetail</p>
+                            <div class="flex items-center mt-1">
+                                <i class="fab fa-linkedin text-blue-600 text-xs mr-1"></i>
+                                <span class="text-xs text-gray-500">18 months partnership</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex mb-4">
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                    </div>
+                    
+                    <p class="text-gray-600 mb-4" data-translate="testimonial2-quote">"The inventory prediction system Jose built has reduced our waste by 45% and increased profits by 30%. The ROI was immediate and significant."</p>
+                    
+                    <!-- Results Metrics -->
+                    <div class="border-t pt-4 grid grid-cols-2 gap-4 text-center">
+                        <div>
+                            <div class="text-2xl font-bold text-green-600">45%</div>
+                            <div class="text-xs text-gray-500" data-translate="testimonial2-metric1">Waste Reduction</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-purple-600">30%</div>
+                            <div class="text-xs text-gray-500" data-translate="testimonial2-metric2">Profit Increase</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg fade-in">
+                    <!-- Company Badge -->
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-purple-100 px-3 py-1 rounded-full">
+                            <span class="text-purple-800 text-xs font-semibold">Healthcare • Startup</span>
+                        </div>
+                        <div class="text-green-600 text-sm font-semibold">4 weeks delivery</div>
+                    </div>
+                    
+                    <div class="flex items-center mb-4">
+                        <img src="https://picsum.photos/seed/client3/60/60" alt="Client" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-semibold text-gray-800">Lisa Thompson</h4>
+                            <p class="text-sm text-gray-600">Founder, HealthCore Analytics</p>
+                            <div class="flex items-center mt-1">
+                                <i class="fab fa-linkedin text-blue-600 text-xs mr-1"></i>
+                                <span class="text-xs text-gray-500">Series A funded</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex mb-4">
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                    </div>
+                    
+                    <p class="text-gray-600 mb-4" data-translate="testimonial3-quote">"Jose's expertise in AI and rapid implementation approach saved us months of development time. Our predictive analytics platform is now our competitive advantage."</p>
+                    
+                    <!-- Results Metrics -->
+                    <div class="border-t pt-4 grid grid-cols-2 gap-4 text-center">
+                        <div>
+                            <div class="text-2xl font-bold text-green-600">6 months</div>
+                            <div class="text-xs text-gray-500" data-translate="testimonial3-metric1">Time Saved</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-blue-600">200%</div>
+                            <div class="text-xs text-gray-500" data-translate="testimonial3-metric2">ROI Achieved</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Client Credibility Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12 fade-in">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4" data-translate="clients-title">Trusted by Forward-Thinking SMEs</h2>
+                <p class="text-gray-600" data-translate="clients-subtitle">Join innovative technology companies that have transformed their operations with AI</p>
+            </div>
+            
+            <!-- Client Logos Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center opacity-70 hover:opacity-100 transition-opacity duration-300">
+                <!-- Placeholder Logo 1 -->
+                <div class="bg-gray-100 rounded-lg p-6 flex items-center justify-center h-20 hover:bg-blue-50 transition-colors fade-in">
+                    <div class="text-gray-400 text-center">
+                        <i class="fas fa-building text-2xl mb-1"></i>
+                        <p class="text-xs font-medium">TechCorp</p>
+                    </div>
+                </div>
+                
+                <!-- Placeholder Logo 2 -->
+                <div class="bg-gray-100 rounded-lg p-6 flex items-center justify-center h-20 hover:bg-blue-50 transition-colors fade-in">
+                    <div class="text-gray-400 text-center">
+                        <i class="fas fa-cogs text-2xl mb-1"></i>
+                        <p class="text-xs font-medium">InnoSoft</p>
+                    </div>
+                </div>
+                
+                <!-- Placeholder Logo 3 -->
+                <div class="bg-gray-100 rounded-lg p-6 flex items-center justify-center h-20 hover:bg-blue-50 transition-colors fade-in">
+                    <div class="text-gray-400 text-center">
+                        <i class="fas fa-rocket text-2xl mb-1"></i>
+                        <p class="text-xs font-medium">StartupAI</p>
+                    </div>
+                </div>
+                
+                <!-- Placeholder Logo 4 -->
+                <div class="bg-gray-100 rounded-lg p-6 flex items-center justify-center h-20 hover:bg-blue-50 transition-colors fade-in">
+                    <div class="text-gray-400 text-center">
+                        <i class="fas fa-chart-line text-2xl mb-1"></i>
+                        <p class="text-xs font-medium">DataFlow</p>
+                    </div>
+                </div>
+                
+                <!-- Placeholder Logo 5 -->
+                <div class="bg-gray-100 rounded-lg p-6 flex items-center justify-center h-20 hover:bg-blue-50 transition-colors fade-in">
+                    <div class="text-gray-400 text-center">
+                        <i class="fas fa-microchip text-2xl mb-1"></i>
+                        <p class="text-xs font-medium">SmartTech</p>
+                    </div>
+                </div>
+                
+                <!-- Placeholder Logo 6 -->
+                <div class="bg-gray-100 rounded-lg p-6 flex items-center justify-center h-20 hover:bg-blue-50 transition-colors fade-in">
+                    <div class="text-gray-400 text-center">
+                        <i class="fas fa-brain text-2xl mb-1"></i>
+                        <p class="text-xs font-medium">NeuroSys</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Client Success Metrics -->
+            <div class="grid md:grid-cols-3 gap-8 mt-16 text-center">
+                <div class="fade-in">
+                    <div class="text-3xl font-bold text-blue-600 mb-2">50+</div>
+                    <p class="text-gray-600" data-translate="stat-projects">AI Projects Delivered</p>
+                </div>
+                <div class="fade-in">
+                    <div class="text-3xl font-bold text-green-600 mb-2">98%</div>
+                    <p class="text-gray-600" data-translate="stat-satisfaction">Client Satisfaction Rate</p>
+                </div>
+                <div class="fade-in">
+                    <div class="text-3xl font-bold text-purple-600 mb-2">30%</div>
+                    <p class="text-gray-600" data-translate="stat-efficiency">Average Efficiency Gain</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="py-20 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-white rounded-3xl shadow-xl overflow-hidden">
+                    <div class="grid md:grid-cols-2 items-center">
+                        <!-- Newsletter Content -->
+                        <div class="p-8 md:p-12">
+                            <div class="flex items-center mb-6">
+                                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-envelope text-blue-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-bold text-gray-800" data-translate="newsletter-name">RapidAI Weekly</h3>
+                                    <p class="text-sm text-gray-600" data-translate="newsletter-tagline">#1 AI Newsletter for SMEs</p>
+                                </div>
+                            </div>
+                            
+                            <h2 class="text-3xl font-bold text-gray-800 mb-4" data-translate="newsletter-title">
+                                Get Weekly AI Insights That Actually Work
+                            </h2>
+                            
+                            <p class="text-gray-600 mb-6" data-translate="newsletter-description">
+                                Join <strong>500+ tech SME leaders</strong> who get practical AI implementation strategies, tools, and case studies delivered every Tuesday. No fluff, just actionable insights.
+                            </p>
+                            
+                            <div class="space-y-3 mb-8">
+                                <div class="flex items-center text-gray-700">
+                                    <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                                    <span data-translate="newsletter-feature1">Weekly AI tool reviews and comparisons</span>
+                                </div>
+                                <div class="flex items-center text-gray-700">
+                                    <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                                    <span data-translate="newsletter-feature2">Real SME implementation case studies</span>
+                                </div>
+                                <div class="flex items-center text-gray-700">
+                                    <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                                    <span data-translate="newsletter-feature3">ROI calculators and assessment frameworks</span>
+                                </div>
+                                <div class="flex items-center text-gray-700">
+                                    <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                                    <span data-translate="newsletter-feature4">Exclusive early access to resources</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Newsletter Signup Form -->
+                            <form id="newsletterForm" class="space-y-4">
+                                <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3">
+                                    <input 
+                                        type="email" 
+                                        placeholder="Enter your business email" data-translate-placeholder="newsletter-placeholder" 
+                                        class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200" 
+                                        required
+                                    >
+                                    <button 
+                                        type="submit" 
+                                        class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors transform hover:scale-105"
+                                    >
+                                        <span data-translate="newsletter-join">Join Free</span>
+                                    </button>
+                                </div>
+                                <p class="text-xs text-gray-500">
+                                    <span data-translate="newsletter-note">Free forever. No spam. Unsubscribe anytime. 2,000+ SME leaders trust us.</span>
+                                </p>
+                            </form>
+                        </div>
+                        
+                        <!-- Newsletter Preview -->
+                        <div class="bg-gradient-to-br from-blue-50 to-indigo-100 p-8 md:p-12 h-full">
+                            <div class="bg-white rounded-2xl shadow-lg p-6 transform rotate-3 hover:rotate-0 transition-transform duration-300">
+                                <div class="border-l-4 border-blue-600 pl-4 mb-4">
+                                    <h4 class="font-bold text-gray-800" data-translate="newsletter-issue-number">RapidAI Weekly #12</h4>
+                                    <p class="text-sm text-gray-600" data-translate="newsletter-latest-issue">Latest Issue</p>
+                                </div>
+                                
+                                <h5 class="text-lg font-semibold text-gray-800 mb-3" data-translate="newsletter-issue-title">
+                                    "5 AI Tools That Save SMEs 20+ Hours Weekly"
+                                </h5>
+                                
+                                <div class="space-y-2 text-sm text-gray-600">
+                                    <p data-translate="newsletter-content1">📊 Tool Comparison: Claude vs ChatGPT for Business</p>
+                                    <p data-translate="newsletter-content2">🏭 Case Study: Manufacturing AI ROI in 30 Days</p>
+                                    <p data-translate="newsletter-content3">🛠️ Free Template: AI Implementation Checklist</p>
+                                    <p data-translate="newsletter-content4">💡 Quick Win: Automate Customer Support</p>
+                                </div>
+                                
+                                <div class="mt-4 pt-4 border-t border-gray-200">
+                                    <div class="flex justify-between text-xs text-gray-500">
+                                        <span data-translate="newsletter-read-time">5 min read</span>
+                                        <span data-translate="newsletter-open-rate">98% open rate</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-gradient-to-r from-blue-600 to-indigo-600">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl font-bold text-white mb-6 fade-in" data-translate="cta-title">Ready to Accelerate with AI?</h2>
+            <p class="text-xl text-blue-100 mb-8 fade-in" data-translate="cta-subtitle">Let's discuss how RapidAI can transform your business in weeks, not months</p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center fade-in">
+                <button onclick="scrollToContact()" class="bg-white text-blue-600 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-colors transform hover:scale-105" data-translate="cta-consultation">
+                    Schedule a Free Consultation
+                </button>
+                <button onclick="showDemo()" class="border-2 border-white text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-blue-600 transition-all transform hover:scale-105" data-translate="cta-case-studies">
+                    View Case Studies
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-12 fade-in">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-4" data-translate="contact-title">Let's Talk AI</h2>
+                    <p class="text-xl text-gray-600" data-translate="contact-subtitle">Ready to transform your business with rapid AI implementation?</p>
+                </div>
+                
+                <form id="contactForm" class="bg-white p-8 rounded-2xl shadow-lg fade-in">
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2" data-translate="contact-first-name">First Name</label>
+                            <input type="text" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2" data-translate="contact-last-name">Last Name</label>
+                            <input type="text" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2" data-translate="contact-company">Company Name</label>
+                            <input type="text" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2" data-translate="contact-industry">Industry</label>
+                            <select class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                                <option value="" data-translate="contact-select-industry">Select Industry</option>
+                                <option value="retail" data-translate="contact-industry-retail">Retail</option>
+                                <option value="manufacturing" data-translate="contact-industry-manufacturing">Manufacturing</option>
+                                <option value="healthcare" data-translate="contact-industry-healthcare">Healthcare</option>
+                                <option value="finance" data-translate="contact-industry-finance">Finance</option>
+                                <option value="technology" data-translate="contact-industry-technology">Technology</option>
+                                <option value="services" data-translate="contact-industry-services">Services</option>
+                                <option value="other" data-translate="contact-industry-other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-gray-700 font-semibold mb-2" data-translate="contact-email">Email Address</label>
+                        <input type="email" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-gray-700 font-semibold mb-2" data-translate="contact-phone">Phone Number</label>
+                        <input type="tel" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-gray-700 font-semibold mb-2" data-translate="contact-project">Project Description</label>
+                        <textarea rows="4" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-blue-500" data-translate="contact-placeholder" placeholder="Tell me about your business challenges and AI goals..." required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-blue-600 text-white py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors transform hover:scale-105" data-translate="contact-submit">
+                        Request Free Consultation
+                    </button>
+                </form>
+                
+                <div class="mt-12 grid md:grid-cols-3 gap-8 text-center fade-in">
+                    <div>
+                        <i class="fas fa-envelope text-blue-600 text-3xl mb-4"></i>
+                        <h4 class="font-semibold text-gray-800 mb-2" data-translate="contact-email-me">Email Me</h4>
+                        <p class="text-gray-600">jose@rapidai.com</p>
+                    </div>
+                    <div>
+                        <i class="fas fa-phone text-blue-600 text-3xl mb-4"></i>
+                        <h4 class="font-semibold text-gray-800 mb-2" data-translate="contact-call-me">Call Me</h4>
+                        <p class="text-gray-600">+1 (555) 123-RAPID</p>
+                    </div>
+                    <div>
+                        <i class="fas fa-calendar text-blue-600 text-3xl mb-4"></i>
+                        <h4 class="font-semibold text-gray-800 mb-2" data-translate="contact-schedule-call">Schedule a Call</h4>
+                        <p class="text-gray-600" data-translate="contact-availability">Available Mon-Fri 9AM-6PM EST</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i class="fas fa-rocket text-3xl"></i>
+                        <span class="text-xl font-bold">RapidAI</span>
+                    </div>
+                    <p class="text-gray-400" data-translate="footer-tagline">Rapid AI implementation for business transformation.</p>
+                    <p class="text-gray-400 mt-2" data-translate="footer-author">By Jose Ruiz</p>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4" data-translate="footer-services">Services</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors" data-translate="footer-ai-strategy">AI Strategy</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors" data-translate="footer-automation">Process Automation</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors" data-translate="footer-custom-ai">Custom AI Solutions</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors" data-translate="footer-implementation">Implementation</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4" data-translate="footer-resources">Resources</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors" data-translate="footer-blog">Blog</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors" data-translate="footer-case-studies">Case Studies</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors" data-translate="footer-insights">AI Insights</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors" data-translate="footer-consultation">Consultation</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4" data-translate="footer-connect">Connect</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-linkedin text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-github text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p data-translate="footer-copyright">&copy; 2024 RapidAI by Jose Ruiz. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Demo Modal -->
+    <div id="demoModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-3xl w-full p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800" data-translate="modal-title">RapidAI Case Studies</h3>
+                <button onclick="closeDemo()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
+                <p class="text-gray-500" data-translate="modal-content">Case study content would be displayed here</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>
