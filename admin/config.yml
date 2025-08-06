@@ -7,7 +7,7 @@ local_backend: true
 
 # Internationalization settings
 i18n:
-  structure: multiple_folders
+  structure: multiple_files
   locales: [en, es, fr]
   default_locale: en
 
