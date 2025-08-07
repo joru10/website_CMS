@@ -4,11 +4,15 @@
   "description": "RapidAI static website with Decap CMS editing UI",
   "private": true,
   "scripts": {
+    "cms:dev": "staticcms dev --config admin/config.yml --content .",
     "start": "serve -l 5501 .",
     "cms": "netlify-cms-proxy-server",
     "dev": "npm-run-all --parallel start cms"
   },
   "devDependencies": {
+    "@staticcms/cli": "^3.0.0",
+    "gray-matter": "^4.0.3",
+    "js-yaml": "^4.1.0",
     "netlify-cms-proxy-server": "^1.0.0",
     "npm-run-all": "^4.1.5",
     "serve": "^14.2.0"
