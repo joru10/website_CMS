@@ -2,7 +2,7 @@ backend:
   name: github
   repo: joru10/website_CMS
   branch: main
-  auth_type: implicit
+  auth_type: pkce
   app_id: Ov23lihO7foR9SHf6I3s
 
 
