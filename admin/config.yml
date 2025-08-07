@@ -4,6 +4,9 @@ backend:
   branch: main
   auth_type: pkce
   app_id: Ov23lihO7foR9SHf6I3s
+  base_url: https://github.com/login/oauth
+  auth_endpoint: /authorize
+  token_endpoint: /access_token
 
 
 
