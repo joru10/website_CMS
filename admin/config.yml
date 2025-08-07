@@ -29,8 +29,6 @@ collections:
       - { label: "Icon",         name: "icon",         widget: "string" }
       - { label: "Order",        name: "order",        widget: "number",  value_type: "int" }
       - { label: "Featured",     name: "featured",     widget: "boolean" }
-      - { label: "Order", name: "order", widget: "number", value_type: "int", default: 0 }
-      - { label: "Featured", name: "featured", widget: "boolean", default: false }
 
   # ---- Translations ----
   - name: "translations"
