@@ -19,6 +19,8 @@ collections:
   - name: "services"
     label: "Services"
     folder: "content/services"
+    nested:
+      depth: 1
     create: true
     slug: "{{slug}}"
     i18n: true
