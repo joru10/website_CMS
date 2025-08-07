@@ -1,7 +1,6 @@
 backend:
-  name: file-system
+  name: git-gateway
   branch: main
-  api_root: http://localhost:8081/api
 
 # This is required for local development.
 local_backend: true
