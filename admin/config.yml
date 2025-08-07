@@ -34,25 +34,6 @@ collections:
       - { label: "Featured", name: "featured", widget: "boolean", default: false }
 
   # ---- Translations ----
-collections:
-  - name: "services"
-    label: "Services"
-    label_singular: "Service"
-    folder: "content/services"
-    create: true
-    slug: "{{slug}}"
-    i18n: true
-    format: frontmatter
-    editor:
-      preview: false
-    fields:
-      - { label: "Title", name: "title", widget: "string", i18n: true }
-      - { label: "Description", name: "description", widget: "markdown", i18n: true }
-      - { label: "Icon", name: "icon", widget: "string", i18n: "duplicate" }
-      - { label: "Order", name: "order", widget: "number", value_type: "int", default: 0 }
-      - { label: "Featured", name: "featured", widget: "boolean", default: false }
-
-  # ---- Translations ----
   - name: "translations"
     label: "Translations"
     label_singular: "Translation file"
