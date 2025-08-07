@@ -21,7 +21,7 @@ collections:
     label_singular: "Service"
     folder: "content/services"
     nested:
-      depth: 2
+      depth: 1
     format: frontmatter
     create: true
     slug: "{{slug}}"
