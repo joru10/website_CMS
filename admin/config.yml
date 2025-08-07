@@ -20,8 +20,6 @@ collections:
     label: "Services"
     label_singular: "Service"
     folder: "content/services"
-    nested:
-      depth: 1
     create: true
     slug: "{{slug}}"
     i18n: true
@@ -31,7 +29,7 @@ collections:
     fields:
       - { label: "Title", name: "title", widget: "string", i18n: true }
       - { label: "Description", name: "description", widget: "markdown", i18n: true }
-      - { label: "Icon", name: "icon", widget: "string", i18n: "duplicate" }
+      - { label: "Icon", name: "icon", widget: "string", i18n: duplicate }
       - { label: "Order", name: "order", widget: "number", value_type: "int", default: 0 }
       - { label: "Featured", name: "featured", widget: "boolean", default: false }
 
