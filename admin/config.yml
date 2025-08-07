@@ -18,14 +18,17 @@ media_folder: "static/uploads"
 collections:
   - name: "services"
     label: "Services"
-    label_singular: "Service"
     folder: "content/services"
-    nested:
-      depth: 1
     create: true
     slug: "{{slug}}"
     i18n: true
     format: frontmatter
+    fields:
+      - { label: "Title",        name: "title",        widget: "string",   i18n: true }
+      - { label: "Description",  name: "description",  widget: "markdown", i18n: true }
+      - { label: "Icon",         name: "icon",         widget: "string" }
+      - { label: "Order",        name: "order",        widget: "number",  value_type: "int" }
+      - { label: "Featured",     name: "featured",     widget: "boolean" }
     editor:
       preview: false
     fields:
