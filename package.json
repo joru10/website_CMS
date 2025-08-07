@@ -10,7 +10,7 @@
     "dev": "npm-run-all --parallel start cms"
   },
   "devDependencies": {
-    "@staticcms/cli": "^3.0.0",
+    "@staticcms/cli": "^0.9.0",
     "gray-matter": "^4.0.3",
     "js-yaml": "^4.1.0",
     "netlify-cms-proxy-server": "^1.0.0",
