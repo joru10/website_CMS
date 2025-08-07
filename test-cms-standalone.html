@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Standalone CMS Test</title>
+  <!-- Load React and ReactDOM -->
+  <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+  <!-- Load Netlify CMS -->
+  <script src="https://unpkg.com/netlify-cms@^2.10.0/dist/netlify-cms.js"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: 20px; }
+    #cms-root { max-width: 800px; margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <h1>Standalone CMS Test</h1>
+  <div id="cms-root"></div>
+
+  <script>
+    console.log('=== Starting CMS Test ===');
+    
+    // Check if React is loaded
+    console.log('React:', window.React ? 'Loaded' : 'Not loaded');
+    console.log('ReactDOM:', window.ReactDOM ? 'Loaded' : 'Not loaded');
+    console.log('CMS:', window.CMS ? 'Loaded' : 'Not loaded');
+    
+    if (window.CMS) {
+      console.log('Initializing CMS...');
+      
+      const config = {
+        backend: {
+          name: 'github',
+          repo: 'joru10/website_CMS',
+          branch: 'main',
+        },
+        media_folder: 'static/uploads',
+        public_folder: '/uploads',
+        logo_url: 'https://www.netlifycms.org/img/logo.svg',
+        collections: [
+          {
+            name: 'test',
+            label: 'Test Collection',
+            folder: 'content/test',
+            create: true,
+            fields: [
+              { name: 'title', label: 'Title', widget: 'string' },
+              { name: 'body', label: 'Body', widget: 'markdown' }
+            ]
+          }
+        ]
+      };
+      
+      console.log('Config:', config);
+      
+      // Initialize with explicit mount point
+      const CMS = window.CMS;
+      CMS.init({
+        config: config,
+        load_config_file: false
+      });
+      
+      // Mount manually
+      const root = document.getElementById('cms-root');
+      if (root) {
+        console.log('Mounting CMS to #cms-root');
+        CMS.registerPreviewStyle('https://unpkg.com/netlify-cms@^2.10.0/dist/cms.css');
+        CMS.registerPreviewStyle('https://unpkg.com/netlify-cms@^2.10.0/dist/cms.js');
+        ReactDOM.render(
+          React.createElement(CMS.CMS, {
+            cms: CMS,
+            config: config
+          }),
+          root
+        );
+        console.log('CMS should be mounted');
+      } else {
+        console.error('Could not find #cms-root element');
+      }
+    } else {
+      console.error('CMS not found');
+    }
+  </script>
+</body>
+</html>
