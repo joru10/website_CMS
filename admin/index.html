@@ -4,52 +4,31 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Content Manager | RapidAI</title>
-  <!-- Load Netlify CMS -->
   <script src="https://unpkg.com/netlify-cms@^2.10.192/dist/netlify-cms.js"></script>
-  <style>
-    html, body { margin: 0; padding: 0; height: 100%; }
-    #nc-root { min-height: 100vh; }
-  </style>
 </head>
 <body>
-  <!-- Mount point for the CMS -->
-  <div id="nc-root"></div>
-
   <script>
-    // Use the global CMS object directly
-    if (window.CMS) {
-      // Register the configuration
-      CMS.registerBackend('github', window.CMS.getBackend('github'));
-      
-      // Initialize with configuration
+    // Create a basic CMS config
+    const config = {
+      backend: {
+        name: 'github',
+        repo: 'joru10/website_CMS',
+        branch: 'main',
+        auth_endpoint: 'api/auth'
+      },
+      media_folder: 'static/uploads',
+      public_folder: '/uploads'
+    };
+
+    // Initialize CMS with the config
+    if (typeof CMS !== 'undefined') {
       CMS.init({
-        config: {
-          backend: {
-            name: 'github',
-            repo: 'joru10/website_CMS',
-            branch: 'main',
-            auth_endpoint: 'api/auth'
-          },
-          media_folder: 'static/uploads',
-          public_folder: '/uploads',
-          collections: [
-            {
-              name: 'test',
-              label: 'Test Collection',
-              folder: 'content/test',
-              create: true,
-              fields: [
-                { name: 'title', label: 'Title', widget: 'string' },
-                { name: 'body', label: 'Body', widget: 'markdown' }
-              ]
-            }
-          ]
-        }
+        config: config,
+        load_config_file: false
       });
-      
-      console.log('Netlify CMS is initialized');
+      console.log('CMS initialized with config:', config);
     } else {
-      console.error('Netlify CMS could not be initialized');
+      console.error('CMS object not found');
     }
   </script>
 </body>
