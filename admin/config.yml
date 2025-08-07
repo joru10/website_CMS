@@ -22,6 +22,8 @@ collections:
     folder: "content/services"
     nested:
       depth: 1
+    extension: md
+    path: "{{slug}}/index"
     create: true
     slug: "{{slug}}"
     i18n: true
