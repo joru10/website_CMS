@@ -1,4 +1,6 @@
 backend:
+  name: test-repo
+collections: []
   name: github
   repo: joru10/website_CMS
   branch: main
