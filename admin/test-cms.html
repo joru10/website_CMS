@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test CMS</title>
+  <script src="https://unpkg.com/netlify-cms@^2.10.0/dist/netlify-cms.js"></script>
+</head>
+<body>
+  <h1>Testing Netlify CMS</h1>
+  <div id="cms"></div>
+  
+  <script>
+    console.log('Script running...');
+    console.log('CMS object:', window.CMS);
+    
+    if (window.CMS) {
+      console.log('CMS found, initializing...');
+      
+      const config = {
+        backend: {
+          name: 'github',
+          repo: 'joru10/website_CMS',
+          branch: 'main',
+        },
+        media_folder: 'static/uploads',
+        public_folder: '/uploads',
+        collections: [
+          {
+            name: 'test',
+            label: 'Test',
+            folder: 'content/test',
+            create: true,
+            fields: [
+              { name: 'title', label: 'Title', widget: 'string' },
+              { name: 'body', label: 'Body', widget: 'markdown' }
+            ]
+          }
+        ]
+      };
+      
+      console.log('Config:', config);
+      
+      CMS.init({
+        config: config,
+        load_config_file: false
+      });
+      
+      console.log('CMS initialized');
+    } else {
+      console.error('CMS not found');
+    }
+  </script>
+</body>
+</html>
