@@ -4,51 +4,42 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Content Manager | RapidAI</title>
-  
-  <!-- This script MUST come before the main CMS script -->
-  <script>
-    window.CMS_MANUAL_INIT = true;
-  </script>
-  
-  <!-- Main Netlify CMS script -->
   <script src="https://unpkg.com/netlify-cms@^2.10.192/dist/netlify-cms.js"></script>
+  <script>
+    // Minimal config to test CMS loading
+    CMS.registerPreviewStyle('/admin/cms.css');
+    
+    const config = {
+      backend: {
+        name: 'github',
+        repo: 'joru10/website_CMS',
+        branch: 'main'
+      },
+      media_folder: 'static/uploads',
+      public_folder: '/uploads',
+      collections: [
+        {
+          name: 'test',
+          label: 'Test Collection',
+          folder: 'content/test',
+          create: true,
+          fields: [
+            { name: 'title', label: 'Title', widget: 'string' },
+            { name: 'body', label: 'Body', widget: 'markdown' }
+          ]
+        }
+      ]
+    };
+    
+    // Initialize CMS with the config
+    CMS.init({ config });
+  </script>
 </head>
 <body>
-  <!-- 
-    Initialize the CMS.
-    We are now hard-coding the path to the config file to eliminate any
-    potential errors with dynamic URL generation.
-  -->
+  <!-- Script is loaded in head for immediate execution -->
   <script>
-    window.CMS.init({
-      load_config_file: false,
-      config: {
-        backend: {
-          name: 'github',
-          repo: 'joru10/website_CMS',
-          branch: 'main',
-          auth_type: 'pkce',
-          app_id: 'Ov23lihO7foR9SHf6I3s',
-          base_url: 'https://comfy-panda-0d488a.netlify.app/.netlify/identity',
-          auth_endpoint: 'authorize',
-          token_endpoint: 'token'
-        },
-        media_folder: "static/uploads",
-        public_folder: "/uploads",
-        collections: [
-          {
-            name: "services",
-            label: "Services",
-            folder: "content/services",
-            create: true,
-            fields: [
-              { name: "title", label: "Title", widget: "string" },
-              { name: "body", label: "Body", widget: "markdown" }
-            ]
-          }
-        ]
-      }
-    });
+    // Add any additional initialization code here
+    console.log('CMS initialized with config:', config);
   </script>
 </body>
 </html>
