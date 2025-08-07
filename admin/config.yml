@@ -2,11 +2,10 @@ backend:
   name: github
   repo: joru10/website_CMS
   branch: main
-  client_id: Ov23lihO7foR9SHf6I3s
-  client_secret: a42920df00df2fafd3f499e2796b25aa97556438
+  auth_type: implicit
+  app_id: Ov23lihO7foR9SHf6I3s
 
-# This is required for local development.
-local_backend: true
+
 
 # Internationalization settings
 i18n:
