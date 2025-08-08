@@ -1,4 +1,9 @@
-# External config intentionally left empty
+backend:
+  name: test-repo
+
+# The "backend" setting is for development pointing to a test repository.
+# For production, you'll need to switch to the "github" backend and configure authentication.
+# See: https://decapcms.org/docs/authentication-backends/
 
   
   

@@ -7,44 +7,6 @@
   <script src="https://unpkg.com/decap-cms@^3/dist/decap-cms.js"></script>
 </head>
 <body>
-  <div id="nc-root"></div>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const cfg = {
-        backend: {
-          name: 'github',
-          repo: 'joru10/website_CMS',
-          branch: 'main',
-          // OAuth provider (deploy separately). Replace placeholder before use.
-          base_url: 'https://REPLACE_WITH_OAUTH_SERVER_BASE_URL',
-          auth_endpoint: 'auth'
-        },
-        media_folder: 'static/uploads',
-        public_folder: '/uploads',
-        load_config_file: false,
-        collections: [
-          {
-            name: 'test',
-            label: 'Test',
-            folder: 'content/test',
-            create: true,
-            extension: 'md',
-            format: 'frontmatter',
-            fields: [
-              { name: 'title', label: 'Title', widget: 'string' },
-              { name: 'body', label: 'Body', widget: 'markdown' }
-            ]
-          }
-        ]
-      };
-
-      if (typeof CMS !== 'undefined') {
-        console.log('Initializing Decap CMS with config:', cfg);
-        CMS.init({ config: cfg, load_config_file: false });
-      } else {
-        console.error('CMS object not found');
-      }
-    });
-  </script>
+  <!-- The Decap CMS script will automatically detect the config file -->
 </body>
 </html>
