@@ -9,13 +9,16 @@ if [ ! -d "node_modules" ]; then
   npm install
 fi
 
-# Check if CMS proxy is already running on port 8081
+# Ensure CMS proxy runs on port 8081 (used by config.yml local_backend)
 if lsof -i :8081 > /dev/null; then
-  echo "CMS proxy is already running on port 8081. Using existing instance."
-  echo "Starting RapidAI site on http://localhost:5501"
-  npm run start
-else
-  echo "Starting RapidAI site on http://localhost:5501 with CMS proxy on port 8082"
-  PORT=8082 npx netlify-cms-proxy-server &
-  npm run start
+  echo "Restarting CMS proxy on port 8081"
+  kill "$(lsof -ti :8081)" || true
+  sleep 0.5
 fi
+echo "Starting CMS proxy on port 8081"
+PORT=8081 npx netlify-cms-proxy-server &
+# give the proxy a moment to boot
+sleep 1
+
+echo "Starting RapidAI site on http://localhost:5501"
+npm run start

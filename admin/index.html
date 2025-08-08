@@ -3,11 +3,255 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <base href="/admin/">
   <title>Content Manager | RapidAI</title>
 </head>
 <body>
   <div id="nc-root"></div>
-  <script src="https://unpkg.com/decap-cms@^3/dist/decap-cms.js"></script>
+  <!-- Prevent auto-init and explicitly point to the root config -->
+  <script>
+    window.CMS_MANUAL_INIT = true;
+  </script>
+  <script>
+    // Resilient loader: try multiple CDNs/versions until one succeeds
+    (function () {
+      const sources = [
+        '/admin/decap-cms.js?v=20250808-1',
+        'https://unpkg.com/decap-cms@^3/dist/decap-cms.js',
+        'https://cdn.jsdelivr.net/npm/decap-cms@3/dist/decap-cms.js',
+        'https://unpkg.com/decap-cms@^2/dist/decap-cms.js',
+        'https://cdn.jsdelivr.net/npm/decap-cms@2/dist/decap-cms.js'
+      ];
+
+      function loadNext(i) {
+        if (i >= sources.length) {
+          console.error('All Decap CMS CDN sources failed to load.');
+          return;
+        }
+        const src = sources[i];
+        const s = document.createElement('script');
+        s.src = src;
+        s.async = true;
+        s.crossOrigin = 'anonymous';
+        s.onload = function () {
+          console.log('Decap CMS loaded from', src);
+          if (typeof CMS !== 'undefined') {
+            // Manual init with inline config only (no external fetch) for all environments
+            const config = {
+              backend: {
+                name: 'github',
+                repo: 'joru10/website_CMS',
+                branch: 'main',
+                // GitHub OAuth (PKCE) for production
+                auth_type: 'pkce',
+                app_id: 'Ov23lihO7foR9SHf6I3s',
+                base_url: 'https://github.com/login/oauth',
+                auth_endpoint: '/authorize',
+                token_endpoint: '/access_token',
+              },
+              local_backend: false,
+              i18n: {
+                structure: 'multiple_files',
+                locales: ['en', 'es', 'fr'],
+                default_locale: 'en',
+              },
+              media_folder: 'static/uploads',
+              public_folder: '/uploads',
+              collections: [
+                {
+                  name: 'services',
+                  label: 'Services',
+                  folder: 'content/services',
+                  nested: { depth: 1 },
+                  extension: 'md',
+                  path: '{{slug}}/index',
+                  create: true,
+                  slug: '{{slug}}',
+                  i18n: true,
+                  format: 'frontmatter',
+                  fields: [
+                    { label: 'Title', name: 'title', widget: 'string', i18n: true },
+                    { label: 'Description', name: 'description', widget: 'markdown', i18n: true },
+                    { label: 'Icon', name: 'icon', widget: 'string' },
+                    { label: 'Order', name: 'order', widget: 'number', value_type: 'int' },
+                    { label: 'Featured', name: 'featured', widget: 'boolean' },
+                    { label: 'Feature 1', name: 'feature1', widget: 'string', i18n: true },
+                    { label: 'Feature 2', name: 'feature2', widget: 'string', i18n: true },
+                    { label: 'Feature 3', name: 'feature3', widget: 'string', i18n: true },
+                  ],
+                },
+                {
+                  name: 'translations',
+                  label: 'Translations',
+                  label_singular: 'Translation file',
+                  delete: false,
+                  files: [
+                    {
+                      file: 'translations/en.json',
+                      name: 'en',
+                      label: 'English',
+                      format: 'json',
+                      fields: [
+                        {
+                          label: 'Strings',
+                          name: 'strings',
+                          widget: 'list',
+                          summary: '{{fields.key}}',
+                          fields: [
+                            { label: 'Key', name: 'key', widget: 'string' },
+                            { label: 'Value', name: 'value', widget: 'string' },
+                          ],
+                        },
+                      ],
+                    },
+                    {
+                      file: 'translations/es.json',
+                      name: 'es',
+                      label: 'Español (EU)',
+                      format: 'json',
+                      fields: [
+                        {
+                          label: 'Strings',
+                          name: 'strings',
+                          widget: 'list',
+                          summary: '{{fields.key}}',
+                          fields: [
+                            { label: 'Key', name: 'key', widget: 'string' },
+                            { label: 'Value', name: 'value', widget: 'string' },
+                          ],
+                        },
+                      ],
+                    },
+                    {
+                      file: 'translations/fr.json',
+                      name: 'fr',
+                      label: 'Français (EU)',
+                      format: 'json',
+                      fields: [
+                        {
+                          label: 'Strings',
+                          name: 'strings',
+                          widget: 'list',
+                          summary: '{{fields.key}}',
+                          fields: [
+                            { label: 'Key', name: 'key', widget: 'string' },
+                            { label: 'Value', name: 'value', widget: 'string' },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  name: 'blog',
+                  label: 'Blog Posts',
+                  folder: 'blog',
+                  create: true,
+                  slug: '{{slug}}',
+                  format: 'frontmatter',
+                  fields: [
+                    { label: 'Title', name: 'title', widget: 'string' },
+                    { label: 'Date', name: 'date', widget: 'datetime' },
+                    { label: 'Summary', name: 'summary', widget: 'text' },
+                    { label: 'Body', name: 'body', widget: 'markdown' },
+                  ],
+                },
+                {
+                  name: 'education',
+                  label: 'Education Articles',
+                  folder: 'education',
+                  create: true,
+                  slug: '{{slug}}',
+                  format: 'frontmatter',
+                  fields: [
+                    { label: 'Title', name: 'title', widget: 'string' },
+                    { label: 'Date', name: 'date', widget: 'datetime' },
+                    { label: 'Summary', name: 'summary', widget: 'text' },
+                    { label: 'Body', name: 'body', widget: 'markdown' },
+                  ],
+                },
+                {
+                  name: 'news',
+                  label: 'News',
+                  folder: 'news',
+                  create: true,
+                  slug: '{{slug}}',
+                  format: 'frontmatter',
+                  fields: [
+                    { label: 'Title', name: 'title', widget: 'string' },
+                    { label: 'Date', name: 'date', widget: 'datetime' },
+                    { label: 'Summary', name: 'summary', widget: 'text' },
+                    { label: 'Body', name: 'body', widget: 'markdown' },
+                  ],
+                },
+                {
+                  name: 'cases',
+                  label: 'Case Studies',
+                  folder: 'cases',
+                  create: true,
+                  slug: '{{slug}}',
+                  format: 'json',
+                  fields: [
+                    { label: 'Title', name: 'title', widget: 'string' },
+                    { label: 'Industry', name: 'industry', widget: 'string' },
+                    { label: 'Challenge', name: 'challenge', widget: 'markdown' },
+                    { label: 'Solution', name: 'solution', widget: 'markdown' },
+                    { label: 'Outcome', name: 'outcome', widget: 'markdown' },
+                  ],
+                },
+                {
+                  name: 'content',
+                  label: 'Site Content (claims, stats)',
+                  delete: false,
+                  files: [
+                    {
+                      file: 'content.json',
+                      label: 'Claims & Stats',
+                      name: 'claims',
+                      format: 'json',
+                      fields: [
+                        {
+                          label: 'Data',
+                          name: 'data',
+                          widget: 'list',
+                          summary: '{{fields.key}}: {{fields.value}}',
+                          fields: [
+                            { label: 'Key', name: 'key', widget: 'string' },
+                            { label: 'Value', name: 'value', widget: 'string' },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            };
+            // Diagnostics: log duplicates prior to init
+            try {
+              const locales = (config.i18n && config.i18n.locales) || [];
+              const dupLocales = locales.filter((v, i, a) => a.indexOf(v) !== i);
+              const names = (config.collections || []).map(c => c.name);
+              const dupCollections = names.filter((v, i, a) => a.indexOf(v) !== i);
+              console.log('Decap inline config summary', { locales, dupLocales, collectionCount: names.length, dupCollections });
+            } catch (e) {
+              console.warn('Config diagnostics failed', e);
+            }
+            console.log('Initializing Decap CMS with inline config (load_config_file=false)');
+            CMS.init({ config, load_config_file: false });
+          } else {
+            console.error('CMS global not found after loading', src);
+          }
+        };
+        s.onerror = function () {
+          console.warn('Failed to load', src, '— trying next CDN');
+          loadNext(i + 1);
+        };
+        document.head.appendChild(s);
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        loadNext(0);
+      });
+    })();
+  </script>
 </body>
 </html>
