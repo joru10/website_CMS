@@ -1,9 +1,11 @@
 backend:
-  name: test-repo
-
-# The "backend" setting is for development pointing to a test repository.
-# For production, you'll need to switch to the "github" backend and configure authentication.
-# See: https://decapcms.org/docs/authentication-backends/
+  name: github
+  repo: joru10/website_CMS
+  branch: main # Or the branch you want to save changes to
+  # The base_url points to your deployed OAuth handler.
+  # You will need to update this placeholder after deploying the oauth-provider.
+  base_url: https://YOUR_OAUTH_HANDLER_URL
+  auth_endpoint: auth
 
   
   
