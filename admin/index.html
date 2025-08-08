@@ -237,6 +237,16 @@
             }
             console.log('Initializing Decap CMS with inline config (load_config_file=false)');
             CMS.init({ config, load_config_file: false });
+            // Post-init diagnostics: inspect final config seen by Decap
+            setTimeout(() => {
+              try {
+                const cfg = CMS && CMS.getConfig ? CMS.getConfig() : null;
+                const jsCfg = cfg && typeof cfg.toJS === 'function' ? cfg.toJS() : cfg;
+                console.log('CMS.getConfig() snapshot', jsCfg || cfg);
+              } catch (e) {
+                console.warn('Failed to read CMS.getConfig()', e);
+              }
+            }, 800);
           } else {
             console.error('CMS global not found after loading', src);
           }
