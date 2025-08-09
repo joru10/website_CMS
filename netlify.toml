@@ -1,10 +1,18 @@
 [build]
   publish = "."
   command = ""
+ 
+[functions]
+  directory = "netlify/functions"
 
 [[redirects]]
   from = "/admin/*"
   to = "/admin/index.html"
+  status = 200
+ 
+[[redirects]]
+  from = "/oauth/*"
+  to = "/.netlify/functions/oauth/:splat"
   status = 200
  
 [[headers]]

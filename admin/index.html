@@ -39,16 +39,22 @@
           console.log('Decap CMS loaded from', src);
           if (typeof CMS !== 'undefined') {
             // Manual init with inline config only (no external fetch) for all environments
+            const isLocalHost = /^(localhost|127\.0\.0\.1)$/i.test(location.hostname);
+            const oauthBase = isLocalHost
+              // Local dev: use production provider to avoid needing functions locally
+              ? 'https://comfy-panda-0d488a.netlify.app/oauth'
+              // Production: use local Netlify Function provider
+              : '/oauth';
             const config = {
               backend: {
                 name: 'github',
                 repo: 'joru10/website_CMS',
                 branch: 'main',
-                // GitHub OAuth (PKCE) for production
+                // GitHub OAuth (PKCE)
                 auth_type: 'pkce',
                 app_id: 'Ov23lihO7foR9SHf6I3s',
-                base_url: 'https://github.com/login/oauth',
-                auth_endpoint: '/authorize',
+                base_url: oauthBase,
+                auth_endpoint: '/auth',
                 token_endpoint: '/access_token',
               },
               local_backend: false,
