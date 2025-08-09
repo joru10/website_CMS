@@ -92,7 +92,6 @@ exports.handler = async (event) => {
       document.body.innerText = 'You can close this window.';
     }
   } catch (e) {
-    console.error(e);
     document.body.innerText = 'OAuth callback error. You can close this window.';
   }
 })();
