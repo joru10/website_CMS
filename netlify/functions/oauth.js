@@ -57,10 +57,12 @@ exports.handler = async (event) => {
         return jsonResponse(500, { error: 'Missing GITHUB_CLIENT_ID env var' });
       }
       const qs = event.queryStringParameters || {};
-      const cb = `${baseUrl(event)}/.netlify/functions/oauth/callback`;
+      const callbackBase = process.env.PUBLIC_CALLBACK_BASE || baseUrl(event);
+      const cb = `${callbackBase}/.netlify/functions/oauth/callback`;
       const url = new URL(GH_AUTH_URL);
       url.searchParams.set('client_id', clientId);
-      url.searchParams.set('redirect_uri', qs.redirect_uri || cb);
+      // Always use our functions callback to match the GitHub App configuration
+      url.searchParams.set('redirect_uri', cb);
       url.searchParams.set('state', qs.state || '');
       // Scope: default to repo (needed to commit). Adjust as needed.
       url.searchParams.set('scope', qs.scope || 'repo');
@@ -119,7 +121,8 @@ exports.handler = async (event) => {
 
       const code = body.code;
       const codeVerifier = body.code_verifier; // optional if using client_secret instead
-      const redirectUri = body.redirect_uri || `${baseUrl(event)}/.netlify/functions/oauth/callback`;
+      const callbackBase = process.env.PUBLIC_CALLBACK_BASE || baseUrl(event);
+      const redirectUri = body.redirect_uri || `${callbackBase}/.netlify/functions/oauth/callback`;
 
       if (!clientId) {
         return jsonResponse(500, { error: 'Missing GITHUB_CLIENT_ID env var' });
