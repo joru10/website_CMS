@@ -27,7 +27,7 @@
     // Resilient loader: try multiple CDNs/versions until one succeeds
     (function () {
       const sources = [
-        '/admin/decap-cms.js?v=20250810-csp2',
+        '/admin/decap-cms.js?v=20250810-csp3',
         'https://unpkg.com/decap-cms@^3/dist/decap-cms.js',
         'https://cdn.jsdelivr.net/npm/decap-cms@3/dist/decap-cms.js',
         'https://unpkg.com/decap-cms@^2/dist/decap-cms.js',
@@ -59,9 +59,12 @@
                 name: 'github',
                 repo: 'joru10/website_CMS',
                 branch: 'main',
-                // GitHub OAuth via external provider (classic)
+                // GitHub OAuth via external provider (PKCE enabled)
                 base_url: oauthBase,
                 auth_endpoint: '/auth',
+                auth_type: 'pkce',
+                app_id: 'Ov23lihO7foR9SHf6I3s',
+                token_endpoint: '/access_token',
               },
               local_backend: false,
               i18n: {

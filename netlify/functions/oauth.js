@@ -104,7 +104,10 @@ exports.handler = async (event) => {
           });
           const data = await resp.json().catch(() => ({}));
           if (resp.ok && data && data.access_token) {
-            const html = `<!doctype html><html><body><script>(function(){try{window.opener&&window.opener.postMessage('authorization:github:success:' + JSON.stringify({ token: '${data.access_token}'.replace(/'/g, "\\'"), provider: 'github' }), '*');}catch(_){}window.close();})();</script></body></html>`;
+            const html = `<!doctype html><html><body><script>(function(){try{if(window.opener){
+  try{window.opener.postMessage('authorization:github:success:' + '${data.access_token}'.replace(/'/g, "\\'"), '*');}catch(_){}}
+  try{window.opener.postMessage({ source: 'decap-cms', code: ${JSON.stringify(code)}, state: ${JSON.stringify(state)} }, '*');}catch(_){}}
+}catch(_){} window.close();})();</script></body></html>`;
             return { statusCode: 200, headers: { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' }, body: html };
           } else {
             const err = (data && (data.error_description || data.error)) || 'token_exchange_failed';
