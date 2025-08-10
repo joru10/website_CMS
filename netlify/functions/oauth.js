@@ -86,7 +86,12 @@ exports.handler = async (event) => {
 (function(){
   try {
     if (window.opener && window.opener.postMessage) {
-      window.opener.postMessage({ source: 'decap-cms', code: ${JSON.stringify(code)}, state: ${JSON.stringify(state)} }, '*');
+      var st = ${JSON.stringify(state)};
+      try {
+        var ls = window.opener && window.opener.localStorage && window.opener.localStorage.getItem('netlify-cms.oauth-state');
+        if (ls) st = ls;
+      } catch (_) {}
+      window.opener.postMessage({ source: 'decap-cms', code: ${JSON.stringify(code)}, state: st }, '*');
       window.close();
     } else {
       document.body.innerText = 'You can close this window.';

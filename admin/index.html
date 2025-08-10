@@ -6,6 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; connect-src 'self' https://api.github.com https://github.com https://*.github.com; frame-src 'self' https://github.com https://*.github.com; frame-ancestors 'self'; object-src 'none'" />
   <title>Content Manager | RapidAI</title>
 </head>
 <body>
@@ -26,7 +27,7 @@
     // Resilient loader: try multiple CDNs/versions until one succeeds
     (function () {
       const sources = [
-        '/admin/decap-cms.js?v=20250808-3',
+        '/admin/decap-cms.js?v=20250810-csp2',
         'https://unpkg.com/decap-cms@^3/dist/decap-cms.js',
         'https://cdn.jsdelivr.net/npm/decap-cms@3/dist/decap-cms.js',
         'https://unpkg.com/decap-cms@^2/dist/decap-cms.js',
@@ -253,7 +254,11 @@
               console.warn('Config diagnostics failed', e);
             }
             console.log('Initializing Decap CMS with inline config (load_config_file=false)');
-            CMS.init({ config, load_config_file: false });
+            try {
+              CMS.init({ config, load_config_file: false });
+            } catch (e) {
+              console.error('CMS.init failed', e);
+            }
             // Post-init diagnostics: inspect final config seen by Decap
             setTimeout(() => {
               try {
