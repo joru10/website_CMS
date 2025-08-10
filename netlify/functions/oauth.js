@@ -64,8 +64,10 @@ exports.handler = async (event) => {
       // Always use our functions callback to match the GitHub App configuration
       url.searchParams.set('redirect_uri', cb);
       url.searchParams.set('state', qs.state || '');
-      // Scope: default to repo (needed to commit). Adjust as needed.
-      url.searchParams.set('scope', qs.scope || 'repo');
+      // Scope: ensure permissions needed by Decap CMS
+      // - repo: commit content
+      // - read:user, user:email: fetch GitHub user profile
+      url.searchParams.set('scope', qs.scope || 'repo,read:user,user:email');
       // PKCE support
       if (qs.code_challenge) url.searchParams.set('code_challenge', qs.code_challenge);
       if (qs.code_challenge_method) url.searchParams.set('code_challenge_method', qs.code_challenge_method);
@@ -107,7 +109,8 @@ exports.handler = async (event) => {
             const html = `<!doctype html><html><body><script>(function(){
   try {
     if (window.opener) {
-      try { window.opener.postMessage('authorization:github:success:' + '${data.access_token}'.replace(/'/g, "\\'"), '*'); } catch (_) {}
+      try { var t='${data.access_token}'.replace(/'/g, "\\'"); window.opener.postMessage('authorization:github:success:' + t, '*'); } catch (_) {}
+      try { var tj = JSON.stringify({ token: t, provider: 'github' }); window.opener.postMessage('authorization:github:success:' + tj, '*'); } catch (_) {}
     }
   } catch (_) {}
   setTimeout(function(){ try { window.close(); } catch(_){} }, 0);
