@@ -81,6 +81,40 @@ exports.handler = async (event) => {
       const qs = event.queryStringParameters || {};
       const code = qs.code || '';
       const state = qs.state || '';
+      const callbackBase = process.env.PUBLIC_CALLBACK_BASE || baseUrl(event);
+      const redirectUri = `${callbackBase}/.netlify/functions/oauth/callback`;
+      if (!code) {
+        const html = `<!doctype html><html><body><script>(function(){try{window.opener&&window.opener.postMessage('authorization:github:error:' + JSON.stringify({ error: 'missing_code' }),'*')}catch(_){}window.close();})();</script></body></html>`;
+        return { statusCode: 200, headers: { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' }, body: html };
+      }
+      if (clientId && clientSecret) {
+        // Classic exchange: get token server-side and notify CMS (bypasses state/PKCE issues)
+        try {
+          const params = new URLSearchParams();
+          params.set('client_id', clientId);
+          params.set('client_secret', clientSecret);
+          params.set('code', code);
+          params.set('redirect_uri', redirectUri);
+          const resp = await fetch(GH_TOKEN_URL, {
+            method: 'POST',
+            headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString(),
+          });
+          const data = await resp.json().catch(() => ({}));
+          if (resp.ok && data && data.access_token) {
+            const html = `<!doctype html><html><body><script>(function(){try{window.opener&&window.opener.postMessage('authorization:github:success:' + JSON.stringify({ token: '${data.access_token}'.replace(/'/g, "\\'"), provider: 'github' }), '*');}catch(_){}window.close();})();</script></body></html>`;
+            return { statusCode: 200, headers: { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' }, body: html };
+          } else {
+            const err = (data && (data.error_description || data.error)) || 'token_exchange_failed';
+            const html = `<!doctype html><html><body><script>(function(){try{window.opener&&window.opener.postMessage('authorization:github:error:' + JSON.stringify({ error: '${err}'.replace(/'/g, "\\'") }), '*');}catch(_){}window.close();})();</script></body></html>`;
+            return { statusCode: 200, headers: { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' }, body: html };
+          }
+        } catch (e) {
+          const html = `<!doctype html><html><body><script>(function(){try{window.opener&&window.opener.postMessage('authorization:github:error:' + JSON.stringify({ error: '${(e && e.message) || 'exception'}'.replace(/'/g, "\\'") }), '*');}catch(_){}window.close();})();</script></body></html>`;
+          return { statusCode: 200, headers: { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' }, body: html };
+        }
+      }
+      // PKCE fallback: send code/state to CMS; try to recover state from opener storage if missing
       const html = `<!doctype html><html><body>
 <script>
 (function(){
@@ -88,8 +122,15 @@ exports.handler = async (event) => {
     if (window.opener && window.opener.postMessage) {
       var st = ${JSON.stringify(state)};
       try {
-        var ls = window.opener && window.opener.localStorage && window.opener.localStorage.getItem('netlify-cms.oauth-state');
-        if (ls) st = ls;
+        var candidates = ['decap-cms.oauthState','decap-cms.oauth-state','netlify-cms.oauthState','netlify-cms.oauth-state','oauthState','oauth-state'];
+        var stores = [];
+        try { if (window.opener.localStorage) stores.push(window.opener.localStorage); } catch(_){}
+        try { if (window.opener.sessionStorage) stores.push(window.opener.sessionStorage); } catch(_){}
+        for (var i=0;i<candidates.length;i++){
+          for (var j=0;j<stores.length;j++){
+            try { var v = stores[j].getItem(candidates[i]); if (v) { st = v; i=candidates.length; break; } } catch(_){}
+          }
+        }
       } catch (_) {}
       window.opener.postMessage({ source: 'decap-cms', code: ${JSON.stringify(code)}, state: st }, '*');
       window.close();
