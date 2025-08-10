@@ -109,11 +109,22 @@ exports.handler = async (event) => {
             const html = `<!doctype html><html><body><script>(function(){
   try {
     if (window.opener) {
-      try { var t='${data.access_token}'.replace(/'/g, "\\'"); window.opener.postMessage('authorization:github:success:' + t, '*'); } catch (_) {}
-      try { var tj = JSON.stringify({ token: t, provider: 'github' }); window.opener.postMessage('authorization:github:success:' + tj, '*'); } catch (_) {}
+      try {
+        var t='${data.access_token}'.replace(/'/g, "\\'");
+        var msgJson='authorization:github:success:' + JSON.stringify({ token: t, provider: 'github', state: ${JSON.stringify(state)} });
+        var pkceMsgObj={ source: 'decap-cms', code: ${JSON.stringify(code)}, state: ${JSON.stringify(state)} };
+        var msgRaw='authorization:github:success:' + t;
+        var attempts=0;
+        (function send(){
+          try{ window.opener.postMessage(pkceMsgObj, '*'); }catch(_){ }
+          try{ window.opener.postMessage(msgJson, '*'); }catch(_){ }
+          try{ window.opener.postMessage(msgRaw, '*'); }catch(_){ }
+          if(++attempts < 6) { setTimeout(send, 200); }
+          else { setTimeout(function(){ try { window.close(); } catch(_){ try{ location.replace('about:blank'); }catch(__){} } }, 100); }
+        })();
+      } catch (_) {}
     }
   } catch (_) {}
-  setTimeout(function(){ try { window.close(); } catch(_){} }, 0);
 })();</script></body></html>`;
             return { statusCode: 200, headers: { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' }, body: html };
           } else {
