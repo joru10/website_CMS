@@ -49,8 +49,8 @@ exports.handler = async (event) => {
     }
 
     const path = event.path || '';
-    const clientId = process.env.GITHUB_CLIENT_ID;
-    const clientSecret = process.env.GITHUB_CLIENT_SECRET; // optional
+    const clientId = (process.env.GITHUB_CLIENT_ID || '').trim();
+    const clientSecret = (process.env.GITHUB_CLIENT_SECRET || '').trim(); // optional
 
     if (path.endsWith('/authorize') || path.endsWith('/auth')) {
       if (!clientId) {
@@ -83,8 +83,10 @@ exports.handler = async (event) => {
       const state = qs.state || '';
       const callbackBase = process.env.PUBLIC_CALLBACK_BASE || baseUrl(event);
       const redirectUri = `${callbackBase}/.netlify/functions/oauth/callback`;
+      const idSuffix = (clientId || '').slice(-4);
+      const hasSecret = !!clientSecret;
       if (!code) {
-        const html = `<!doctype html><html><body><script>(function(){try{window.opener&&window.opener.postMessage('authorization:github:error:' + JSON.stringify({ error: 'missing_code' }),'*')}catch(_){}window.close();})();</script></body></html>`;
+        const html = `<!doctype html><html><body><script>(function(){try{window.opener&&window.opener.postMessage('authorization:github:error:' + JSON.stringify({ error: 'missing_code', context: { idSuffix: '${idSuffix}', hasSecret: ${hasSecret}, redirectUri: '${redirectUri}' } }),'*')}catch(_){}window.close();})();</script></body></html>`;
         return { statusCode: 200, headers: { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' }, body: html };
       }
       if (clientId && clientSecret) {
@@ -106,11 +108,11 @@ exports.handler = async (event) => {
             return { statusCode: 200, headers: { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' }, body: html };
           } else {
             const err = (data && (data.error_description || data.error)) || 'token_exchange_failed';
-            const html = `<!doctype html><html><body><script>(function(){try{window.opener&&window.opener.postMessage('authorization:github:error:' + JSON.stringify({ error: '${err}'.replace(/'/g, "\\'") }), '*');}catch(_){}window.close();})();</script></body></html>`;
+            const html = `<!doctype html><html><body><script>(function(){try{window.opener&&window.opener.postMessage('authorization:github:error:' + JSON.stringify({ error: '${err}'.replace(/'/g, "\\'"), context: { idSuffix: '${idSuffix}', hasSecret: ${hasSecret}, redirectUri: '${redirectUri}' } }), '*');}catch(_){}window.close();})();</script></body></html>`;
             return { statusCode: 200, headers: { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' }, body: html };
           }
         } catch (e) {
-          const html = `<!doctype html><html><body><script>(function(){try{window.opener&&window.opener.postMessage('authorization:github:error:' + JSON.stringify({ error: '${(e && e.message) || 'exception'}'.replace(/'/g, "\\'") }), '*');}catch(_){}window.close();})();</script></body></html>`;
+          const html = `<!doctype html><html><body><script>(function(){try{window.opener&&window.opener.postMessage('authorization:github:error:' + JSON.stringify({ error: '${(e && e.message) || 'exception'}'.replace(/'/g, "\\'"), context: { idSuffix: '${idSuffix}', hasSecret: ${hasSecret}, redirectUri: '${redirectUri}' } }), '*');}catch(_){}window.close();})();</script></body></html>`;
           return { statusCode: 200, headers: { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' }, body: html };
         }
       }
