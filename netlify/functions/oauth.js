@@ -111,12 +111,23 @@ exports.handler = async (event) => {
     if (window.opener) {
       try {
         var t='${data.access_token}'.replace(/'/g, "\\'");
-        var msgJson='authorization:github:success:' + JSON.stringify({ token: t, provider: 'github', state: ${JSON.stringify(state)} });
-        var pkceMsgObj={ source: 'decap-cms', code: ${JSON.stringify(code)}, state: ${JSON.stringify(state)} };
+        // Try to recover the original OAuth state from the opener's storage
+        var st=${JSON.stringify(state)}; // fallback to query param (may be empty)
+        try {
+          var candidates=['decap-cms.oauthState','decap-cms.oauth-state','netlify-cms.oauthState','netlify-cms.oauth-state','oauthState','oauth-state'];
+          var stores=[];
+          try { if (window.opener.localStorage) stores.push(window.opener.localStorage); } catch(_){ }
+          try { if (window.opener.sessionStorage) stores.push(window.opener.sessionStorage); } catch(_){ }
+          for (var i=0;i<candidates.length;i++){
+            for (var j=0;j<stores.length;j++){
+              try { var v=stores[j].getItem(candidates[i]); if (v) { st=v; i=candidates.length; break; } } catch(__){}
+            }
+          }
+        } catch(__){}
+        var msgJson='authorization:github:success:' + JSON.stringify({ token: t, provider: 'github', state: st });
         var msgRaw='authorization:github:success:' + t;
         var attempts=0;
         (function send(){
-          try{ window.opener.postMessage(pkceMsgObj, '*'); }catch(_){ }
           try{ window.opener.postMessage(msgJson, '*'); }catch(_){ }
           try{ window.opener.postMessage(msgRaw, '*'); }catch(_){ }
           if(++attempts < 6) { setTimeout(send, 200); }

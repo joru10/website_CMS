@@ -27,7 +27,7 @@
     // Resilient loader: try multiple CDNs/versions until one succeeds
     (function () {
       const sources = [
-        '/admin/decap-cms.js?v=20250810-csp5',
+        '/admin/decap-cms.js?v=20250810-csp7',
         'https://unpkg.com/decap-cms@^3/dist/decap-cms.js',
         'https://cdn.jsdelivr.net/npm/decap-cms@3/dist/decap-cms.js',
         'https://unpkg.com/decap-cms@^2/dist/decap-cms.js',
@@ -59,12 +59,10 @@
                 name: 'github',
                 repo: 'joru10/website_CMS',
                 branch: 'main',
-                // GitHub OAuth via external provider (PKCE)
+                // GitHub OAuth via external provider (classic token handoff)
                 base_url: oauthBase,
                 auth_endpoint: '/auth',
-                auth_type: 'pkce',
-                app_id: 'Ov23lihO7foR9SHf6I3s',
-                token_endpoint: '/access_token',
+                // Classic flow: provider returns token via postMessage
               },
               local_backend: false,
               i18n: {
@@ -255,20 +253,37 @@
             }
             console.log('Initializing Decap CMS with inline config (load_config_file=false)');
             try {
+              // Make config available for any consumers checking the global
+              window.CMS_CONFIG = config;
               CMS.init({ config, load_config_file: false });
             } catch (e) {
               console.error('CMS.init failed', e);
             }
-            // Post-init diagnostics: inspect final config seen by Decap
-            setTimeout(() => {
-              try {
-                const cfg = CMS && CMS.getConfig ? CMS.getConfig() : null;
-                const jsCfg = cfg && typeof cfg.toJS === 'function' ? cfg.toJS() : cfg;
-                console.log('CMS.getConfig() snapshot', jsCfg || cfg);
-              } catch (e) {
-                console.warn('Failed to read CMS.getConfig()', e);
+            // Ensure config sticks: poll a few times and retry update/init if needed
+            (function () {
+              let tries = 0;
+              function snapshot(label) {
+                try {
+                  const cfg = CMS && CMS.getConfig ? CMS.getConfig() : null;
+                  const js = cfg && typeof cfg.toJS === 'function' ? cfg.toJS() : cfg;
+                  console.log('CMS.getConfig()', label, js || cfg);
+                  return !!cfg;
+                } catch (_) { return false; }
               }
-            }, 800);
+              function ensure() {
+                if (snapshot('check #' + (tries + 1))) return;
+                tries++;
+                if (tries === 2) {
+                  try { CMS && CMS.updateConfig && CMS.updateConfig(config); console.log('Called CMS.updateConfig'); } catch (e) { console.warn('updateConfig failed', e); }
+                }
+                if (tries === 4) {
+                  try { CMS && CMS.init && CMS.init({ config, load_config_file: false }); console.log('Re-invoked CMS.init'); } catch (e) { console.warn('re-init failed', e); }
+                }
+                if (tries < 8) setTimeout(ensure, 350);
+                else console.warn('Config still not registered after retries');
+              }
+              setTimeout(ensure, 600);
+            })();
           } else {
             console.error('CMS global not found after loading', src);
           }
