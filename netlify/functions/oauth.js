@@ -13,6 +13,7 @@
 
 const GH_AUTH_URL = 'https://github.com/login/oauth/authorize';
 const GH_TOKEN_URL = 'https://github.com/login/oauth/access_token';
+const crypto = require('crypto');
 
 function baseUrl(event) {
   const proto = event.headers['x-forwarded-proto'] || 'https';
@@ -83,26 +84,52 @@ exports.handler = async (event) => {
       url.searchParams.set('client_id', clientId);
       // Always use our functions callback to match the GitHub App configuration
       url.searchParams.set('redirect_uri', cb);
-      url.searchParams.set('state', qs.state || '');
+      // Prepare state/PKCE, generating if missing
+      let usedState = (qs.state || '').toString();
+      let usedCC = (qs.code_challenge || '').toString();
+      let usedCCM = (qs.code_challenge_method || '').toString();
+      let generatedVerifier = '';
+      if (!usedState) {
+        // 32 bytes -> 64 hex chars is fine for state
+        usedState = crypto.randomBytes(16).toString('hex');
+      }
+      if (!usedCC) {
+        // Generate PKCE verifier and challenge
+        const verifier = crypto.randomBytes(32).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/,'');
+        const challenge = crypto
+          .createHash('sha256')
+          .update(verifier)
+          .digest('base64')
+          .replace(/\+/g, '-')
+          .replace(/\//g, '_')
+          .replace(/=+$/,'');
+        generatedVerifier = verifier;
+        usedCC = challenge;
+        usedCCM = 'S256';
+      }
+      url.searchParams.set('state', usedState);
       // Scope: ensure permissions needed by Decap CMS
       // - repo: commit content
       // - read:user, user:email: fetch GitHub user profile
       url.searchParams.set('scope', qs.scope || 'repo,read:user,user:email');
       // PKCE support
-      if (qs.code_challenge) url.searchParams.set('code_challenge', qs.code_challenge);
-      if (qs.code_challenge_method) url.searchParams.set('code_challenge_method', qs.code_challenge_method);
+      if (usedCC) url.searchParams.set('code_challenge', usedCC);
+      if (usedCCM) url.searchParams.set('code_challenge_method', usedCCM);
 
       const authDbg = {
-        has_state: !!qs.state,
-        state_len: (qs.state || '').length,
-        has_cc: !!qs.code_challenge,
-        cc_len: (qs.code_challenge || '').length,
-        ccm: qs.code_challenge_method || '',
+        has_state: !!usedState,
+        state_len: (usedState || '').length,
+        has_cc: !!usedCC,
+        cc_len: (usedCC || '').length,
+        ccm: usedCCM || '',
         scope: (qs.scope || '').slice(0, 60),
         method: event.httpMethod,
       };
       const cookies = [];
-      if (qs.state) cookies.push(`cms_oauth_state=${encodeURIComponent(qs.state)}; Path=/; SameSite=None; Secure`);
+      // preserve Decap-provided state (if any) and always set our server state for fallback
+      if (qs.state) cookies.push(`cms_oauth_state=${encodeURIComponent(qs.state)}; Path=/; SameSite=None; Secure; Max-Age=600`);
+      if (usedState) cookies.push(`cms_state=${encodeURIComponent(usedState)}; Path=/; SameSite=None; Secure; Max-Age=600`);
+      if (generatedVerifier) cookies.push(`cms_pkce_v=${encodeURIComponent(generatedVerifier)}; Path=/; SameSite=None; Secure; Max-Age=600`);
       cookies.push(`cms_auth_dbg=${encodeURIComponent(JSON.stringify(authDbg))}; Path=/; SameSite=None; Secure; Max-Age=300`);
       return {
         statusCode: 302,
@@ -123,6 +150,78 @@ exports.handler = async (event) => {
       if (!code) {
         const html = `<!doctype html><html><body><script>(function(){try{window.opener&&window.opener.postMessage('authorization:github:error:' + JSON.stringify({ error: 'missing_code', context: { idSuffix: '${idSuffix}', hasSecret: ${hasSecret}, redirectUri: '${redirectUri}' } }),'*')}catch(_){}window.close();})();</script></body></html>`;
         return { statusCode: 200, headers: { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' }, body: html };
+      }
+      // Server-managed PKCE fallback: if we generated a verifier, perform token exchange here
+      const cookieHeader = event.headers.cookie || event.headers.Cookie || '';
+      const getCookie = (name) => {
+        try {
+          const m = (cookieHeader || '').match(new RegExp('(?:^|; )' + name.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&') + '=([^;]+)'));
+          return m ? decodeURIComponent(m[1]) : '';
+        } catch (_) { return ''; }
+      };
+      const serverVerifier = getCookie('cms_pkce_v');
+      const serverState = getCookie('cms_state');
+      if (serverVerifier) {
+        try {
+          const params = new URLSearchParams();
+          params.set('client_id', clientId);
+          params.set('code', code);
+          params.set('redirect_uri', redirectUri);
+          params.set('code_verifier', serverVerifier);
+          const resp = await fetch(GH_TOKEN_URL, {
+            method: 'POST',
+            headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString(),
+          });
+          const data = await resp.json().catch(() => ({}));
+          if (resp.ok && data && data.access_token) {
+            const token = data.access_token;
+            const html = `<!doctype html><html><body><script>(function(){
+              try {
+                // clear temp cookies
+                document.cookie = 'cms_pkce_v=; Max-Age=0; Path=/; SameSite=None; Secure';
+                document.cookie = 'cms_state=; Max-Age=0; Path=/; SameSite=None; Secure';
+                document.cookie = 'cms_oauth_state=; Max-Age=0; Path=/; SameSite=None; Secure';
+                document.cookie = 'cms_auth_dbg=; Max-Age=0; Path=/; SameSite=None; Secure';
+              } catch(_){}
+              try { window.opener && window.opener.postMessage('authorization:github:success:' + JSON.stringify({ token: ${JSON.stringify('') } + token + ${JSON.stringify('')}, provider: 'github' }), '*'); } catch(_){}
+              window.close();
+            })();</script></body></html>`;
+            return { statusCode: 200, headers: { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' }, body: html };
+          }
+        } catch (_) {
+          // fall through to other strategies
+        }
+      }
+      // If PKCE state is missing but we have a client secret, fall back to classic server-side exchange
+      if (!state && clientSecret) {
+        try {
+          const params = new URLSearchParams();
+          params.set('client_id', clientId);
+          params.set('client_secret', clientSecret);
+          params.set('code', code);
+          params.set('redirect_uri', redirectUri);
+          const resp = await fetch(GH_TOKEN_URL, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: params.toString(),
+          });
+          const data = await resp.json().catch(() => ({}));
+          if (resp.ok && data && data.access_token) {
+            const token = data.access_token;
+            const html = `<!doctype html><html><body><script>(function(){try{window.opener&&window.opener.postMessage('authorization:github:success:' + JSON.stringify({token: ${JSON.stringify('') } + token + ${JSON.stringify('')}, provider: 'github'}),'*')}catch(_){}window.close();})();</script></body></html>`;
+            return { statusCode: 200, headers: { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' }, body: html };
+          } else {
+            const html = `<!doctype html><html><body><script>(function(){try{window.opener&&window.opener.postMessage('authorization:github:error:' + JSON.stringify({ error: 'token_exchange_failed', status: ${JSON.stringify('') } + (resp&&resp.status) + ${JSON.stringify('')}, data: ${JSON.stringify('') } + (JSON.stringify(data)||'') + ${JSON.stringify('')}, context: { idSuffix: '${idSuffix}', hasSecret: ${hasSecret} } }),'*')}catch(_){}window.close();})();</script></body></html>`;
+            return { statusCode: 200, headers: { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' }, body: html };
+          }
+        } catch (err) {
+          const html = `<!doctype html><html><body><script>(function(){try{window.opener&&window.opener.postMessage('authorization:github:error:' + JSON.stringify({ error: 'exception_exchange', message: ${JSON.stringify('') } + ((${JSON.stringify('') } , function(e){try{return e.message||String(e)}catch(_){return 'error'}})(${/* placeholder */''})) + ${JSON.stringify('')}, context: { idSuffix: '${idSuffix}', hasSecret: ${hasSecret} } }),'*')}catch(_){}window.close();})();</script></body></html>`;
+          return { statusCode: 200, headers: { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' }, body: html };
+        }
       }
       // Always prefer PKCE: send code/state back to CMS; token exchange happens via /oauth/access_token
       // PKCE fallback: send code/state to CMS; try to recover state from opener storage if missing
