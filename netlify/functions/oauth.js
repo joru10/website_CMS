@@ -92,12 +92,22 @@ exports.handler = async (event) => {
       if (qs.code_challenge) url.searchParams.set('code_challenge', qs.code_challenge);
       if (qs.code_challenge_method) url.searchParams.set('code_challenge_method', qs.code_challenge_method);
 
+      const authDbg = {
+        has_state: !!qs.state,
+        state_len: (qs.state || '').length,
+        has_cc: !!qs.code_challenge,
+        cc_len: (qs.code_challenge || '').length,
+        ccm: qs.code_challenge_method || '',
+        scope: (qs.scope || '').slice(0, 60),
+        method: event.httpMethod,
+      };
+      const cookies = [];
+      if (qs.state) cookies.push(`cms_oauth_state=${encodeURIComponent(qs.state)}; Path=/; SameSite=None; Secure`);
+      cookies.push(`cms_auth_dbg=${encodeURIComponent(JSON.stringify(authDbg))}; Path=/; SameSite=None; Secure; Max-Age=300`);
       return {
         statusCode: 302,
-        headers: Object.assign(
-          { Location: url.toString(), 'Cache-Control': 'no-store' },
-          qs.state ? { 'Set-Cookie': `cms_oauth_state=${encodeURIComponent(qs.state)}; Path=/; SameSite=None; Secure` } : {}
-        ),
+        headers: { Location: url.toString(), 'Cache-Control': 'no-store' },
+        multiValueHeaders: { 'Set-Cookie': cookies },
         body: '',
       };
     }
@@ -168,8 +178,14 @@ exports.handler = async (event) => {
         }
         try { dbg.cookie_len = (document.cookie || '').length; } catch(_){ }
       } catch(_){ }
-      // Clear temporary cookie
+      // Include auth debug from /authorize
+      try {
+        var m2 = document.cookie.match(/(?:^|; )cms_auth_dbg=([^;]+)/);
+        if (m2) { try { dbg.auth = JSON.parse(decodeURIComponent(m2[1])); } catch(_){} }
+      } catch(_){ }
+      // Clear temporary cookies
       try { document.cookie = 'cms_oauth_state=; Max-Age=0; Path=/; SameSite=None; Secure'; } catch(_){ }
+      try { document.cookie = 'cms_auth_dbg=; Max-Age=0; Path=/; SameSite=None; Secure'; } catch(_){ }
       window.opener.postMessage({ source: 'decap-cms', code: ${JSON.stringify(code)}, state: st, debug: dbg }, '*');
       window.close();
     } else {
