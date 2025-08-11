@@ -52,6 +52,11 @@ exports.handler = async (event) => {
     const clientId = (process.env.GITHUB_CLIENT_ID || '').trim();
     const clientSecret = (process.env.GITHUB_CLIENT_SECRET || '').trim(); // optional
 
+    // Expose public client_id for PKCE front-end config
+    if (path.endsWith('/client_id')) {
+      return jsonResponse(200, { client_id: clientId || '' });
+    }
+
     if (path.endsWith('/authorize') || path.endsWith('/auth')) {
       if (!clientId) {
         return jsonResponse(500, { error: 'Missing GITHUB_CLIENT_ID env var' });
@@ -91,63 +96,7 @@ exports.handler = async (event) => {
         const html = `<!doctype html><html><body><script>(function(){try{window.opener&&window.opener.postMessage('authorization:github:error:' + JSON.stringify({ error: 'missing_code', context: { idSuffix: '${idSuffix}', hasSecret: ${hasSecret}, redirectUri: '${redirectUri}' } }),'*')}catch(_){}window.close();})();</script></body></html>`;
         return { statusCode: 200, headers: { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' }, body: html };
       }
-      if (clientId && clientSecret) {
-        // Classic exchange: get token server-side and notify CMS (bypasses state/PKCE issues)
-        try {
-          const params = new URLSearchParams();
-          params.set('client_id', clientId);
-          params.set('client_secret', clientSecret);
-          params.set('code', code);
-          params.set('redirect_uri', redirectUri);
-          const resp = await fetch(GH_TOKEN_URL, {
-            method: 'POST',
-            headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: params.toString(),
-          });
-          const data = await resp.json().catch(() => ({}));
-          if (resp.ok && data && data.access_token) {
-            const html = `<!doctype html><html><body><script>(function(){
-  try {
-    if (window.opener) {
-      try {
-        var t='${data.access_token}'.replace(/'/g, "\\'");
-        // Try to recover the original OAuth state from the opener's storage
-        var st=${JSON.stringify(state)}; // fallback to query param (may be empty)
-        try {
-          var candidates=['decap-cms.oauthState','decap-cms.oauth-state','netlify-cms.oauthState','netlify-cms.oauth-state','oauthState','oauth-state'];
-          var stores=[];
-          try { if (window.opener.localStorage) stores.push(window.opener.localStorage); } catch(_){ }
-          try { if (window.opener.sessionStorage) stores.push(window.opener.sessionStorage); } catch(_){ }
-          for (var i=0;i<candidates.length;i++){
-            for (var j=0;j<stores.length;j++){
-              try { var v=stores[j].getItem(candidates[i]); if (v) { st=v; i=candidates.length; break; } } catch(__){}
-            }
-          }
-        } catch(__){}
-        var msgJson='authorization:github:success:' + JSON.stringify({ token: t, provider: 'github', state: st });
-        var msgRaw='authorization:github:success:' + t;
-        var attempts=0;
-        (function send(){
-          try{ window.opener.postMessage(msgJson, '*'); }catch(_){ }
-          try{ window.opener.postMessage(msgRaw, '*'); }catch(_){ }
-          if(++attempts < 6) { setTimeout(send, 200); }
-          else { setTimeout(function(){ try { window.close(); } catch(_){ try{ location.replace('about:blank'); }catch(__){} } }, 100); }
-        })();
-      } catch (_) {}
-    }
-  } catch (_) {}
-})();</script></body></html>`;
-            return { statusCode: 200, headers: { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' }, body: html };
-          } else {
-            const err = (data && (data.error_description || data.error)) || 'token_exchange_failed';
-            const html = `<!doctype html><html><body><script>(function(){try{window.opener&&window.opener.postMessage('authorization:github:error:' + JSON.stringify({ error: '${err}'.replace(/'/g, "\\'"), context: { idSuffix: '${idSuffix}', hasSecret: ${hasSecret}, redirectUri: '${redirectUri}' } }), '*');}catch(_){}window.close();})();</script></body></html>`;
-            return { statusCode: 200, headers: { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' }, body: html };
-          }
-        } catch (e) {
-          const html = `<!doctype html><html><body><script>(function(){try{window.opener&&window.opener.postMessage('authorization:github:error:' + JSON.stringify({ error: '${(e && e.message) || 'exception'}'.replace(/'/g, "\\'"), context: { idSuffix: '${idSuffix}', hasSecret: ${hasSecret}, redirectUri: '${redirectUri}' } }), '*');}catch(_){}window.close();})();</script></body></html>`;
-          return { statusCode: 200, headers: { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' }, body: html };
-        }
-      }
+      // Always prefer PKCE: send code/state back to CMS; token exchange happens via /oauth/access_token
       // PKCE fallback: send code/state to CMS; try to recover state from opener storage if missing
       const html = `<!doctype html><html><body>
 <script>
