@@ -79,7 +79,10 @@ exports.handler = async (event) => {
 
       return {
         statusCode: 302,
-        headers: { Location: url.toString() },
+        headers: Object.assign(
+          { Location: url.toString(), 'Cache-Control': 'no-store' },
+          qs.state ? { 'Set-Cookie': `cms_oauth_state=${encodeURIComponent(qs.state)}; Path=/; SameSite=Lax; Secure` } : {}
+        ),
         body: '',
       };
     }
@@ -115,6 +118,15 @@ exports.handler = async (event) => {
           }
         }
       } catch (_) {}
+      // Fallback: recover state from cookie if missing
+      try {
+        if (!st) {
+          var m = document.cookie.match(/(?:^|; )cms_oauth_state=([^;]+)/);
+          if (m) { st = decodeURIComponent(m[1]); }
+        }
+      } catch(_){ }
+      // Clear temporary cookie
+      try { document.cookie = 'cms_oauth_state=; Max-Age=0; Path=/; SameSite=Lax; Secure'; } catch(_){ }
       window.opener.postMessage({ source: 'decap-cms', code: ${JSON.stringify(code)}, state: st }, '*');
       window.close();
     } else {
