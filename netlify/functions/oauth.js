@@ -172,7 +172,6 @@ exports.handler = async (event) => {
           params.set('code', code);
           params.set('redirect_uri', redirectUri);
           params.set('code_verifier', serverVerifier);
-          if (clientSecret) params.set('client_secret', clientSecret);
           const resp = await fetch(GH_TOKEN_URL, {
             method: 'POST',
             headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -183,7 +182,13 @@ exports.handler = async (event) => {
           const data = await resp.json().catch(async () => {
             try { return { raw: await resp.text() }; } catch (_) { return {}; }
           });
-          try { svBody = JSON.stringify(data).slice(0, 500); } catch(_) { svBody = '[unserializable]'; }
+          try {
+            if (data && data.access_token) {
+              svBody = JSON.stringify({ token_type: data.token_type, scope: data.scope, access_token: '[redacted]' });
+            } else {
+              svBody = JSON.stringify(data).slice(0, 500);
+            }
+          } catch(_) { svBody = '[unserializable]'; }
           if (resp.ok && data && data.access_token) {
             const token = data.access_token;
             const html = `<!doctype html><html><body><script>(function(){
@@ -267,7 +272,7 @@ exports.handler = async (event) => {
                 document.cookie = 'cms_oauth_state=; Max-Age=0; Path=/; SameSite=None; Secure';
                 document.cookie = 'cms_auth_dbg=; Max-Age=0; Path=/; SameSite=None; Secure';
               } catch(_){ }
-              try { window.opener.postMessage({ source: 'oauth-debug', phase: 'browser-pkce-success', status: r.status, body: (function(){ try { return JSON.stringify(d).slice(0, 500); } catch(_) { return '[unserializable]'; } })() }, '*'); } catch(_){ }
+              try { window.opener.postMessage({ source: 'oauth-debug', phase: 'browser-pkce-success', status: r.status, body: (function(){ try { if (d && d.access_token) { return JSON.stringify({ token_type: d.token_type, scope: d.scope, access_token: '[redacted]' }); } return JSON.stringify(d).slice(0, 500); } catch(_) { return '[unserializable]'; } })() }, '*'); } catch(_){ }
               window.opener.postMessage('authorization:github:success:' + JSON.stringify({ token: d.access_token, provider: 'github' }), '*');
               window.close();
               return;
@@ -378,9 +383,12 @@ exports.handler = async (event) => {
       params.set('client_id', clientId);
       params.set('code', code);
       params.set('redirect_uri', redirectUri);
-      // Support both PKCE (no secret) and classic (with secret)
-      if (codeVerifier) params.set('code_verifier', codeVerifier);
-      if (clientSecret) params.set('client_secret', clientSecret);
+      // Support both PKCE (no secret when code_verifier present) and classic (with secret)
+      if (codeVerifier) {
+        params.set('code_verifier', codeVerifier);
+      } else if (clientSecret) {
+        params.set('client_secret', clientSecret);
+      }
 
       const resp = await fetch(GH_TOKEN_URL, {
         method: 'POST',
