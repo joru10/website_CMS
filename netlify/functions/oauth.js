@@ -81,7 +81,7 @@ exports.handler = async (event) => {
         statusCode: 302,
         headers: Object.assign(
           { Location: url.toString(), 'Cache-Control': 'no-store' },
-          qs.state ? { 'Set-Cookie': `cms_oauth_state=${encodeURIComponent(qs.state)}; Path=/; SameSite=Lax; Secure` } : {}
+          qs.state ? { 'Set-Cookie': `cms_oauth_state=${encodeURIComponent(qs.state)}; Path=/; SameSite=None; Secure` } : {}
         ),
         body: '',
       };
@@ -143,15 +143,19 @@ exports.handler = async (event) => {
         }
       } catch (_) {}
       // Fallback: recover state from cookie if missing
+      var dbg = { qs_state_len: (st ? String(st).length : 0), had_cookie: false, cookie_len: 0, ls: false, ss: false };
+      try { dbg.ls = !!(window.opener && window.opener.localStorage); } catch(_){}
+      try { dbg.ss = !!(window.opener && window.opener.sessionStorage); } catch(_){}
       try {
         if (!st) {
           var m = document.cookie.match(/(?:^|; )cms_oauth_state=([^;]+)/);
-          if (m) { st = decodeURIComponent(m[1]); }
+          if (m) { st = decodeURIComponent(m[1]); dbg.had_cookie = true; }
         }
+        try { dbg.cookie_len = (document.cookie || '').length; } catch(_){ }
       } catch(_){ }
       // Clear temporary cookie
-      try { document.cookie = 'cms_oauth_state=; Max-Age=0; Path=/; SameSite=Lax; Secure'; } catch(_){ }
-      window.opener.postMessage({ source: 'decap-cms', code: ${JSON.stringify(code)}, state: st }, '*');
+      try { document.cookie = 'cms_oauth_state=; Max-Age=0; Path=/; SameSite=None; Secure'; } catch(_){ }
+      window.opener.postMessage({ source: 'decap-cms', code: ${JSON.stringify(code)}, state: st, debug: dbg }, '*');
       window.close();
     } else {
       document.body.innerText = 'You can close this window.';
