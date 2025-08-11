@@ -57,6 +57,15 @@ exports.handler = async (event) => {
     if (path.endsWith('/client_id')) {
       return jsonResponse(200, { client_id: clientId || '' });
     }
+    // Safe diagnostics (no secrets): verify what the function sees at runtime
+    if (path.endsWith('/env')) {
+      return jsonResponse(200, {
+        client_id: clientId || '',
+        client_id_suffix: (clientId || '').slice(-4),
+        has_secret: !!clientSecret,
+        callback_base: process.env.PUBLIC_CALLBACK_BASE || baseUrl(event),
+      });
+    }
 
     if (path.endsWith('/authorize') || path.endsWith('/auth')) {
       if (!clientId) {
@@ -126,6 +135,8 @@ exports.handler = async (event) => {
         method: event.httpMethod,
       };
       const cookies = [];
+      // Clear any stale verifier to avoid mismatches across attempts
+      cookies.push(`cms_pkce_v=; Path=/; SameSite=None; Secure; Max-Age=0`);
       // preserve Decap-provided state (if any) and always set our server state for fallback
       if (qs.state) cookies.push(`cms_oauth_state=${encodeURIComponent(qs.state)}; Path=/; SameSite=None; Secure; Max-Age=600`);
       if (usedState) cookies.push(`cms_state=${encodeURIComponent(usedState)}; Path=/; SameSite=None; Secure; Max-Age=600`);
@@ -165,7 +176,7 @@ exports.handler = async (event) => {
       };
       const serverVerifier = getCookie('cms_pkce_v');
       const serverState = getCookie('cms_state');
-      if (serverVerifier) {
+      if (serverVerifier && serverState && serverState === state) {
         try {
           const params = new URLSearchParams();
           params.set('client_id', clientId);
@@ -383,7 +394,7 @@ exports.handler = async (event) => {
       params.set('client_id', clientId);
       params.set('code', code);
       params.set('redirect_uri', redirectUri);
-      // Support both PKCE (no secret when code_verifier present) and classic (with secret)
+      // Support PKCE and classic; only include client_secret when no code_verifier
       if (codeVerifier) {
         params.set('code_verifier', codeVerifier);
       } else if (clientSecret) {
