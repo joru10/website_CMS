@@ -112,10 +112,34 @@ exports.handler = async (event) => {
         var stores = [];
         try { if (window.opener.localStorage) stores.push(window.opener.localStorage); } catch(_){}
         try { if (window.opener.sessionStorage) stores.push(window.opener.sessionStorage); } catch(_){}
-        for (var i=0;i<candidates.length;i++){
-          for (var j=0;j<stores.length;j++){
-            try { var v = stores[j].getItem(candidates[i]); if (v) { st = v; i=candidates.length; break; } } catch(_){}
+        // 1) Try known plain-text state keys
+        for (var i=0;i<candidates.length && !st;i++){
+          for (var j=0;j<stores.length && !st;j++){
+            try { var v = stores[j].getItem(candidates[i]); if (v) { st = v; } } catch(_){ }
           }
+        }
+        // 2) Try known JSON oauth blobs
+        var jsonKeys = ['netlify-cms.oauth','decap-cms.oauth','cms.oauth'];
+        for (var k=0;k<jsonKeys.length && !st;k++){
+          for (var j2=0;j2<stores.length && !st;j2++){
+            try { var val = stores[j2].getItem(jsonKeys[k]); if (val) { try { var obj = JSON.parse(val); if (obj && obj.state) { st = obj.state; } } catch(_){ } } } catch(_){ }
+          }
+        }
+        // 3) As a last resort, scan all storage keys for any JSON with a 'state' field
+        for (var j3=0;j3<stores.length && !st;j3++){
+          try {
+            var store = stores[j3];
+            for (var idx=0; idx<(store && store.length || 0) && !st; idx++){
+              try {
+                var key = store.key(idx);
+                var sval = key && store.getItem(key);
+                if (!sval || typeof sval !== 'string') continue;
+                if (sval[0] === '{' || /oauth/i.test(key)) {
+                  try { var o = JSON.parse(sval); if (o && typeof o === 'object' && o.state) { st = o.state; } } catch(_){ }
+                }
+              } catch(_){ }
+            }
+          } catch(_){ }
         }
       } catch (_) {}
       // Fallback: recover state from cookie if missing
