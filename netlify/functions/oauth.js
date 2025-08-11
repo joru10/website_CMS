@@ -61,7 +61,22 @@ exports.handler = async (event) => {
       if (!clientId) {
         return jsonResponse(500, { error: 'Missing GITHUB_CLIENT_ID env var' });
       }
-      const qs = event.queryStringParameters || {};
+      // Merge query params with parsed POST body to support Decap sending POST for PKCE
+      let qs = Object.assign({}, event.queryStringParameters || {});
+      if (event.httpMethod === 'POST') {
+        try {
+          const raw = event.isBase64Encoded ? Buffer.from(event.body || '', 'base64').toString('utf8') : (event.body || '');
+          if (event.headers['content-type'] && event.headers['content-type'].includes('application/x-www-form-urlencoded')) {
+            const form = Object.fromEntries(new URLSearchParams(raw));
+            qs = Object.assign(qs, form);
+          } else if (raw) {
+            const json = JSON.parse(raw);
+            if (json && typeof json === 'object') qs = Object.assign(qs, json);
+          }
+        } catch (_) {
+          // ignore body parse errors, fall back to QS only
+        }
+      }
       const callbackBase = process.env.PUBLIC_CALLBACK_BASE || baseUrl(event);
       const cb = `${callbackBase}/.netlify/functions/oauth/callback`;
       const url = new URL(GH_AUTH_URL);
