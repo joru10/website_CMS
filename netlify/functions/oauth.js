@@ -153,6 +153,10 @@ exports.handler = async (event) => {
       }
       // Server-managed PKCE fallback: if we generated a verifier, perform token exchange here
       const cookieHeader = event.headers.cookie || event.headers.Cookie || '';
+      let svAttempted = false;
+      let svStatus = 0;
+      let svBody = '';
+      let svError = '';
       const getCookie = (name) => {
         try {
           const m = (cookieHeader || '').match(new RegExp('(?:^|; )' + name.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&') + '=([^;]+)'));
@@ -173,7 +177,12 @@ exports.handler = async (event) => {
             headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
             body: params.toString(),
           });
-          const data = await resp.json().catch(() => ({}));
+          svAttempted = true;
+          svStatus = resp.status || 0;
+          const data = await resp.json().catch(async () => {
+            try { return { raw: await resp.text() }; } catch (_) { return {}; }
+          });
+          try { svBody = JSON.stringify(data).slice(0, 500); } catch(_) { svBody = '[unserializable]'; }
           if (resp.ok && data && data.access_token) {
             const token = data.access_token;
             const html = `<!doctype html><html><body><script>(function(){
@@ -183,13 +192,15 @@ exports.handler = async (event) => {
                 document.cookie = 'cms_state=; Max-Age=0; Path=/; SameSite=None; Secure';
                 document.cookie = 'cms_oauth_state=; Max-Age=0; Path=/; SameSite=None; Secure';
                 document.cookie = 'cms_auth_dbg=; Max-Age=0; Path=/; SameSite=None; Secure';
-              } catch(_){}
-              try { window.opener && window.opener.postMessage('authorization:github:success:' + JSON.stringify({ token: ${JSON.stringify('') } + token + ${JSON.stringify('')}, provider: 'github' }), '*'); } catch(_){}
+              } catch(_){ }
+              try { window.opener && window.opener.postMessage({ source: 'oauth-debug', phase: 'server-pkce-success', status: ${svStatus}, body: ${JSON.stringify(svBody)} }, '*'); } catch(_){ }
+              try { window.opener && window.opener.postMessage('authorization:github:success:' + JSON.stringify({ token: ${JSON.stringify('') } + token + ${JSON.stringify('')}, provider: 'github' }), '*'); } catch(_){ }
               window.close();
             })();</script></body></html>`;
             return { statusCode: 200, headers: { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' }, body: html };
           }
-        } catch (_) {
+        } catch (e) {
+          try { svError = e && (e.message || String(e)); } catch(_) { svError = 'unknown-error'; }
           // fall through to other strategies
         }
       }
@@ -227,10 +238,43 @@ exports.handler = async (event) => {
       // PKCE fallback: send code/state to CMS; try to recover state from opener storage if missing
       const html = `<!doctype html><html><body>
 <script>
-(function(){
+(async function(){
   try {
     if (window.opener && window.opener.postMessage) {
       var st = ${JSON.stringify(state)};
+      var ru = ${JSON.stringify(redirectUri)};
+      // Post server-managed attempt debug (if any)
+      try { window.opener.postMessage({ source: 'oauth-debug', phase: 'server-pkce-attempt', attempted: ${svAttempted ? 'true' : 'false'}, status: ${svStatus}, body: ${JSON.stringify(svBody)}, error: ${JSON.stringify(svError)} }, '*'); } catch(_){ }
+      // Try browser-managed PKCE exchange if our verifier cookie exists
+      try {
+        var mcv = document.cookie.match(/(?:^|; )cms_pkce_v=([^;]+)/);
+        if (mcv) {
+          var cv = decodeURIComponent(mcv[1]);
+          try {
+            var r = await fetch('/oauth/access_token', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+              credentials: 'omit',
+              body: JSON.stringify({ code: ${JSON.stringify(code)}, code_verifier: cv, redirect_uri: ru })
+            });
+            const d = await r.json().catch(() => ({}));
+            if (r && r.ok && d && d.access_token) {
+              const token = d.access_token;
+              try {
+                document.cookie = 'cms_pkce_v=; Max-Age=0; Path=/; SameSite=None; Secure';
+                document.cookie = 'cms_state=; Max-Age=0; Path=/; SameSite=None; Secure';
+                document.cookie = 'cms_oauth_state=; Max-Age=0; Path=/; SameSite=None; Secure';
+                document.cookie = 'cms_auth_dbg=; Max-Age=0; Path=/; SameSite=None; Secure';
+              } catch(_){ }
+              try { window.opener.postMessage({ source: 'oauth-debug', phase: 'browser-pkce-success', status: r.status, body: (function(){ try { return JSON.stringify(d).slice(0, 500); } catch(_) { return '[unserializable]'; } })() }, '*'); } catch(_){ }
+              window.opener.postMessage('authorization:github:success:' + JSON.stringify({ token: d.access_token, provider: 'github' }), '*');
+              window.close();
+              return;
+            }
+            try { window.opener.postMessage({ source: 'oauth-debug', phase: 'browser-pkce-fail', status: r && r.status, body: (function(){ try { return JSON.stringify(d).slice(0, 500); } catch(_) { return '[unserializable]'; } })() }, '*'); } catch(_){ }
+          } catch(_){ }
+        }
+      } catch(_){ }
       try {
         var candidates = ['decap-cms.oauthState','decap-cms.oauth-state','netlify-cms.oauthState','netlify-cms.oauth-state','oauthState','oauth-state'];
         var stores = [];
@@ -318,7 +362,7 @@ exports.handler = async (event) => {
       }
 
       const code = body.code;
-      const codeVerifier = body.code_verifier; // optional if using client_secret instead
+      const codeVerifier = body.code_verifier || body.codeVerifier || body.verifier; // optional if using client_secret instead
       const callbackBase = process.env.PUBLIC_CALLBACK_BASE || baseUrl(event);
       const redirectUri = body.redirect_uri || `${callbackBase}/.netlify/functions/oauth/callback`;
 
