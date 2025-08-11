@@ -172,6 +172,7 @@ exports.handler = async (event) => {
           params.set('code', code);
           params.set('redirect_uri', redirectUri);
           params.set('code_verifier', serverVerifier);
+          if (clientSecret) params.set('client_secret', clientSecret);
           const resp = await fetch(GH_TOKEN_URL, {
             method: 'POST',
             headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
