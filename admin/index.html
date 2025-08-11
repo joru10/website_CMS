@@ -54,6 +54,18 @@
               ? 'https://comfy-panda-0d488a.netlify.app/oauth'
               // Production: use local Netlify Function provider
               : '/oauth';
+            // Allow passing public client_id via query param or localStorage for PKCE fallback
+            try {
+              const qp = new URLSearchParams(location.search);
+              const qid = qp.get('client_id');
+              if (qid) {
+                window.CMS_GITHUB_CLIENT_ID = qid;
+                try { localStorage.setItem('CMS_GITHUB_CLIENT_ID', qid); } catch(_) {}
+              }
+              if (!window.CMS_GITHUB_CLIENT_ID) {
+                try { const v = localStorage.getItem('CMS_GITHUB_CLIENT_ID'); if (v) window.CMS_GITHUB_CLIENT_ID = v; } catch(_) {}
+              }
+            } catch(_) {}
             // Build backend dynamically: prefer PKCE if client_id can be retrieved
             async function buildBackend() {
               const backend = {
@@ -80,6 +92,13 @@
                 }
               } catch (e) {
                 console.log('Decap backend: client_id fetch error, using classic flow', e && e.message);
+              }
+              // Optional fallback: allow setting public client_id via global for PKCE
+              if (!backend.app_id && typeof window !== 'undefined' && window.CMS_GITHUB_CLIENT_ID) {
+                backend.auth_type = 'pkce';
+                backend.app_id = window.CMS_GITHUB_CLIENT_ID;
+                backend.token_endpoint = '/access_token';
+                console.log('Decap backend: using PKCE (window.CMS_GITHUB_CLIENT_ID) suffix', String(backend.app_id).slice(-4));
               }
               return backend;
             }
@@ -280,31 +299,12 @@
             } catch (e) {
               console.error('CMS.init failed', e);
             }
-            // Ensure config sticks: poll a few times and retry update/init if needed
-            (function () {
-              let tries = 0;
-              function snapshot(label) {
-                try {
-                  const cfg = CMS && CMS.getConfig ? CMS.getConfig() : null;
-                  const js = cfg && typeof cfg.toJS === 'function' ? cfg.toJS() : cfg;
-                  console.log('CMS.getConfig()', label, js || cfg);
-                  return !!cfg;
-                } catch (_) { return false; }
-              }
-              function ensure() {
-                if (snapshot('check #' + (tries + 1))) return;
-                tries++;
-                if (tries === 2) {
-                  try { CMS && CMS.updateConfig && CMS.updateConfig(config); console.log('Called CMS.updateConfig'); } catch (e) { console.warn('updateConfig failed', e); }
-                }
-                if (tries === 4) {
-                  try { CMS && CMS.init && CMS.init({ config, load_config_file: false }); console.log('Re-invoked CMS.init'); } catch (e) { console.warn('re-init failed', e); }
-                }
-                if (tries < 8) setTimeout(ensure, 350);
-                else console.warn('Config still not registered after retries');
-              }
-              setTimeout(ensure, 600);
-            })();
+            // One-time snapshot for diagnostics
+            try {
+              const cfg = CMS && CMS.getConfig ? CMS.getConfig() : null;
+              const js = cfg && typeof cfg.toJS === 'function' ? cfg.toJS() : cfg;
+              console.log('CMS.getConfig() after init', js || cfg);
+            } catch (_) {}
           } else {
             console.error('CMS global not found after loading', src);
           }
