@@ -32,9 +32,7 @@ backend: {
   repo: 'joru10/website_CMS',
   branch: 'main',
   base_url: 'https://YOUR-OAUTH-SERVER',
-  auth_endpoint: '/auth',
-  token_endpoint: '/access_token',
-  auth_type: 'pkce',
+  auth_endpoint: 'auth'
 }
 ```
 
@@ -47,9 +45,3 @@ backend: {
 ## Notes
 - Ensure `ALLOWED_ORIGINS`/CORS allows https://comfy-panda-0d488a.netlify.app if you add stricter CORS.
 - If you see a 404 after GitHub, double-check `OAUTH_REDIRECT_URL` matches your deployed server `/callback` exactly.
-
-## Netlify Functions variant used in this repo
-- Base URL (production): `base_url: '/oauth'` (served by Netlify Functions via `netlify.toml` redirect)
-- Endpoints: `auth_endpoint: '/auth'`, `token_endpoint: '/access_token'`
-- Callback URL (GitHub OAuth App): `https://<your-site>/.netlify/functions/oauth/callback`
-- The callback page posts `{ source: 'decap-cms', code, state }` back to the opener and closes. Decap CMS completes the token exchange via `token_endpoint` using PKCE (`code_verifier`).

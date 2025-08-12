@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; connect-src 'self' https://api.github.com https://github.com https://*.github.com https://comfy-panda-0d488a.netlify.app; frame-src 'self' https://github.com https://*.github.com; frame-ancestors 'self'; object-src 'none'" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; connect-src 'self' https://api.github.com https://github.com https://*.github.com https://comfy-panda-0d488a.netlify.app https://joru10-cms-oauth.onrender.com; frame-src 'self' https://github.com https://*.github.com; frame-ancestors 'self'; object-src 'none'" />
   <title>Content Manager | RapidAI</title>
 </head>
 <body>
@@ -48,12 +48,9 @@
           console.log('Decap CMS loaded from', src);
           if (typeof CMS !== 'undefined') {
             // Manual init with inline config only (no external fetch) for all environments
-            const isLocalHost = /^(localhost|127\.0\.0\.1)$/i.test(location.hostname);
-            const oauthBase = isLocalHost
-              // Local dev: use production provider to avoid needing functions locally
-              ? 'https://comfy-panda-0d488a.netlify.app/oauth'
-              // Production: use local Netlify Function provider
-              : '/oauth';
+            // The oauthBase should always point to our deployed Render service.
+            const oauthBase = 'https://joru10-cms-oauth.onrender.com';
+
             // Allow passing public client_id via query param or localStorage for PKCE fallback
             try {
               const qp = new URLSearchParams(location.search);
@@ -283,7 +280,7 @@
             };
             // Diagnostics: log duplicates prior to init
             try {
-              const locales = (config.i18n && config.i18n.locales) || [];
+              const locales = (config.i1n && config.i1n.locales) || [];
               const dupLocales = locales.filter((v, i, a) => a.indexOf(v) !== i);
               const names = (config.collections || []).map(c => c.name);
               const dupCollections = names.filter((v, i, a) => a.indexOf(v) !== i);
