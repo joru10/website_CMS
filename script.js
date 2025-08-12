@@ -963,7 +963,7 @@ function parseFrontmatter(text) {
  */
 console.log('Script loaded, initializing services...');
 
-async function loadServicesContent(lang = 'en') {
+function loadServicesContent(lang = 'en') {
     console.log('loadServicesContent called with lang:', lang);
     const servicesContainer = document.getElementById('services-container');
     if (!servicesContainer) {
@@ -978,72 +978,42 @@ async function loadServicesContent(lang = 'en') {
             <p class="mt-4 text-gray-600">Loading services...</p>
         </div>`;
 
-    // Try to fetch CMS-managed services from the repository
-    const slugs = ['service1', 'service2', 'service3'];
-    const langSuffix = lang && lang !== 'en' ? `.${lang}` : '';
-    let servicesData = [];
-    try {
-        const results = await Promise.all(slugs.map(async (slug) => {
-            const url = `content/services/${slug}/index${langSuffix}.md`;
-            try {
-                const res = await fetch(url, { cache: 'no-store' });
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const text = await res.text();
-                const { frontmatter } = parseFrontmatter(text);
-                return {
-                    name: slug,
-                    title: frontmatter.title || slug,
-                    description: frontmatter.description || '',
-                    icon: frontmatter.icon || 'fas fa-cogs',
-                    features: [frontmatter.feature1, frontmatter.feature2, frontmatter.feature3].filter(Boolean)
-                };
-            } catch (e) {
-                console.warn('Service not found or failed to load:', url, e.message || e);
-                return null;
-            }
-        }));
-        servicesData = results.filter(Boolean);
-    } catch (e) {
-        console.error('Failed to load services from CMS files:', e);
-    }
-    // Fallback to defaults if nothing loaded
-    if (!servicesData.length) {
-        servicesData = [
-            {
-                name: 'service1',
-                title: 'AI Strategy & Consulting',
-                description: 'We develop comprehensive AI strategies that align with your business goals, ensuring maximum impact and a clear roadmap for implementation.',
-                icon: 'fas fa-brain',
-                features: [
-                    'AI opportunity assessment',
-                    'Custom implementation roadmap',
-                    'ROI analysis & projections'
-                ]
-            },
-            {
-                name: 'service2',
-                title: 'Process Automation',
-                description: 'Streamline your operations with intelligent automation solutions that reduce costs and increase efficiency.',
-                icon: 'fas fa-cogs',
-                features: [
-                    'Workflow optimization',
-                    'Task automation',
-                    'Integration with existing systems'
-                ]
-            },
-            {
-                name: 'service3',
-                title: 'Custom AI Solutions',
-                description: 'Bespoke AI applications designed specifically for your industry and business requirements.',
-                icon: 'fas fa-robot',
-                features: [
-                    'Machine learning models',
-                    'Natural language processing',
-                    'Predictive analytics'
-                ]
-            }
-        ];
-    }
+    // Hardcoded service data
+    const servicesData = [
+        {
+            name: 'service1',
+            title: 'AI Strategy & Consulting',
+            description: 'We develop comprehensive AI strategies that align with your business goals, ensuring maximum impact and a clear roadmap for implementation.',
+            icon: 'fas fa-brain',
+            features: [
+                'AI opportunity assessment',
+                'Custom implementation roadmap',
+                'ROI analysis & projections'
+            ]
+        },
+        {
+            name: 'service2',
+            title: 'Process Automation',
+            description: 'Streamline your operations with intelligent automation solutions that reduce costs and increase efficiency.',
+            icon: 'fas fa-cogs',
+            features: [
+                'Workflow optimization',
+                'Task automation',
+                'Integration with existing systems'
+            ]
+        },
+        {
+            name: 'service3',
+            title: 'Custom AI Solutions',
+            description: 'Bespoke AI applications designed specifically for your industry and business requirements.',
+            icon: 'fas fa-robot',
+            features: [
+                'Machine learning models',
+                'Natural language processing',
+                'Predictive analytics'
+            ]
+        }
+    ];
     
     // Clear loading state and render services
     servicesContainer.innerHTML = '';

@@ -1,12 +1,7 @@
 ---
-title: "Custom AI Solutions"
-description: "Bespoke AI applications designed specifically for your industry and business requirements."
-icon: "fas fa-robot"
+title: Custom AI Solutions
+description: We design and build tailor-made AI models and applications to address your unique business challenges and opportunities, ensuring a perfect fit for your needs.
+icon: fas fa-laptop-code
 order: 3
 featured: false
-feature1: "Machine learning models"
-feature2: "Natural language processing"
-feature3: "Predictive analytics"
 ---
-
-From prototypes to production, we build end‑to‑end AI systems tailored to your workflows and KPIs.
