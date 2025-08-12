@@ -8,6 +8,16 @@ backend:
   name: github
   repo: joru10/website_CMS
   branch: main
+  base_url: https://joru10-cms-oauth.onrender.com
+  auth_endpoint: auth
+
+  
+  
+  
+  
+  
+
+
 
 # Internationalization settings
 i18n:
