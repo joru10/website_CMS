@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>OAuth Callback Handler</title>
+  <script>
+    // This page handles the OAuth callback
+    // The actual OAuth flow is handled by Decap CMS
+    window.opener.postMessage(
+      'authorization:github:success:{"token":"' + 
+      window.location.hash.substr(1) + '"}',
+      window.location.origin
+    );
+    window.close();
+  </script>
+</head>
+<body>
+  <p>Completing login... You can close this window.</p>
+</body>
+</html>
