@@ -193,8 +193,19 @@ app.get('/callback', async (req, res) => {
     
     console.log('Sending token request to:', tokenUrl);
     console.log('Request body:', tokenBody);
+    console.log('Environment variables:', {
+      CLIENT_ID: CLIENT_ID,
+      CLIENT_SECRET: CLIENT_SECRET ? '***' : 'MISSING',
+      CALLBACK_URL: CALLBACK_URL
+    });
     
     try {
+      console.log('Sending token request with headers:', {
+        'Accept': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Decap-CMS-OAuth-Provider'
+      });
+      
       const tokenResponse = await fetch(tokenUrl, {
         method: 'POST',
         headers: {
@@ -206,6 +217,7 @@ app.get('/callback', async (req, res) => {
       });
 
       console.log('Token response status:', tokenResponse.status);
+      console.log('Response headers:', Object.fromEntries(tokenResponse.headers.entries()));
       
       const responseText = await tokenResponse.text();
       console.log('GitHub raw response:', responseText);
@@ -213,9 +225,19 @@ app.get('/callback', async (req, res) => {
       let tokenData;
       try {
         tokenData = JSON.parse(responseText);
+        console.log('Parsed token data:', {
+          ...tokenData,
+          access_token: tokenData.access_token ? '***' : 'MISSING',
+          refresh_token: tokenData.refresh_token ? '***' : 'MISSING'
+        });
       } catch (e) {
         console.error('Error parsing GitHub response as JSON:', e);
-        return res.status(500).send('Invalid JSON response from GitHub');
+        console.error('Raw response that failed to parse:', responseText);
+        return res.status(500).json({
+          error: 'invalid_json_response',
+          error_description: 'Invalid JSON response from GitHub',
+          raw_response: responseText
+        });
       }
 
       console.log('GitHub response data:', tokenData);
