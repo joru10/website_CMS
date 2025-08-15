@@ -124,9 +124,23 @@ app.get('/callback', async (req, res) => {
         received: state, 
         expected: savedState,
         hasCodeVerifier: !!codeVerifier,
+        cookies: req.cookies,
         headers: req.headers
       });
-      return res.status(400).send('Invalid OAuth state');
+      
+      // For debugging - log all cookies
+      console.log('All cookies:', req.cookies);
+      
+      // Try to get the state from the Authorization header as fallback
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.split(' ')[1];
+        console.log('Found token in Authorization header, length:', token?.length);
+      }
+      
+      return res.status(400).send(`Invalid OAuth state. Please try again.\n\n` +
+        `Received state: ${state || 'undefined'}\n` +
+        `Expected state: ${savedState || 'undefined'}`);
     }
 
     // Verify code
