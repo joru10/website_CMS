@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>OAuth Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    a { color: #0366d6; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <h1>GitHub OAuth Test</h1>
+  <p>Click the link below to test the OAuth flow:</p>
+  
+  <p>
+    <a href="https://github.com/login/oauth/authorize?client_id=Ov23lilcBd8JkV3HWZbE&redirect_uri=https%3A%2F%2Fjoru10-cms-oauth.onrender.com%2Fcallback&scope=repo,user&state=test123" 
+       target="_blank">
+      Test GitHub OAuth
+    </a>
+  </p>
+  
+  <h2>What to expect:</h2>
+  <ol>
+    <li>You'll be redirected to GitHub to authorize the application</li>
+    <li>After authorizing, you'll be redirected back to the OAuth proxy</li>
+    <li>The OAuth proxy will handle the token exchange</li>
+  </ol>
+</body>
+</html>
