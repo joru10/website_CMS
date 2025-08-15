@@ -164,9 +164,9 @@ app.get('/callback', async (req, res) => {
     // For PKCE flow, only include the code_verifier and explicitly remove client_secret
     if (codeVerifier) {
       console.log('Using PKCE flow with code_verifier');
-      // Create new URLSearchParams to ensure no client_secret is present
       const pkceParams = new URLSearchParams({
         client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET, // Include client_secret for server-side PKCE
         code,
         redirect_uri: CALLBACK_URL,
         grant_type: 'authorization_code',
