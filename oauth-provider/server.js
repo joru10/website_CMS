@@ -6,12 +6,12 @@ import cookieParser from 'cookie-parser';
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-const CLIENT_ID = process.env.OAUTH_CLIENT_ID;
+const CLIENT_ID = 'Ov23liC4fJrNvQIAjDiy';
 const CLIENT_SECRET = process.env.OAUTH_CLIENT_SECRET;
-const REDIRECT_URI = process.env.OAUTH_REDIRECT_URL; // e.g. https://your-oauth-server.com/callback
-const SCOPE = process.env.SCOPE || 'repo,user';
+const CALLBACK_URL = 'https://joru10-cms-oauth.onrender.com/callback';
+const SCOPE = 'repo,user';
 
-if (!CLIENT_ID || !CLIENT_SECRET || !REDIRECT_URI) {
+if (!CLIENT_ID || !CLIENT_SECRET || !CALLBACK_URL) {
   console.warn('[WARN] Missing one of OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, OAUTH_REDIRECT_URL');
 }
 

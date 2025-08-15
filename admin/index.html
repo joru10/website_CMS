@@ -46,7 +46,10 @@
           console.log('Decap CMS loaded from', src);
           if (typeof CMS !== 'undefined') {
             // The oauthBase should always point to our deployed Render service.
-            const oauthBase = 'https://joru10-cms-oauth.onrender.com';
+            const oauthBase = { 
+              proxy_url: 'https://joru10-cms-oauth.onrender.com',
+              client_id: 'Ov23liC4fJrNvQIAjDiy' // GitHub OAuth App Client ID
+            };
 
             // Allow passing public client_id via query param or localStorage for PKCE fallback
             try {
