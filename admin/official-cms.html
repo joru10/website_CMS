@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Content Manager</title>
+    <!-- Include the script that enables Netlify Identity on this page. -->
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  </head>
+  <body>
+    <!-- Include the script that enables Decap CMS -->
+    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    
+    <script>
+    // Log when the script loads
+    console.log('Script loaded, initializing CMS...');
+    
+    // Initialize the CMS object
+    if (typeof CMS !== 'undefined') {
+      console.log('CMS object found, version:', CMS.version);
+      
+      // Initialize with configuration
+      CMS.init({
+        config: {
+          backend: {
+            name: 'github',
+            repo: 'joru10/website_CMS',
+            branch: 'main',
+            base_url: 'https://joru10-cms-oauth.onrender.com',
+            auth_endpoint: 'auth',
+            token_endpoint: 'callback',
+            auth_type: 'pkce',
+            app_id: 'Ov23liC4fJrNvQIAjDiy'
+          },
+          media_folder: 'static/uploads',
+          public_folder: '/uploads',
+          site_url: 'https://comfy-panda-0d488a.netlify.app',
+          display_url: 'https://comfy-panda-0d488a.netlify.app',
+          logo_url: 'https://comfy-panda-0d488a.netlify.app/logo.png',
+          collections: [
+            {
+              name: 'test',
+              label: 'Test',
+              folder: 'content/test',
+              create: true,
+              fields: [
+                { label: 'Title', name: 'title', widget: 'string' },
+                { label: 'Body', name: 'body', widget: 'markdown' }
+              ]
+            }
+          ]
+        }
+      });
+      
+      console.log('CMS initialization complete');
+    } else {
+      console.error('CMS object not found!');
+      document.body.innerHTML = '<div style="color: red; padding: 20px; font-family: sans-serif;">Error: Could not load CMS. Please check the browser console for details.</div>';
+    }
+    </script>
+  </body>
+</html>
