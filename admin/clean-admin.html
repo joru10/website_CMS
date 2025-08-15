@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Content Manager</title>
+  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+</head>
+<body>
+  <script>
+    // Simple CMS configuration for testing OAuth
+    const config = {
+      backend: {
+        name: 'github',
+        repo: 'joru10/website_CMS',
+        branch: 'main',
+        base_url: 'https://joru10-cms-oauth.onrender.com',
+        auth_endpoint: 'auth',
+        token_endpoint: 'callback',
+        auth_type: 'pkce',
+        app_id: 'Ov23liC4fJrNvQIAjDiy'
+      },
+      media_folder: 'static/uploads',
+      public_folder: '/uploads',
+      collections: [
+        {
+          name: 'test',
+          label: 'Test',
+          folder: 'content/test',
+          create: true,
+          fields: [
+            { label: 'Title', name: 'title', widget: 'string' },
+            { label: 'Body', name: 'body', widget: 'markdown' }
+          ]
+        }
+      ]
+    };
+
+    // Initialize CMS
+    CMS.init({ config });
+  </script>
+</body>
+</html>
