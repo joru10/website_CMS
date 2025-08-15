@@ -1,0 +1,21 @@
+backend:
+  name: github
+  repo: joru10/website_CMS
+  branch: main
+  base_url: https://joru10-cms-oauth.onrender.com
+  auth_endpoint: auth
+  token_endpoint: callback
+  auth_type: pkce
+  app_id: Ov23liC4fJrNvQIAjDiy
+
+media_folder: static/uploads
+public_folder: /uploads
+
+collections:
+  - name: test
+    label: Test
+    folder: content/test
+    create: true
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Body, name: body, widget: markdown }
