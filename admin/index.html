@@ -32,12 +32,38 @@
   </script>
   
   <script>
-    // Debug: log OAuth popup messages reaching the admin window
+    // Handle OAuth popup messages
     window.addEventListener('message', function(e) {
       try {
-        console.log('oauth message', e && e.data);
-      } catch (_) {}
+        console.log('Received message from popup:', e.data);
+        
+        // Handle GitHub OAuth success
+        if (e.data && e.data.type === 'authorization:github:success') {
+          console.log('GitHub OAuth successful:', e.data.response);
+          // Initialize CMS with the received token
+          if (window.CMS && window.CMS.init) {
+            console.log('Initializing CMS with auth token');
+            window.CMS.init({ config: window.CMS_CONFIG, load_config_file: false });
+            document.getElementById('nc-root').style.display = 'block';
+          }
+        }
+        
+        // Handle GitHub OAuth errors
+        if (e.data && e.data.type === 'authorization:github:error') {
+          console.error('GitHub OAuth error:', e.data.error);
+          alert('Authentication failed: ' + (e.data.error_description || 'Unknown error'));
+        }
+      } catch (err) {
+        console.error('Error processing message:', err);
+      }
     });
+    
+    // Check for OAuth callback in URL (in case the popup was blocked)
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('code') && params.get('state')) {
+      console.log('Detected OAuth callback in URL');
+      // This will be handled by the CMS automatically
+    }
   </script>
   
   <script>
@@ -79,8 +105,14 @@
                   auth_scope: 'repo,user',
                   cms_label_prefix: '',
                   use_graphql: true,
-                  proxy_url: 'https://joru10-cms-oauth.onrender.com/auth'
+                  proxy_url: 'https://joru10-cms-oauth.onrender.com/auth',
+                  // Important: Ensure the CMS knows we're using a proxy
+                  api_root: 'https://joru10-cms-oauth.onrender.com',
+                  // Debug options
+                  debug: true
                 },
+                // Enable debug mode
+                debug: true,
                 media_folder: 'static/uploads',
                 public_folder: '/uploads',
                 collections: [
