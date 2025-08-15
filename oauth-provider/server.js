@@ -23,7 +23,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Helper function to generate random state
-const randomState = () => crypto.randomBytes(16).toString('hex');
+function randomState(len = 24) {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let s = '';
+  for (let i = 0; i < len; i++) s += chars[Math.floor(Math.random() * chars.length)];
+  return s;
+}
 
 // Generate a code verifier for PKCE
 const generateCodeVerifier = () => {
@@ -38,13 +43,6 @@ const generateCodeChallenge = (verifier) => {
     .replace(/=+$/, '');
   return hash;
 };
-
-function randomState(len = 24) {
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  let s = '';
-  for (let i = 0; i < len; i++) s += chars[Math.floor(Math.random() * chars.length)];
-  return s;
-}
 
 app.get('/status', (_req, res) => {
   res.json({ ok: true });
