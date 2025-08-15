@@ -7,7 +7,7 @@ const app = express();
 const SERVER_PORT = process.env.PORT || 3000;
 
 // GitHub OAuth App credentials from environment variables
-const CLIENT_ID = process.env.GITHUB_CLIENT_ID || 'Ov23liC4fJrNvQIAjDiy';
+const CLIENT_ID = process.env.GITHUB_CLIENT_ID || 'Ov23lilcBd8JkV3HWZbE';
 const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET; // Must be set in production
 const CALLBACK_URL = 'https://joru10-cms-oauth.onrender.com/callback';
 const SCOPE = 'repo,user';
