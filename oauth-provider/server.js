@@ -259,13 +259,18 @@ app.get('/callback', async (req, res) => {
         });
       }
 
-      // Success - close the popup and pass the token to the parent window
-      console.log('OAuth successful, closing popup and returning token');
+      // Success - redirect back to the admin page with token in URL hash
+      console.log('OAuth successful, redirecting back to admin page');
+      
+      // Create a redirect URL with the token in the hash
+      const redirectUrl = `${process.env.FRONTEND_URL || 'https://comfy-panda-0d488a.netlify.app'}/admin/#token=${encodeURIComponent(JSON.stringify(tokenData))}`;
+      
       const responseHtml = `
         <!DOCTYPE html>
         <html>
           <head>
             <title>Authentication Complete</title>
+            <meta http-equiv="refresh" content="0;url=${redirectUrl}">
             <script>
               (function() {
                 // Store the token in localStorage as a fallback

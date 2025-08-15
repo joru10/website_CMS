@@ -43,27 +43,23 @@
       
       // Store the token in localStorage for the CMS to pick up
       if (response && response.access_token) {
-        localStorage.setItem('netlify-cms-user', JSON.stringify({
+        const userData = {
           access_token: response.access_token,
           token_type: response.token_type,
-          scope: response.scope
-        }));
+          scope: response.scope,
+          created_at: Date.now()
+        };
+        localStorage.setItem('netlify-cms-user', JSON.stringify(userData));
+        
+        // Also set in sessionStorage for immediate access
+        sessionStorage.setItem('netlify-cms-user', JSON.stringify(userData));
+        
+        // Trigger a custom event that the CMS can listen to
+        document.dispatchEvent(new CustomEvent('cms:oauth:success', { detail: response }));
       }
       
-      // Initialize CMS if not already done
-      if (window.CMS && window.CMS.init) {
-        console.log('Initializing CMS after successful auth');
-        try {
-          window.CMS.init({ 
-            config: window.CMS_CONFIG, 
-            load_config_file: false 
-          });
-          const rootEl = document.getElementById('nc-root');
-          if (rootEl) rootEl.style.display = 'block';
-        } catch (e) {
-          console.error('Error initializing CMS:', e);
-        }
-      }
+      // Force reload the page to ensure clean initialization
+      window.location.href = window.location.pathname + '?auth=success&t=' + Date.now();
     }
     
     // Listen for messages from the popup
@@ -73,17 +69,25 @@
         
         // Handle GitHub OAuth success
         if (e.data && e.data.type === 'authorization:github:success') {
+          console.log('Processing GitHub OAuth success message');
           handleAuthSuccess(e.data.response);
+          return;
         }
         
         // Handle GitHub OAuth errors
         if (e.data && e.data.type === 'authorization:github:error') {
           console.error('GitHub OAuth error:', e.data.error);
           alert('Authentication failed: ' + (e.data.error_description || 'Unknown error'));
+          return;
         }
       } catch (err) {
         console.error('Error processing message:', err);
       }
+    });
+    
+    // Listen for the custom success event
+    document.addEventListener('cms:oauth:success', function(e) {
+      console.log('Received cms:oauth:success event', e.detail);
     });
     
     // Check for existing auth token on load
