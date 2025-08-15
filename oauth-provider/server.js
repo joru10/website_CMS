@@ -63,19 +63,25 @@ app.get('/callback', async (req, res) => {
 
     // Exchange code for access token
     console.log('Exchanging code for token with GitHub...');
+    const tokenParams = {
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
+      code,
+      redirect_uri: CALLBACK_URL
+    };
+
+    // Only include code_verifier if using PKCE
+    if (codeVerifier) {
+      tokenParams.code_verifier = codeVerifier;
+    }
+
     const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'User-Agent': 'joru10-cms-oauth/1.0.0'
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
-        code,
-        redirect_uri: CALLBACK_URL
-      })
+      body: JSON.stringify(tokenParams)
     });
 
     console.log('GitHub response status:', tokenResponse.status);
