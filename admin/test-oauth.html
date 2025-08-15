@@ -6,32 +6,57 @@
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
     button { padding: 10px 15px; font-size: 16px; cursor: pointer; }
-    #result { margin-top: 20px; padding: 15px; border: 1px solid #ddd; }
+    #result { margin-top: 20px; padding: 15px; border: 1px solid #ddd; white-space: pre-wrap; }
+    .error { color: red; }
   </style>
 </head>
 <body>
   <h1>OAuth Test</h1>
   <button id="startOAuth">Start OAuth Flow</button>
   <div id="result">Click the button to start OAuth flow</div>
+  <div id="debug"></div>
 
   <script>
+    // Debug logging
+    function log(message) {
+      const debug = document.getElementById('debug');
+      const entry = document.createElement('div');
+      entry.textContent = `[${new Date().toISOString()}] ${JSON.stringify(message)}`;
+      debug.appendChild(entry);
+      console.log('OAuth Debug:', message);
+    }
+
+    // Handle OAuth start
     document.getElementById('startOAuth').addEventListener('click', () => {
       const result = document.getElementById('result');
       result.innerHTML = 'Redirecting to GitHub...';
+      log('Starting OAuth flow');
       
-      // Start OAuth flow
-      window.location.href = 'https://joru10-cms-oauth.onrender.com/auth';
+      // Start OAuth flow with the current page as the origin
+      const origin = window.location.origin + window.location.pathname;
+      window.location.href = `https://joru10-cms-oauth.onrender.com/auth?origin=${encodeURIComponent(origin)}`;
     });
 
-    // Check for token in URL hash
-    window.addEventListener('load', () => {
+    // Check for token in URL hash or query params
+    function checkForToken() {
       const hash = window.location.hash.substring(1);
+      const urlParams = new URLSearchParams(window.location.search);
       const result = document.getElementById('result');
       
       if (hash) {
-        result.innerHTML = `OAuth Response: <pre>${decodeURIComponent(hash)}</pre>`;
+        result.innerHTML = `OAuth Response (hash): <pre>${decodeURIComponent(hash)}</pre>`;
+        log('Received hash: ' + hash);
+      } else if (urlParams.has('code')) {
+        result.innerHTML = `OAuth Response (code): <pre>${JSON.stringify(Object.fromEntries(urlParams), null, 2)}</pre>`;
+        log('Received code: ' + urlParams.get('code'));
+      } else if (urlParams.has('error')) {
+        result.innerHTML = `<div class="error">OAuth Error: ${urlParams.get('error')}<br>${urlParams.get('error_description') || ''}</div>`;
+        log('OAuth error: ' + urlParams.get('error_description') || urlParams.get('error'));
       }
-    });
+    }
+
+    // Initial check
+    window.addEventListener('load', checkForToken);
   </script>
 </body>
 </html>
