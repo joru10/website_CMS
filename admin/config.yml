@@ -6,7 +6,7 @@ backend:
   auth_endpoint: auth
   token_endpoint: access_token
   auth_type: pkce
-  app_id: Ov23liC4fJrNvQIAjDiy
+  app_id: Ov23lilcBd8JkV3HWZbE
   site_domain: https://comfy-panda-0d488a.netlify.app
 
 media_folder: static/uploads
