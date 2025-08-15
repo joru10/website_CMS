@@ -67,60 +67,26 @@ app.get('/auth', async (req, res) => {
     
     console.log('State data before encoding:', JSON.stringify(stateData, null, 2));
     
-    // Simple URL-safe JSON encoding with validation
-    const stateString = JSON.stringify({
-      t: Date.now(), // Add timestamp for validation
-      d: stateData   // Nested data
-    });
+    // Simple URL parameter format: state=<state>&o=<origin>&v=<codeVerifier>
+    const stateParams = new URLSearchParams();
+    stateParams.set('s', state);
+    stateParams.set('o', origin);
+    if (codeVerifier) stateParams.set('v', codeVerifier);
     
-    // Double-encode to prevent any URL parameter issues
-    const encodedState = encodeURIComponent(encodeURIComponent(stateString));
-    
-    console.log('State encoding details:', {
-      originalState: state,
-      origin,
-      hasCodeVerifier: !!codeVerifier,
-      stringLength: stateString.length,
-      encodedLength: encodedState.length,
-      stateString: stateString, // For debugging
-      encodedState: encodedState
-    });
-    
-    // Verify we can decode it
-    try {
-      const decoded = JSON.parse(decodeURIComponent(decodeURIComponent(encodedState)));
-      console.log('State encoding verified:', {
-        timestamp: new Date(decoded.t),
-        data: decoded.d
-      });
-    } catch (e) {
-      console.error('Failed to verify state encoding:', e);
-      throw new Error('State encoding verification failed');
-    }
-    
-    // Verify we can decode it
-    try {
-      const decoded = JSON.parse(Buffer.from(encodedState, 'base64').toString());
-      console.log('Successfully verified state encoding:', {
-        stateMatch: decoded.s === state,
-        originMatch: decoded.o === origin,
-        verifierMatch: decoded.v === codeVerifier
-      });
-    } catch (e) {
-      console.error('Failed to verify state encoding:', e);
-    }
+    const stateParam = stateParams.toString();
+    console.log('State parameter string:', stateParam);
     
     // Build GitHub OAuth URL with PKCE and encoded state
-    const params = new URLSearchParams({
+    const oauthParams = new URLSearchParams({
       client_id: CLIENT_ID,
       redirect_uri: CALLBACK_URL,
       scope: SCOPE,
-      state: encodedState, // Pass all data in the state parameter
+      state: stateParam, // Pass all data in the state parameter
       code_challenge: codeChallenge,
       code_challenge_method: 'S256'
     });
     
-    const authUrl = `https://github.com/login/oauth/authorize?${params.toString()}`;
+    const authUrl = `https://github.com/login/oauth/authorize?${oauthParams.toString()}`;
     console.log('Redirecting to GitHub OAuth');
     res.redirect(authUrl);
     
@@ -142,55 +108,26 @@ app.get('/callback', async (req, res) => {
       return res.redirect(`${origin}/?error=${encodeURIComponent(error_description || error)}`);
     }
     
-    // Decode state data
-    let stateData;
-    let origin = FRONTEND_URL;
-    let codeVerifier;
-    let state;
+    console.log('Raw state parameter:', encodedState);
     
-    console.log('Raw state parameter:', {
-      value: encodedState,
-      type: typeof encodedState,
-      length: encodedState?.length,
-      first10: encodedState?.substring(0, 10),
-      last10: encodedState?.substring(encodedState.length - 10)
+    // Parse URL parameters from state
+    const params = new URLSearchParams(encodedState);
+    const state = params.get('s');
+    const origin = params.get('o') || FRONTEND_URL;
+    const codeVerifier = params.get('v') || null;
+    
+    console.log('Parsed state parameters:', {
+      state,
+      origin,
+      hasCodeVerifier: !!codeVerifier
     });
     
-    // If state is a number, it's likely corrupted
-    if (typeof encodedState === 'number' || /^\d+$/.test(encodedState)) {
-      console.error('State parameter appears to be a number, which indicates corruption');
-      return res.status(400).send('Invalid state format: state parameter is corrupted');
+    if (!state) {
+      console.error('Missing state in URL parameters');
+      return res.status(400).send('Invalid state parameter');
     }
-    
-    try {
-      // Decode the URL-encoded JSON string
-      let decodedString;
-      try {
-        decodedString = decodeURIComponent(encodedState);
-        console.log('Decoded state string:', decodedString);
-      } catch (decodeError) {
-        console.error('URL decode error:', decodeError);
-        return res.status(400).send(`Failed to decode state parameter: ${decodeError.message}`);
-      }
       
-      // Then try to parse the JSON
-      let decodedState;
-      try {
-        decodedState = JSON.parse(decodedString);
-      } catch (parseError) {
-        console.error('JSON parse error:', parseError);
-        return res.status(400).send(`Failed to parse state JSON: ${parseError.message}`);
-      }
-      
-      // Validate the decoded state structure
-      if (!decodedState || typeof decodedState !== 'object') {
-        console.error('Invalid state format:', decodedState);
-        return res.status(400).send('Invalid state format: expected an object');
-      }
-      
-      state = decodedState.s; // Original state
-      origin = decodedState.o || FRONTEND_URL;
-      codeVerifier = decodedState.v; // PKCE code verifier
+      // State is already parsed from URL parameters
       
       console.log('Successfully decoded state:', {
         originalState: state,
