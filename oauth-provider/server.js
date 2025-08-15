@@ -131,12 +131,6 @@ app.get('/callback', async (req, res) => {
     if (!state) {
       throw new Error('State parameter is missing required data');
     }
-      
-    } catch (e) {
-      console.error('Error parsing state parameter:', e);
-      console.error('Raw state value:', stateParam);
-      return res.status(400).send('Invalid state parameter format');
-    }
     
     // For debugging - log all cookies
     console.log('All cookies:', req.cookies);
@@ -148,12 +142,6 @@ app.get('/callback', async (req, res) => {
       console.log('Found token in Authorization header, length:', token?.length);
     }
     
-    // Verify code
-    if (!code) {
-      console.error('Missing authorization code');
-      return res.status(400).send('Missing authorization code');
-    }
-
     // Verify code
     if (!code) {
       console.error('Missing authorization code');
