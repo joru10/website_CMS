@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>React Mount Test</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    #root { 
+      padding: 20px;
+      font-family: Arial, sans-serif;
+    }
+    .success { color: green; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <h1>React Mount Test</h1>
+    <div id="status">Testing React mounting...</div>
+  </div>
+
+  <script type="text/babel">
+    function App() {
+      return (
+        <div>
+          <h2>React is working! ✅</h2>
+          <p>If you can see this, React is mounted correctly.</p>
+          <p>Now loading Decap CMS...</p>
+        </div>
+      );
+    }
+
+    // Try to mount React
+    try {
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+      document.getElementById('status').innerHTML = 
+        '<span class="success">✓ React mounted successfully!</span>';
+    } catch (e) {
+      document.getElementById('status').innerHTML = 
+        `<span class="error">✗ React mount failed: ${e.message}</span>`;
+    }
+
+    // Now load Decap CMS
+    const cmsScript = document.createElement('script');
+    cmsScript.src = 'https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js';
+    cmsScript.onload = () => {
+      console.log('Decap CMS loaded');
+      if (window.CMS) {
+        console.log('CMS object available:', CMS);
+        document.getElementById('status').innerHTML += 
+          '<div class="success">✓ Decap CMS loaded successfully!</div>';
+      } else {
+        document.getElementById('status').innerHTML += 
+          '<div class="error">✗ CMS object not found after script load</div>';
+      }
+    };
+    cmsScript.onerror = () => {
+      document.getElementById('status').innerHTML += 
+        '<div class="error">✗ Failed to load Decap CMS script</div>';
+    };
+    document.head.appendChild(cmsScript);
+  </script>
+</body>
+</html>
