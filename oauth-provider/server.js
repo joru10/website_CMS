@@ -8,7 +8,8 @@ const app = express();
 const SERVER_PORT = process.env.PORT || 3000;
 
 // GitHub OAuth App credentials from environment variables
-const CLIENT_ID = process.env.GITHUB_CLIENT_ID || process.env.OAUTH_CLIENT_ID || 'Ov23lilcBd8JkV3HWZbE';
+// GitHub OAuth App credentials from environment variables
+const CLIENT_ID = process.env.GITHUB_CLIENT_ID || process.env.OAUTH_CLIENT_ID || 'Ov23lilcBd8JkV3HWZbE'; // Correct client ID
 const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET || process.env.OAUTH_CLIENT_SECRET; // Must be set in production
 const CALLBACK_URL = process.env.OAUTH_REDIRECT_URL || 'https://joru10-cms-oauth.onrender.com/callback';
 const SCOPE = 'repo,user';
@@ -151,78 +152,108 @@ app.get('/callback', async (req, res) => {
     console.log('Exchanging code for access token...');
     
     // Prepare token request parameters
-    const tokenParams = new URLSearchParams({
+    let tokenParams = new URLSearchParams({
       client_id: CLIENT_ID,
       code,
       redirect_uri: CALLBACK_URL,
       grant_type: 'authorization_code'
     });
 
-    // Add PKCE code_verifier if available, otherwise use client_secret
+    // For PKCE flow, only include the code_verifier and explicitly remove client_secret
     if (codeVerifier) {
       console.log('Using PKCE flow with code_verifier');
-      tokenParams.append('code_verifier', codeVerifier);
-      // Don't send client_secret with PKCE
+      // Create new URLSearchParams to ensure no client_secret is present
+      const pkceParams = new URLSearchParams({
+        client_id: CLIENT_ID,
+        code,
+        redirect_uri: CALLBACK_URL,
+        grant_type: 'authorization_code',
+        code_verifier: codeVerifier
+      });
+      tokenParams = pkceParams;
     } else if (CLIENT_SECRET) {
+      // Fallback to traditional OAuth with client_secret (not recommended)
       console.log('Using traditional OAuth with client_secret');
       tokenParams.append('client_secret', CLIENT_SECRET);
     } else {
       console.error('No code_verifier or CLIENT_SECRET available');
-      return res.status(500).send('Server configuration error');
+      return res.status(500).json({
+        error: 'server_error',
+        error_description: 'Server configuration error: Missing required credentials'
+      });
     }
 
     console.log('Token request params:', tokenParams.toString());
 
-    // Exchange code for token
-    const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'GitHub-OAuth-PKCE-Demo'
-      },
-      body: tokenParams.toString()
-    });
-
-    console.log('Token response status:', tokenResponse.status);
-
-    console.log('GitHub response status:', tokenResponse.status);
-    const tokenData = await tokenResponse.json().catch(e => {
-      console.error('Error parsing GitHub response:', e);
-      return { error: 'Invalid response from GitHub' };
-    });
-
-    console.log('GitHub response data:', tokenData);
-
-    if (tokenData.error) {
-      console.error('GitHub OAuth error:', tokenData);
-      return res.status(400).send(`GitHub OAuth error: ${tokenData.error_description || tokenData.error}`);
-    }
-
-    if (!tokenData.access_token) {
-      console.error('Token exchange failed:', tokenData);
-      return res.status(500).send('Token exchange failed: No access token received');
-    }
-
-    // Redirect back to the admin interface with the token
-    const redirectUrl = new URL('/admin/#/', origin);
-    redirectUrl.hash = `#/auth?token=${encodeURIComponent(tokenData.access_token)}`;
+    // Exchange code for token using GitHub's OAuth endpoint
+    const tokenUrl = 'https://github.com/login/oauth/access_token';
+    const tokenBody = tokenParams.toString();
     
-    // Set token in a secure, httpOnly cookie
-    res.cookie('cms_token', tokenData.access_token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
-      maxAge: tokenData.expires_in * 1000 || 60 * 60 * 1000, // 1 hour default
-      path: '/'
-    });
+    console.log('Sending token request to:', tokenUrl);
+    console.log('Request body:', tokenBody);
+    
+    try {
+      const tokenResponse = await fetch(tokenUrl, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': 'Decap-CMS-OAuth-Provider'
+        },
+        body: tokenBody
+      });
 
-    console.log('OAuth successful, redirecting to:', redirectUrl.toString());
-    res.redirect(redirectUrl.toString());
+      console.log('Token response status:', tokenResponse.status);
+      
+      const responseText = await tokenResponse.text();
+      console.log('GitHub raw response:', responseText);
+      
+      let tokenData;
+      try {
+        tokenData = JSON.parse(responseText);
+      } catch (e) {
+        console.error('Error parsing GitHub response as JSON:', e);
+        return res.status(500).send('Invalid JSON response from GitHub');
+      }
+
+      console.log('GitHub response data:', tokenData);
+
+      if (tokenData.error) {
+        console.error('GitHub OAuth error:', tokenData);
+        return res.status(400).json({
+          error: 'GitHub OAuth error',
+          error_description: tokenData.error_description || tokenData.error,
+          error_uri: tokenData.error_uri
+        });
+      }
+
+      if (!tokenData.access_token) {
+        console.error('No access token in response:', tokenData);
+        return res.status(500).json({
+          error: 'No access token',
+          error_description: 'GitHub did not return an access token'
+        });
+      }
+
+      // Success - return the access token
+      console.log('OAuth successful, returning token data');
+      return res.json({
+        access_token: tokenData.access_token,
+        token_type: tokenData.token_type,
+        scope: tokenData.scope
+      });
+
+    } catch (error) {
+      console.error('Error during token exchange:', error);
+      return res.status(500).json({
+        error: 'token_exchange_error',
+        error_description: error.message
+      });
+    }
 
   } catch (error) {
     console.error('OAuth callback error:', error);
-    res.status(500).send('Authentication failed: ' + error.message);
+    return res.status(500).send('Authentication failed: ' + error.message);
   }
 });
 
