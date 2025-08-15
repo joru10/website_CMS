@@ -12,6 +12,7 @@ const CLIENT_ID = process.env.GITHUB_CLIENT_ID || 'Ov23lilcBd8JkV3HWZbE';
 const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET; // Must be set in production
 const CALLBACK_URL = 'https://joru10-cms-oauth.onrender.com/callback';
 const SCOPE = 'repo,user';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://comfy-panda-0d488a.netlify.app';
 
 if (!CLIENT_ID || !CLIENT_SECRET || !CALLBACK_URL) {
   console.warn('[WARN] Missing one of OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, OAUTH_REDIRECT_URL');
