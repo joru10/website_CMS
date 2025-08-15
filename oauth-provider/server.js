@@ -259,13 +259,73 @@ app.get('/callback', async (req, res) => {
         });
       }
 
-      // Success - return the access token
-      console.log('OAuth successful, returning token data');
-      return res.json({
-        access_token: tokenData.access_token,
-        token_type: tokenData.token_type,
-        scope: tokenData.scope
-      });
+      // Success - close the popup and pass the token to the parent window
+      console.log('OAuth successful, closing popup and returning token');
+      const responseHtml = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Authentication Complete</title>
+            <script>
+              (function() {
+                try {
+                  // Try to send the token to the parent window
+                  if (window.opener) {
+                    window.opener.postMessage({
+                      type: 'authorization:github:success',
+                      response: ${JSON.stringify(tokenData)}
+                    }, window.opener.location.origin);
+                  }
+                  
+                  // Try to close the window
+                  setTimeout(function() {
+                    window.close();
+                  }, 100);
+                  
+                  // Fallback message
+                  setTimeout(function() {
+                    document.getElementById('message').innerHTML = 
+                      'Authentication successful. You can close this window.';
+                  }, 500);
+                  
+                } catch (e) {
+                  console.error('Error in auth callback:', e);
+                  document.body.innerText = 'Authentication successful. Please close this window and return to the application.';
+                }
+              })();
+            </script>
+            <style>
+              body { 
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                background: #f5f5f5;
+                color: #333;
+              }
+              .message {
+                background: white;
+                padding: 2rem;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                text-align: center;
+                max-width: 400px;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="message" id="message">
+              <h2>Authentication Successful</h2>
+              <p>Please wait while we redirect you back to the application...</p>
+            </div>
+          </body>
+        </html>
+      `;
+      
+      res.set('Content-Type', 'text/html');
+      return res.send(responseHtml);
 
     } catch (error) {
       console.error('Error during token exchange:', error);

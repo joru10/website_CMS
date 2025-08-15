@@ -16,7 +16,7 @@
   </style>
 </head>
 <body>
-  <div id="nc-root"></div>
+  <div id="nc-root" style="min-height: 100vh; display: none;"></div>
   
   <script>
     // Enable manual initialization
@@ -129,12 +129,22 @@
                 ]
               };
               
-              // Initialize CMS with the config
+              // Store config for later use
               window.CMS_CONFIG = config;
-              CMS.init({ config, load_config_file: false });
               
-              // Show the CMS UI now that it's initialized
-              document.getElementById('nc-root').style.display = 'block';
+              // Check if we're coming back from OAuth
+              const urlParams = new URLSearchParams(window.location.search);
+              if (urlParams.get('code') && urlParams.get('state')) {
+                // Let the CMS handle the OAuth callback
+                CMS.init({ config, load_config_file: false });
+              } else {
+                // Initialize CMS without OAuth flow
+                CMS.init({ config, load_config_file: false });
+              }
+              
+              // Show the CMS UI
+              const rootEl = document.getElementById('nc-root');
+              if (rootEl) rootEl.style.display = 'block';
               
               // Debug: Log the config
               try {
