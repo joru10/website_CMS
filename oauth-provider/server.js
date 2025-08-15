@@ -9,7 +9,7 @@ const SERVER_PORT = process.env.PORT || 3000;
 
 // GitHub OAuth App credentials from environment variables
 // GitHub OAuth App credentials from environment variables
-const CLIENT_ID = process.env.GITHUB_CLIENT_ID || process.env.OAUTH_CLIENT_ID || 'Ov23lilcBd8JkV3HWZbE'; // Correct client ID
+const CLIENT_ID = process.env.GITHUB_CLIENT_ID || process.env.OAUTH_CLIENT_ID || 'Ov23lihO7foR9SHf6I3s'; // Updated client ID from memory
 const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET || process.env.OAUTH_CLIENT_SECRET; // Must be set in production
 const CALLBACK_URL = process.env.OAUTH_REDIRECT_URL || 'https://joru10-cms-oauth.onrender.com/callback';
 const SCOPE = 'repo,user';
