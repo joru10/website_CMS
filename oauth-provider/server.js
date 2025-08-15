@@ -58,22 +58,11 @@ app.get('/auth', async (req, res) => {
     const codeVerifier = generateCodeVerifier();
     const codeChallenge = await generateCodeChallenge(codeVerifier);
     
-    // Encode state data in the state parameter
-    const stateData = {
-      s: state, // Original state for CSRF protection
-      o: origin, // Origin to redirect back to
-      v: codeVerifier // PKCE code verifier
-    };
+    // Create state parameter as a simple string format
+    // Format: s=<state>&o=<origin>&v=<codeVerifier>
+    const stateParam = `s=${encodeURIComponent(state)}&o=${encodeURIComponent(origin)}` + 
+      (codeVerifier ? `&v=${encodeURIComponent(codeVerifier)}` : '');
     
-    console.log('State data before encoding:', JSON.stringify(stateData, null, 2));
-    
-    // Simple URL parameter format: state=<state>&o=<origin>&v=<codeVerifier>
-    const stateParams = new URLSearchParams();
-    stateParams.set('s', state);
-    stateParams.set('o', origin);
-    if (codeVerifier) stateParams.set('v', codeVerifier);
-    
-    const stateParam = stateParams.toString();
     console.log('State parameter string:', stateParam);
     
     // Build GitHub OAuth URL with PKCE and encoded state
@@ -118,10 +107,11 @@ app.get('/callback', async (req, res) => {
     // Parse URL parameters from state
     let state, origin, codeVerifier;
     try {
+      // Manually parse the URL-encoded state string
       const params = new URLSearchParams(stateParam);
-      state = params.get('s');
-      origin = params.get('o') || FRONTEND_URL;
-      codeVerifier = params.get('v') || null;
+      state = params.get('s') ? decodeURIComponent(params.get('s')) : null;
+      origin = params.get('o') ? decodeURIComponent(params.get('o')) : FRONTEND_URL;
+      codeVerifier = params.get('v') ? decodeURIComponent(params.get('v')) : null;
       
       console.log('Parsed state parameters:', {
         state,
