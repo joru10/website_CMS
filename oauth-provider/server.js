@@ -6,8 +6,9 @@ import cookieParser from 'cookie-parser';
 const app = express();
 const SERVER_PORT = process.env.PORT || 3000;
 
+// GitHub OAuth App credentials
 const CLIENT_ID = 'Ov23liC4fJrNvQIAjDiy';
-const CLIENT_SECRET = process.env.OAUTH_CLIENT_SECRET;
+const CLIENT_SECRET = 'b5f6b8d1d6e3e8d9c5d2c2d7f8a9b0c1a2b3c4d5'; // Note: In production, use environment variables
 const CALLBACK_URL = 'https://joru10-cms-oauth.onrender.com/callback';
 const SCOPE = 'repo,user';
 
@@ -61,11 +62,13 @@ app.get('/callback', async (req, res) => {
     }
 
     // Exchange code for access token
+    console.log('Exchanging code for token with GitHub...');
     const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'User-Agent': 'joru10-cms-oauth/1.0.0'
       },
       body: JSON.stringify({
         client_id: CLIENT_ID,
@@ -75,8 +78,14 @@ app.get('/callback', async (req, res) => {
       })
     });
 
-    const tokenData = await tokenResponse.json();
-    
+    console.log('GitHub response status:', tokenResponse.status);
+    const tokenData = await tokenResponse.json().catch(e => {
+      console.error('Error parsing GitHub response:', e);
+      return { error: 'Invalid response from GitHub' };
+    });
+
+    console.log('GitHub response data:', tokenData);
+
     if (tokenData.error) {
       console.error('GitHub OAuth error:', tokenData);
       return res.status(400).send(`GitHub OAuth error: ${tokenData.error_description || tokenData.error}`);
