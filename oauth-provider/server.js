@@ -67,13 +67,9 @@ app.get('/auth', async (req, res) => {
     
     console.log('State data before encoding:', JSON.stringify(stateData, null, 2));
     
-    // URL-safe base64 encoding for the state parameter
+    // Simple URL-safe JSON encoding
     const stateString = JSON.stringify(stateData);
-    const encodedState = Buffer.from(stateString)
-      .toString('base64')
-      .replace(/\+/g, '-') // Replace + with -
-      .replace(/\//g, '_') // Replace / with _
-      .replace(/=+$/, ''); // Remove padding
+    const encodedState = encodeURIComponent(stateString);
     
     console.log('State encoding details:', {
       originalState: state,
@@ -137,26 +133,13 @@ app.get('/callback', async (req, res) => {
     console.log('Raw state parameter:', encodedState);
     
     try {
-      // First, convert URL-safe base64 to standard base64
-      const standardBase64 = encodedState
-        .replace(/-/g, '+')
-        .replace(/_/g, '/');
-      
-      // Add padding if needed
-      const pad = standardBase64.length % 4;
-      const paddedBase64 = pad ? 
-        standardBase64 + '='.repeat(4 - pad) : 
-        standardBase64;
-      
-      console.log('Converted to standard base64:', paddedBase64);
-      
-      // Now decode
+      // Decode the URL-encoded JSON string
       let decodedString;
       try {
-        decodedString = Buffer.from(paddedBase64, 'base64').toString('utf8');
+        decodedString = decodeURIComponent(encodedState);
         console.log('Decoded state string:', decodedString);
       } catch (decodeError) {
-        console.error('Base64 decode error:', decodeError);
+        console.error('URL decode error:', decodeError);
         return res.status(400).send(`Failed to decode state parameter: ${decodeError.message}`);
       }
       
