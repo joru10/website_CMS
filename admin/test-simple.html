@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Simple Test</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      max-width: 800px; 
+      margin: 40px auto; 
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .login-button {
+      display: inline-block;
+      background: #24292e;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Simple OAuth Test</h1>
+  <p>This is a basic test page to check if the OAuth flow works.</p>
+  
+  <a href="https://joru10-cms-oauth.onrender.com/auth?origin=https://comfy-panda-0d488a.netlify.app" class="login-button">
+    Login with GitHub
+  </a>
+
+  <h2>Debug Info:</h2>
+  <pre id="debug"></pre>
+
+  <script>
+    // Simple debug logging
+    function log(message) {
+      const debugEl = document.getElementById('debug');
+      debugEl.textContent += message + '\n';
+      console.log(message);
+    }
+
+    log('Page loaded');
+    log('Origin: ' + window.location.origin);
+    log('Search: ' + window.location.search);
+
+    // Check for OAuth response in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const authToken = urlParams.get('token');
+    
+    if (authToken) {
+      log('Auth token received: ' + authToken.substring(0, 10) + '...');
+    }
+  </script>
+</body>
+</html>
