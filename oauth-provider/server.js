@@ -6,9 +6,9 @@ import cookieParser from 'cookie-parser';
 const app = express();
 const SERVER_PORT = process.env.PORT || 3000;
 
-// GitHub OAuth App credentials
-const CLIENT_ID = 'Ov23liC4fJrNvQIAjDiy';
-const CLIENT_SECRET = 'b5f6b8d1d6e3e8d9c5d2c2d7f8a9b0c1a2b3c4d5'; // Note: In production, use environment variables
+// GitHub OAuth App credentials from environment variables
+const CLIENT_ID = process.env.GITHUB_CLIENT_ID || 'Ov23liC4fJrNvQIAjDiy';
+const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET; // Must be set in production
 const CALLBACK_URL = 'https://joru10-cms-oauth.onrender.com/callback';
 const SCOPE = 'repo,user';
 
