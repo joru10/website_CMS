@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>CMS Load Test</title>
+  <script>
+    // Test if CMS is loaded
+    function checkCMS() {
+      if (window.CMS) {
+        console.log('CMS loaded successfully:', CMS);
+        document.body.innerHTML += '<div style="color: green; font-size: 24px; padding: 20px;">CMS Loaded Successfully!</div>';
+      } else {
+        console.log('CMS not loaded yet');
+        document.body.innerHTML += '<div style="color: red; font-size: 24px; padding: 20px;">CMS Not Loaded</div>';
+      }
+    }
+
+    // Load CMS script
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js';
+    script.onload = checkCMS;
+    script.onerror = () => {
+      console.error('Failed to load CMS script');
+      document.body.innerHTML += '<div style="color: red; font-size: 24px; padding: 20px;">Failed to Load CMS Script</div>';
+    };
+    document.head.appendChild(script);
+  </script>
+</head>
+<body>
+  <div style="padding: 20px;">
+    <h1>CMS Load Test</h1>
+    <p>Checking if CMS loads correctly...</p>
+  </div>
+</body>
+</html>
