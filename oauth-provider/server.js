@@ -65,8 +65,20 @@ app.get('/callback', async (req, res) => {
     res.clearCookie('oauth_state');
     res.clearCookie('oauth_origin');
 
+    console.log('Verifying OAuth state:', { 
+      receivedState: state, 
+      storedState: savedState,
+      cookies: req.cookies,
+      headers: req.headers
+    });
+    
     if (!code || !state || !savedState || state !== savedState) {
-      console.error('Invalid OAuth state or missing code:', { code, state, savedState });
+      console.error('Invalid OAuth state:', { 
+        received: state, 
+        expected: savedState,
+        cookies: req.cookies,
+        headers: req.headers
+      });
       return res.status(400).send('Invalid OAuth state or missing code');
     }
 
