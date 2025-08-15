@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Working CMS</title>
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  </head>
+  <body>
+    <div id="root" style="min-height: 100vh;"></div>
+    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    <script>
+    // Verify CMS is loaded
+    if (typeof CMS === 'undefined') {
+      document.getElementById('root').innerHTML = 
+        '<div style="color: red; padding: 20px; font-family: sans-serif;">Error: CMS script failed to load. Check browser console for details.</div>';
+      throw new Error('CMS script failed to load');
+    }
+
+    // Initialize CMS with configuration
+    CMS.init({
+      config: {
+        // Basic CMS configuration
+        backend: {
+          name: 'github',
+          repo: 'joru10/website_CMS',
+          branch: 'main',
+          base_url: 'https://joru10-cms-oauth.onrender.com',
+          auth_endpoint: 'auth',
+          token_endpoint: 'callback',
+          auth_type: 'pkce',
+          app_id: 'Ov23liC4fJrNvQIAjDiy'
+        },
+        // Media storage
+        media_folder: 'static/uploads',
+        public_folder: '/uploads',
+        // Site settings
+        site_url: 'https://comfy-panda-0d488a.netlify.app',
+        display_url: 'https://comfy-panda-0d488a.netlify.app',
+        // Collections - ensure all names are unique
+        collections: [
+          {
+            name: 'blog_posts',  // Changed from 'test' to be more specific
+            label: 'Blog Posts',
+            folder: 'content/blog',
+            create: true,
+            fields: [
+              { label: 'Title', name: 'title', widget: 'string' },
+              { label: 'Publish Date', name: 'date', widget: 'datetime' },
+              { label: 'Body', name: 'body', widget: 'markdown' }
+            ]
+          }
+        ]
+      }
+    });
+    </script>
+  </body>
+</html>
