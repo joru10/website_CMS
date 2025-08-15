@@ -58,34 +58,30 @@ app.get('/auth', async (req, res) => {
     const codeVerifier = generateCodeVerifier();
     const codeChallenge = await generateCodeChallenge(codeVerifier);
     
-    // Cookie options - simplified for cross-domain
-    const cookieOptions = {
-      httpOnly: false, // Set to false so client-side JS can read if needed
-      secure: true,
-      sameSite: 'lax', // More compatible than 'none'
-      maxAge: 10 * 60 * 1000, // 10 minutes
-      path: '/'
-      // Removed domain to work on all domains
+    // Store state in memory (in production, use a proper session store)
+    const stateData = {
+      state,
+      origin,
+      codeVerifier
     };
     
-    // Set cookies
-    res.cookie('oauth_state', state, cookieOptions);
-    res.cookie('oauth_origin', origin, cookieOptions);
-    res.cookie('code_verifier', codeVerifier, cookieOptions);
+    // In a production app, you'd want to use a proper session store
+    // This is just for demonstration
+    global.oauthStates = global.oauthStates || {};
+    global.oauthStates[state] = stateData;
     
-    // For debugging - log the cookies being set
-    console.log('Setting cookies:', {
-      oauth_state: state,
-      oauth_origin: origin,
-      code_verifier: codeVerifier ? '***REDACTED***' : 'undefined'
+    console.log('Storing state data:', {
+      state,
+      origin,
+      hasCodeVerifier: !!codeVerifier
     });
     
-    // Build GitHub OAuth URL with PKCE
+    // Build GitHub OAuth URL with PKCE and state
     const params = new URLSearchParams({
       client_id: CLIENT_ID,
       redirect_uri: CALLBACK_URL,
       scope: SCOPE,
-      state: state,
+      state: state, // Pass state in the URL
       code_challenge: codeChallenge,
       code_challenge_method: 'S256'
     });
@@ -104,23 +100,24 @@ app.get('/auth', async (req, res) => {
 app.get('/callback', async (req, res) => {
   try {
     const { code, state, error, error_description } = req.query;
-    const savedState = req.cookies['oauth_state'];
-    const origin = req.cookies['oauth_origin'] || FRONTEND_URL;
-    const codeVerifier = req.cookies['code_verifier'];
     
-    // Clear cookies - match the same options used when setting them
-    ['oauth_state', 'oauth_origin', 'code_verifier'].forEach(cookie => {
-      res.clearCookie(cookie, {
-        path: '/',
-        secure: true,
-        httpOnly: false,
-        sameSite: 'lax'
-      });
-      console.log(`Cleared cookie: ${cookie}`);
+    // Get state data from memory
+    const stateData = global.oauthStates?.[state];
+    const savedState = stateData?.state;
+    const origin = stateData?.origin || FRONTEND_URL;
+    const codeVerifier = stateData?.codeVerifier;
+    
+    // Clean up the state data (even if validation fails)
+    if (state && global.oauthStates) {
+      delete global.oauthStates[state];
+    }
+    
+    console.log('Retrieved state data:', {
+      receivedState: state,
+      savedState,
+      origin,
+      hasCodeVerifier: !!codeVerifier
     });
-    
-    // Log all cookies for debugging
-    console.log('Available cookies after clearing:', req.cookies);
 
     // Handle OAuth errors
     if (error) {
