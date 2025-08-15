@@ -61,13 +61,18 @@ app.get('/callback', async (req, res) => {
     const savedState = req.cookies['oauth_state'];
     const origin = req.cookies['oauth_origin'] || 'https://comfy-panda-0d488a.netlify.app';
 
+    // Get the code verifier from cookies before clearing
+    const codeVerifier = req.cookies['code_verifier'];
+    
     // Clear the cookies
     res.clearCookie('oauth_state');
     res.clearCookie('oauth_origin');
+    res.clearCookie('code_verifier');
 
-    console.log('Verifying OAuth state:', { 
+    console.log('Verifying OAuth state and code verifier:', { 
       receivedState: state, 
       storedState: savedState,
+      hasCodeVerifier: !!codeVerifier,
       cookies: req.cookies,
       headers: req.headers
     });
@@ -76,6 +81,7 @@ app.get('/callback', async (req, res) => {
       console.error('Invalid OAuth state:', { 
         received: state, 
         expected: savedState,
+        hasCodeVerifier: !!codeVerifier,
         cookies: req.cookies,
         headers: req.headers
       });
@@ -86,14 +92,19 @@ app.get('/callback', async (req, res) => {
     console.log('Exchanging code for token with GitHub...');
     const tokenParams = {
       client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
       code,
       redirect_uri: CALLBACK_URL
     };
 
-    // Only include code_verifier if using PKCE
+    // If we have a code verifier (PKCE flow), use it without client_secret
+    // Otherwise fall back to traditional OAuth with client_secret
     if (codeVerifier) {
+      console.log('Using PKCE flow with code_verifier');
       tokenParams.code_verifier = codeVerifier;
+      tokenParams.client_secret = ''; // Explicitly empty for PKCE
+    } else {
+      console.log('Using traditional OAuth with client_secret');
+      tokenParams.client_secret = CLIENT_SECRET;
     }
 
     const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
