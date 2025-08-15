@@ -5,14 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Content Manager</title>
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
-</head>
-<body>
   <script>
+    // Wait for CMS to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
     // Initialize CMS with external config
-    CMS.init({
-      config: '/admin/config.yml',
-      load_config_file: true
+      // Initialize CMS after it's fully loaded
+      if (window.CMS) {
+        CMS.init({
+          config: '/admin/config.yml',
+          load_config_file: true
+        });
+      } else {
+        console.error('CMS not loaded. Check script loading order.');
+      }
     });
   </script>
+</head>
+<body>
 </body>
 </html>
