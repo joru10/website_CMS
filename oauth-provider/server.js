@@ -99,7 +99,7 @@ app.get('/auth', async (req, res) => {
 // Step 2: GitHub redirects here with ?code=...&state=...
 app.get('/callback', async (req, res) => {
   try {
-    const { code, state: encodedState, error, error_description } = req.query;
+    const { code, state: stateParam, error, error_description } = req.query;
     
     // Handle OAuth errors first
     if (error) {
@@ -108,35 +108,35 @@ app.get('/callback', async (req, res) => {
       return res.redirect(`${origin}/?error=${encodeURIComponent(error_description || error)}`);
     }
     
-    console.log('Raw state parameter:', encodedState);
+    console.log('Received OAuth callback with state:', stateParam);
     
-    // Parse URL parameters from state
-    const params = new URLSearchParams(encodedState);
-    const state = params.get('s');
-    const origin = params.get('o') || FRONTEND_URL;
-    const codeVerifier = params.get('v') || null;
-    
-    console.log('Parsed state parameters:', {
-      state,
-      origin,
-      hasCodeVerifier: !!codeVerifier
-    });
-    
-    if (!state) {
-      console.error('Missing state in URL parameters');
-      return res.status(400).send('Invalid state parameter');
+    if (!stateParam) {
+      console.error('No state parameter received from GitHub');
+      return res.status(400).send('Missing state parameter');
     }
     
-    console.log('Successfully decoded state:', {
-      originalState: state,
-      origin,
-      hasCodeVerifier: !!codeVerifier
-    });
-    
-    // Verify state
-    if (!state) {
-      console.error('Missing state in decoded data');
-      return res.status(400).send('Invalid state parameter');
+    // Parse URL parameters from state
+    let state, origin, codeVerifier;
+    try {
+      const params = new URLSearchParams(stateParam);
+      state = params.get('s');
+      origin = params.get('o') || FRONTEND_URL;
+      codeVerifier = params.get('v') || null;
+      
+      console.log('Parsed state parameters:', {
+        state,
+        origin,
+        hasCodeVerifier: !!codeVerifier
+      });
+      
+      if (!state) {
+        throw new Error('State parameter is missing required data');
+      }
+      
+    } catch (e) {
+      console.error('Error parsing state parameter:', e);
+      console.error('Raw state value:', stateParam);
+      return res.status(400).send('Invalid state parameter format');
     }
     
     // For debugging - log all cookies
