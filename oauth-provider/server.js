@@ -67,9 +67,14 @@ app.get('/auth', async (req, res) => {
     
     console.log('State data before encoding:', JSON.stringify(stateData, null, 2));
     
-    // Simple URL-safe JSON encoding
-    const stateString = JSON.stringify(stateData);
-    const encodedState = encodeURIComponent(stateString);
+    // Simple URL-safe JSON encoding with validation
+    const stateString = JSON.stringify({
+      t: Date.now(), // Add timestamp for validation
+      d: stateData   // Nested data
+    });
+    
+    // Double-encode to prevent any URL parameter issues
+    const encodedState = encodeURIComponent(encodeURIComponent(stateString));
     
     console.log('State encoding details:', {
       originalState: state,
@@ -77,8 +82,21 @@ app.get('/auth', async (req, res) => {
       hasCodeVerifier: !!codeVerifier,
       stringLength: stateString.length,
       encodedLength: encodedState.length,
-      encodedState: encodedState // For debugging the exact value
+      stateString: stateString, // For debugging
+      encodedState: encodedState
     });
+    
+    // Verify we can decode it
+    try {
+      const decoded = JSON.parse(decodeURIComponent(decodeURIComponent(encodedState)));
+      console.log('State encoding verified:', {
+        timestamp: new Date(decoded.t),
+        data: decoded.d
+      });
+    } catch (e) {
+      console.error('Failed to verify state encoding:', e);
+      throw new Error('State encoding verification failed');
+    }
     
     // Verify we can decode it
     try {
@@ -130,7 +148,19 @@ app.get('/callback', async (req, res) => {
     let codeVerifier;
     let state;
     
-    console.log('Raw state parameter:', encodedState);
+    console.log('Raw state parameter:', {
+      value: encodedState,
+      type: typeof encodedState,
+      length: encodedState?.length,
+      first10: encodedState?.substring(0, 10),
+      last10: encodedState?.substring(encodedState.length - 10)
+    });
+    
+    // If state is a number, it's likely corrupted
+    if (typeof encodedState === 'number' || /^\d+$/.test(encodedState)) {
+      console.error('State parameter appears to be a number, which indicates corruption');
+      return res.status(400).send('Invalid state format: state parameter is corrupted');
+    }
     
     try {
       // Decode the URL-encoded JSON string
