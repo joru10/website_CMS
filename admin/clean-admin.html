@@ -44,12 +44,13 @@
               public_folder: '/uploads',
               collections: [
                 {
-                  name: 'test',
-                  label: 'Test',
-                  folder: 'content/test',
+                  name: 'posts',
+                  label: 'Blog Posts',
+                  folder: 'content/posts',
                   create: true,
                   fields: [
                     { label: 'Title', name: 'title', widget: 'string' },
+                    { label: 'Publish Date', name: 'date', widget: 'datetime' },
                     { label: 'Body', name: 'body', widget: 'markdown' }
                   ]
                 }
