@@ -58,20 +58,27 @@ app.get('/auth', async (req, res) => {
     const codeVerifier = generateCodeVerifier();
     const codeChallenge = await generateCodeChallenge(codeVerifier);
     
-    // Cookie options
+    // Cookie options - simplified for cross-domain
     const cookieOptions = {
-      httpOnly: true,
+      httpOnly: false, // Set to false so client-side JS can read if needed
       secure: true,
-      sameSite: 'none',
+      sameSite: 'lax', // More compatible than 'none'
       maxAge: 10 * 60 * 1000, // 10 minutes
-      path: '/',
-      domain: '.onrender.com'
+      path: '/'
+      // Removed domain to work on all domains
     };
     
     // Set cookies
     res.cookie('oauth_state', state, cookieOptions);
     res.cookie('oauth_origin', origin, cookieOptions);
     res.cookie('code_verifier', codeVerifier, cookieOptions);
+    
+    // For debugging - log the cookies being set
+    console.log('Setting cookies:', {
+      oauth_state: state,
+      oauth_origin: origin,
+      code_verifier: codeVerifier ? '***REDACTED***' : 'undefined'
+    });
     
     // Build GitHub OAuth URL with PKCE
     const params = new URLSearchParams({
@@ -101,16 +108,19 @@ app.get('/callback', async (req, res) => {
     const origin = req.cookies['oauth_origin'] || FRONTEND_URL;
     const codeVerifier = req.cookies['code_verifier'];
     
-    // Clear cookies
+    // Clear cookies - match the same options used when setting them
     ['oauth_state', 'oauth_origin', 'code_verifier'].forEach(cookie => {
       res.clearCookie(cookie, {
-        domain: '.onrender.com',
         path: '/',
         secure: true,
-        httpOnly: true,
-        sameSite: 'none'
+        httpOnly: false,
+        sameSite: 'lax'
       });
+      console.log(`Cleared cookie: ${cookie}`);
     });
+    
+    // Log all cookies for debugging
+    console.log('Available cookies after clearing:', req.cookies);
 
     // Handle OAuth errors
     if (error) {
