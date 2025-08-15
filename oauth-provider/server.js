@@ -2,6 +2,7 @@ import express from 'express';
 import fetch from 'node-fetch';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import crypto from 'crypto';
 
 const app = express();
 const SERVER_PORT = process.env.PORT || 3000;
@@ -18,6 +19,25 @@ if (!CLIENT_ID || !CLIENT_SECRET || !CALLBACK_URL) {
 
 app.use(cors());
 app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Helper function to generate random state
+const randomState = () => crypto.randomBytes(16).toString('hex');
+
+// Generate a code verifier for PKCE
+const generateCodeVerifier = () => {
+  return crypto.randomBytes(32).toString('hex');
+};
+
+// Generate a code challenge from verifier for PKCE
+const generateCodeChallenge = (verifier) => {
+  const hash = crypto.createHash('sha256').update(verifier).digest('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+  return hash;
+};
 
 function randomState(len = 24) {
   const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -30,91 +50,129 @@ app.get('/status', (_req, res) => {
   res.json({ ok: true });
 });
 
-// Step 1: Start OAuth flow
+// Step 1: Start OAuth flow with PKCE
 // GET /auth?origin=https://comfy-panda-0d488a.netlify.app
-app.get('/auth', (req, res) => {
-  const state = randomState();
-  const origin = req.query.origin || 'https://comfy-panda-0d488a.netlify.app';
-  
-  // Store state and origin in cookies
-  const cookieOptions = {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none',
-    maxAge: 60000, // 1 minute
-    path: '/',
-    domain: '.onrender.com' // Allow subdomains to access the cookie
-  };
-  
-  res.cookie('oauth_state', state, cookieOptions);
-  res.cookie('oauth_origin', origin, cookieOptions);
-  
-  const url = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(CALLBACK_URL)}&scope=${encodeURIComponent(SCOPE)}&state=${state}&allow_signup=false`;
-  console.log('Redirecting to GitHub OAuth:', url);
-  res.redirect(url);
+app.get('/auth', async (req, res) => {
+  try {
+    const state = randomState();
+    const origin = req.query.origin || FRONTEND_URL;
+    const codeVerifier = generateCodeVerifier();
+    const codeChallenge = await generateCodeChallenge(codeVerifier);
+    
+    // Cookie options
+    const cookieOptions = {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 10 * 60 * 1000, // 10 minutes
+      path: '/',
+      domain: '.onrender.com'
+    };
+    
+    // Set cookies
+    res.cookie('oauth_state', state, cookieOptions);
+    res.cookie('oauth_origin', origin, cookieOptions);
+    res.cookie('code_verifier', codeVerifier, cookieOptions);
+    
+    // Build GitHub OAuth URL with PKCE
+    const params = new URLSearchParams({
+      client_id: CLIENT_ID,
+      redirect_uri: CALLBACK_URL,
+      scope: SCOPE,
+      state: state,
+      code_challenge: codeChallenge,
+      code_challenge_method: 'S256'
+    });
+    
+    const authUrl = `https://github.com/login/oauth/authorize?${params.toString()}`;
+    console.log('Redirecting to GitHub OAuth:', authUrl);
+    res.redirect(authUrl);
+    
+  } catch (error) {
+    console.error('Error in /auth:', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 // Step 2: GitHub redirects here with ?code=...&state=...
 app.get('/callback', async (req, res) => {
   try {
-    const { code, state } = req.query;
+    const { code, state, error, error_description } = req.query;
     const savedState = req.cookies['oauth_state'];
-    const origin = req.cookies['oauth_origin'] || 'https://comfy-panda-0d488a.netlify.app';
-
-    // Get the code verifier from cookies before clearing
+    const origin = req.cookies['oauth_origin'] || FRONTEND_URL;
     const codeVerifier = req.cookies['code_verifier'];
     
-    // Clear the cookies
-    res.clearCookie('oauth_state');
-    res.clearCookie('oauth_origin');
-    res.clearCookie('code_verifier');
-
-    console.log('Verifying OAuth state and code verifier:', { 
-      receivedState: state, 
-      storedState: savedState,
-      hasCodeVerifier: !!codeVerifier,
-      cookies: req.cookies,
-      headers: req.headers
+    // Clear cookies
+    ['oauth_state', 'oauth_origin', 'code_verifier'].forEach(cookie => {
+      res.clearCookie(cookie, {
+        domain: '.onrender.com',
+        path: '/',
+        secure: true,
+        httpOnly: true,
+        sameSite: 'none'
+      });
     });
-    
-    if (!code || !state || !savedState || state !== savedState) {
+
+    // Handle OAuth errors
+    if (error) {
+      console.error('GitHub OAuth error:', { error, error_description });
+      return res.redirect(`${origin}/?error=${encodeURIComponent(error_description || error)}`);
+    }
+
+    // Verify state
+    if (!state || !savedState || state !== savedState) {
       console.error('Invalid OAuth state:', { 
         received: state, 
         expected: savedState,
         hasCodeVerifier: !!codeVerifier,
-        cookies: req.cookies,
         headers: req.headers
       });
-      return res.status(400).send('Invalid OAuth state or missing code');
+      return res.status(400).send('Invalid OAuth state');
     }
 
-    // Exchange code for access token
-    console.log('Exchanging code for token with GitHub...');
-    const tokenParams = {
+    // Verify code
+    if (!code) {
+      console.error('Missing authorization code');
+      return res.status(400).send('Missing authorization code');
+    }
+
+    console.log('Exchanging code for access token...');
+    
+    // Prepare token request parameters
+    const tokenParams = new URLSearchParams({
       client_id: CLIENT_ID,
       code,
-      redirect_uri: CALLBACK_URL
-    };
+      redirect_uri: CALLBACK_URL,
+      grant_type: 'authorization_code'
+    });
 
-    // If we have a code verifier (PKCE flow), use it without client_secret
-    // Otherwise fall back to traditional OAuth with client_secret
+    // Add PKCE code_verifier if available, otherwise use client_secret
     if (codeVerifier) {
       console.log('Using PKCE flow with code_verifier');
-      tokenParams.code_verifier = codeVerifier;
-      tokenParams.client_secret = ''; // Explicitly empty for PKCE
-    } else {
+      tokenParams.append('code_verifier', codeVerifier);
+      // Don't send client_secret with PKCE
+    } else if (CLIENT_SECRET) {
       console.log('Using traditional OAuth with client_secret');
-      tokenParams.client_secret = CLIENT_SECRET;
+      tokenParams.append('client_secret', CLIENT_SECRET);
+    } else {
+      console.error('No code_verifier or CLIENT_SECRET available');
+      return res.status(500).send('Server configuration error');
     }
 
+    console.log('Token request params:', tokenParams.toString());
+
+    // Exchange code for token
     const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'GitHub-OAuth-PKCE-Demo'
       },
-      body: JSON.stringify(tokenParams)
+      body: tokenParams.toString()
     });
+
+    console.log('Token response status:', tokenResponse.status);
 
     console.log('GitHub response status:', tokenResponse.status);
     const tokenData = await tokenResponse.json().catch(e => {
