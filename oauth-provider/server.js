@@ -4,7 +4,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const SERVER_PORT = process.env.PORT || 3000;
 
 const CLIENT_ID = 'Ov23liC4fJrNvQIAjDiy';
 const CLIENT_SECRET = process.env.OAUTH_CLIENT_SECRET;
@@ -32,29 +32,16 @@ app.get('/status', (_req, res) => {
 // Step 1: Start OAuth flow
 // GET /auth?origin=https://comfy-panda-0d488a.netlify.app
 app.get('/auth', (req, res) => {
-  try {
-    // Decap CMS v3 sends site_id instead of origin. Handle both for compatibility.
-    const origin = req.query.origin || req.query.site_id;
-    if (!origin) return res.status(400).send('Missing origin or site_id');
-
-    const state = randomState();
-    res.cookie('oauth_origin', origin, { httpOnly: false, sameSite: 'lax' });
-    res.cookie('oauth_state', state, { httpOnly: true, sameSite: 'lax' });
-
-    const params = new URLSearchParams({
-      client_id: CLIENT_ID,
-      redirect_uri: REDIRECT_URI,
-      scope: SCOPE,
-      state,
-      allow_signup: 'false'
-    });
-
-    const authURL = `https://github.com/login/oauth/authorize?${params.toString()}`;
-    return res.redirect(authURL);
-  } catch (e) {
-    console.error('Auth error:', e);
-    return res.status(500).send('Auth error');
-  }
+  const state = randomState();
+  const origin = req.query.origin || 'https://comfy-panda-0d488a.netlify.app';
+  
+  // Store state and origin in cookies
+  res.cookie('oauth_state', state, { httpOnly: true, secure: true });
+  res.cookie('oauth_origin', origin, { httpOnly: true, secure: true });
+  
+  const url = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(CALLBACK_URL)}&scope=${encodeURIComponent(SCOPE)}&state=${state}&allow_signup=false`;
+  console.log('Redirecting to GitHub OAuth:', url);
+  res.redirect(url);
 });
 
 // Step 2: GitHub redirects here with ?code=...&state=...
@@ -62,71 +49,67 @@ app.get('/callback', async (req, res) => {
   try {
     const { code, state } = req.query;
     const savedState = req.cookies['oauth_state'];
-    const origin = req.cookies['oauth_origin'];
+    const origin = req.cookies['oauth_origin'] || 'https://comfy-panda-0d488a.netlify.app';
 
-    if (!code || !state || !origin) return res.status(400).send('Missing required params');
-    if (state !== savedState) return res.status(400).send('Invalid state');
+    // Clear the cookies
+    res.clearCookie('oauth_state');
+    res.clearCookie('oauth_origin');
 
-    const tokenResp = await fetch('https://github.com/login/oauth/access_token', {
+    if (!code || !state || !savedState || state !== savedState) {
+      console.error('Invalid OAuth state or missing code:', { code, state, savedState });
+      return res.status(400).send('Invalid OAuth state or missing code');
+    }
+
+    // Exchange code for access token
+    const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
-      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
         client_id: CLIENT_ID,
         client_secret: CLIENT_SECRET,
         code,
-        redirect_uri: REDIRECT_URI,
-        state
+        redirect_uri: CALLBACK_URL
       })
     });
 
-    const tokenJson = await tokenResp.json();
-    if (!tokenJson.access_token) {
-      console.error('Token error:', tokenJson);
-      return res.status(500).send('Token exchange failed');
+    const tokenData = await tokenResponse.json();
+    
+    if (tokenData.error) {
+      console.error('GitHub OAuth error:', tokenData);
+      return res.status(400).send(`GitHub OAuth error: ${tokenData.error_description || tokenData.error}`);
     }
 
-    const token = tokenJson.access_token;
-
-    // Return a page that sends the token to the CMS window and closes
-    res.send(`<!doctype html>
-<html>
-<head><meta charset="utf-8"><title>OAuth Complete</title></head>
-<body>
-<script>
-  (function() {
-    var token = ${JSON.stringify(token)};
-    var origin = ${JSON.stringify(origin)};
-
-    function send() {
-      try {
-        window.opener.postMessage('authorization:github:success:' + token, origin);
-        window.close();
-      } catch (e) {
-        console.error('PostMessage error', e);
-      }
+    if (!tokenData.access_token) {
+      console.error('Token exchange failed:', tokenData);
+      return res.status(500).send('Token exchange failed: No access token received');
     }
 
-    window.addEventListener('message', function(event) {
-      if (event.data === 'authorizing:github') {
-        send();
-      }
-    }, false);
+    // Redirect back to the admin interface with the token
+    const redirectUrl = new URL('/admin/#/', origin);
+    redirectUrl.hash = `#/auth?token=${encodeURIComponent(tokenData.access_token)}`;
+    
+    // Set token in a secure, httpOnly cookie
+    res.cookie('cms_token', tokenData.access_token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: tokenData.expires_in * 1000 || 60 * 60 * 1000, // 1 hour default
+      path: '/'
+    });
 
-    // Prompt the opener to request the token
-    if (window.opener) {
-      window.opener.postMessage('authorizing:github', '*');
-    }
-  })();
-</script>
-<p>Authentication complete. You can close this window.</p>
-</body>
-</html>`);
-  } catch (e) {
-    console.error('Callback error:', e);
-    return res.status(500).send('Callback error');
+    console.log('OAuth successful, redirecting to:', redirectUrl.toString());
+    res.redirect(redirectUrl.toString());
+
+  } catch (error) {
+    console.error('OAuth callback error:', error);
+    res.status(500).send('Authentication failed: ' + error.message);
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`[oauth-provider] listening on :${PORT}`);
+// Start the server
+app.listen(SERVER_PORT, () => {
+  console.log(`OAuth server running on port ${SERVER_PORT}`);
 });
