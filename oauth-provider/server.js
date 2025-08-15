@@ -268,30 +268,50 @@ app.get('/callback', async (req, res) => {
             <title>Authentication Complete</title>
             <script>
               (function() {
+                // Store the token in localStorage as a fallback
                 try {
-                  // Try to send the token to the parent window
-                  if (window.opener) {
-                    window.opener.postMessage({
-                      type: 'authorization:github:success',
-                      response: ${JSON.stringify(tokenData)}
-                    }, window.opener.location.origin);
-                  }
-                  
-                  // Try to close the window
-                  setTimeout(function() {
-                    window.close();
-                  }, 100);
-                  
-                  // Fallback message
-                  setTimeout(function() {
-                    document.getElementById('message').innerHTML = 
-                      'Authentication successful. You can close this window.';
-                  }, 500);
-                  
+                  localStorage.setItem('netlify-cms-token', JSON.stringify(${JSON.stringify(tokenData)}));
                 } catch (e) {
-                  console.error('Error in auth callback:', e);
-                  document.body.innerText = 'Authentication successful. Please close this window and return to the application.';
+                  console.error('Error storing token:', e);
                 }
+                
+                // Function to send message to parent
+                function sendMessage() {
+                  try {
+                    if (window.opener && !window.opener.closed) {
+                      window.opener.postMessage({
+                        type: 'authorization:github:success',
+                        response: ${JSON.stringify(tokenData)}
+                      }, window.opener.location.origin);
+                      return true;
+                    }
+                    return false;
+                  } catch (e) {
+                    console.error('Error sending message:', e);
+                    return false;
+                  }
+                }
+                
+                // Try to send message immediately
+                if (!sendMessage()) {
+                  // If that fails, try again after a short delay
+                  setTimeout(function() {
+                    if (!sendMessage()) {
+                      console.log('Could not send message to parent window');
+                      document.getElementById('fallback-message').style.display = 'block';
+                    }
+                  }, 300);
+                }
+                
+                // Try to close the window after a short delay
+                setTimeout(function() {
+                  try {
+                    window.close();
+                  } catch (e) {
+                    console.error('Error closing window:', e);
+                  }
+                }, 1000);
+                
               })();
             </script>
             <style>

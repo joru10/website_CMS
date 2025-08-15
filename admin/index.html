@@ -33,19 +33,47 @@
   
   <script>
     // Handle OAuth popup messages
+    window.authSuccess = false;
+    
+    function handleAuthSuccess(response) {
+      if (window.authSuccess) return; // Prevent multiple initializations
+      window.authSuccess = true;
+      
+      console.log('GitHub OAuth successful:', response);
+      
+      // Store the token in localStorage for the CMS to pick up
+      if (response && response.access_token) {
+        localStorage.setItem('netlify-cms-user', JSON.stringify({
+          access_token: response.access_token,
+          token_type: response.token_type,
+          scope: response.scope
+        }));
+      }
+      
+      // Initialize CMS if not already done
+      if (window.CMS && window.CMS.init) {
+        console.log('Initializing CMS after successful auth');
+        try {
+          window.CMS.init({ 
+            config: window.CMS_CONFIG, 
+            load_config_file: false 
+          });
+          const rootEl = document.getElementById('nc-root');
+          if (rootEl) rootEl.style.display = 'block';
+        } catch (e) {
+          console.error('Error initializing CMS:', e);
+        }
+      }
+    }
+    
+    // Listen for messages from the popup
     window.addEventListener('message', function(e) {
       try {
         console.log('Received message from popup:', e.data);
         
         // Handle GitHub OAuth success
         if (e.data && e.data.type === 'authorization:github:success') {
-          console.log('GitHub OAuth successful:', e.data.response);
-          // Initialize CMS with the received token
-          if (window.CMS && window.CMS.init) {
-            console.log('Initializing CMS with auth token');
-            window.CMS.init({ config: window.CMS_CONFIG, load_config_file: false });
-            document.getElementById('nc-root').style.display = 'block';
-          }
+          handleAuthSuccess(e.data.response);
         }
         
         // Handle GitHub OAuth errors
@@ -55,6 +83,22 @@
         }
       } catch (err) {
         console.error('Error processing message:', err);
+      }
+    });
+    
+    // Check for existing auth token on load
+    document.addEventListener('DOMContentLoaded', function() {
+      const userData = localStorage.getItem('netlify-cms-user');
+      if (userData) {
+        try {
+          const user = JSON.parse(userData);
+          if (user.access_token) {
+            console.log('Found existing auth token');
+            handleAuthSuccess(user);
+          }
+        } catch (e) {
+          console.error('Error parsing user data:', e);
+        }
       }
     });
     
