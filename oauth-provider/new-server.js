@@ -23,15 +23,39 @@ function randomState() {
   return crypto.randomBytes(16).toString('hex');
 }
 
+// Generate a secure random string for PKCE
+function generateCodeVerifier() {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+// Create code challenge from verifier
+async function generateCodeChallenge(verifier) {
+  const hash = crypto.createHash('sha256').update(verifier).digest();
+  return hash.toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+}
+
 // OAuth Start
-app.get('/auth', (req, res) => {
+app.get('/auth', async (req, res) => {
   const state = randomState();
   const origin = req.query.origin || 'https://comfy-panda-0d488a.netlify.app';
+  const codeVerifier = generateCodeVerifier();
+  const codeChallenge = await generateCodeChallenge(codeVerifier);
   
   res.cookie('oauth_state', state, { httpOnly: true, secure: true, sameSite: 'none' });
   res.cookie('oauth_origin', origin, { httpOnly: true, secure: true, sameSite: 'none' });
+  res.cookie('code_verifier', codeVerifier, { httpOnly: true, secure: true, sameSite: 'none' });
   
-  const url = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(CALLBACK_URL)}&scope=${encodeURIComponent(SCOPE)}&state=${state}&allow_signup=false`;
+  const url = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}` +
+    `&redirect_uri=${encodeURIComponent(CALLBACK_URL)}` +
+    `&scope=${encodeURIComponent(SCOPE)}` +
+    `&state=${state}` +
+    `&code_challenge=${codeChallenge}` +
+    '&code_challenge_method=S256' +
+    '&allow_signup=false';
+    
   res.redirect(url);
 });
 
@@ -39,7 +63,11 @@ app.get('/auth', (req, res) => {
 app.get('/callback', async (req, res) => {
   const { code, state } = req.query;
   const storedState = req.cookies.oauth_state;
+  const codeVerifier = req.cookies.code_verifier;
   const origin = req.cookies.oauth_origin || 'https://comfy-panda-0d488a.netlify.app';
+  
+  // Clear the code verifier cookie
+  res.clearCookie('code_verifier');
 
   // Clear cookies
   res.clearCookie('oauth_state');
@@ -51,19 +79,18 @@ app.get('/callback', async (req, res) => {
   }
 
   try {
-    // Exchange code for token
+    // Exchange code for token using PKCE (no client secret)
     const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
         code,
         redirect_uri: CALLBACK_URL,
-        state
+        code_verifier: codeVerifier
       })
     });
 
