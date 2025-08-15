@@ -58,36 +58,34 @@ app.get('/auth', async (req, res) => {
     const codeVerifier = generateCodeVerifier();
     const codeChallenge = await generateCodeChallenge(codeVerifier);
     
-    // Store state in memory (in production, use a proper session store)
-    const stateData = {
-      state,
-      origin,
-      codeVerifier
-    };
+    // Encode state data in the state parameter
+    const stateData = JSON.stringify({
+      s: state, // Original state for CSRF protection
+      o: origin, // Origin to redirect back to
+      v: codeVerifier // PKCE code verifier
+    });
     
-    // In a production app, you'd want to use a proper session store
-    // This is just for demonstration
-    global.oauthStates = global.oauthStates || {};
-    global.oauthStates[state] = stateData;
+    // URL-encode the state data
+    const encodedState = Buffer.from(stateData).toString('base64');
     
-    console.log('Storing state data:', {
-      state,
+    console.log('Encoded state data:', {
+      originalState: state,
       origin,
       hasCodeVerifier: !!codeVerifier
     });
     
-    // Build GitHub OAuth URL with PKCE and state
+    // Build GitHub OAuth URL with PKCE and encoded state
     const params = new URLSearchParams({
       client_id: CLIENT_ID,
       redirect_uri: CALLBACK_URL,
       scope: SCOPE,
-      state: state, // Pass state in the URL
+      state: encodedState, // Pass all data in the state parameter
       code_challenge: codeChallenge,
       code_challenge_method: 'S256'
     });
     
     const authUrl = `https://github.com/login/oauth/authorize?${params.toString()}`;
-    console.log('Redirecting to GitHub OAuth:', authUrl);
+    console.log('Redirecting to GitHub OAuth');
     res.redirect(authUrl);
     
   } catch (error) {
@@ -99,55 +97,58 @@ app.get('/auth', async (req, res) => {
 // Step 2: GitHub redirects here with ?code=...&state=...
 app.get('/callback', async (req, res) => {
   try {
-    const { code, state, error, error_description } = req.query;
+    const { code, state: encodedState, error, error_description } = req.query;
     
-    // Get state data from memory
-    const stateData = global.oauthStates?.[state];
-    const savedState = stateData?.state;
-    const origin = stateData?.origin || FRONTEND_URL;
-    const codeVerifier = stateData?.codeVerifier;
-    
-    // Clean up the state data (even if validation fails)
-    if (state && global.oauthStates) {
-      delete global.oauthStates[state];
-    }
-    
-    console.log('Retrieved state data:', {
-      receivedState: state,
-      savedState,
-      origin,
-      hasCodeVerifier: !!codeVerifier
-    });
-
-    // Handle OAuth errors
+    // Handle OAuth errors first
     if (error) {
       console.error('GitHub OAuth error:', { error, error_description });
+      const origin = FRONTEND_URL; // Fallback origin
       return res.redirect(`${origin}/?error=${encodeURIComponent(error_description || error)}`);
     }
-
-    // Verify state
-    if (!state || !savedState || state !== savedState) {
-      console.error('Invalid OAuth state:', { 
-        received: state, 
-        expected: savedState,
-        hasCodeVerifier: !!codeVerifier,
-        cookies: req.cookies,
-        headers: req.headers
+    
+    // Decode state data
+    let stateData;
+    let origin = FRONTEND_URL;
+    let codeVerifier;
+    let state;
+    
+    try {
+      const decodedState = JSON.parse(Buffer.from(encodedState, 'base64').toString());
+      state = decodedState.s; // Original state
+      origin = decodedState.o || FRONTEND_URL; // Origin to redirect to
+      codeVerifier = decodedState.v; // PKCE code verifier
+      
+      console.log('Decoded state data:', {
+        originalState: state,
+        origin,
+        hasCodeVerifier: !!codeVerifier
       });
       
-      // For debugging - log all cookies
-      console.log('All cookies:', req.cookies);
-      
-      // Try to get the state from the Authorization header as fallback
-      const authHeader = req.headers.authorization;
-      if (authHeader && authHeader.startsWith('Bearer ')) {
-        const token = authHeader.split(' ')[1];
-        console.log('Found token in Authorization header, length:', token?.length);
-      }
-      
-      return res.status(400).send(`Invalid OAuth state. Please try again.\n\n` +
-        `Received state: ${state || 'undefined'}\n` +
-        `Expected state: ${savedState || 'undefined'}`);
+    } catch (e) {
+      console.error('Error decoding state:', e);
+      return res.status(400).send('Invalid state parameter');
+    }
+    
+    // Verify state
+    if (!state) {
+      console.error('Missing state in decoded data');
+      return res.status(400).send('Invalid state parameter');
+    }
+    
+    // For debugging - log all cookies
+    console.log('All cookies:', req.cookies);
+    
+    // Try to get the state from the Authorization header as fallback
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      console.log('Found token in Authorization header, length:', token?.length);
+    }
+    
+    // Verify code
+    if (!code) {
+      console.error('Missing authorization code');
+      return res.status(400).send('Missing authorization code');
     }
 
     // Verify code
