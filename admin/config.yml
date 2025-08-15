@@ -4,9 +4,10 @@ backend:
   branch: main
   base_url: https://joru10-cms-oauth.onrender.com
   auth_endpoint: auth
-  token_endpoint: callback
+  token_endpoint: access_token
   auth_type: pkce
   app_id: Ov23liC4fJrNvQIAjDiy
+  site_domain: https://comfy-panda-0d488a.netlify.app
 
 media_folder: static/uploads
 public_folder: /uploads
