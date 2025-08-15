@@ -1,30 +1,40 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
-  <title>Content Manager | RapidAI</title>
+  <title>Content Manager</title>
+  <!-- Include the script that enables Netlify Identity on this page. -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <!-- Include the script that loads the Decap CMS configuration. -->
+  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <style>
+    /* Hide any potential flash of the CMS loading animation */
+    #nc-root {
+      display: none;
+    }
+  </style>
 </head>
 <body>
   <div id="nc-root"></div>
-  <!-- Prevent auto-init and explicitly point to the root config -->
+  
   <script>
+    // Enable manual initialization
     window.CMS_MANUAL_INIT = true;
   </script>
+  
   <script>
     // Debug: log OAuth popup messages reaching the admin window
-    window.addEventListener('message', function (e) {
+    window.addEventListener('message', function(e) {
       try {
         console.log('oauth message', e && e.data);
       } catch (_) {}
     });
   </script>
+  
   <script>
-    // Resilient loader: try multiple CDNs/versions until one succeeds
-    (function () {
+    // Load Decap CMS from CDN with fallback
+    (function() {
       const sources = [
         'https://unpkg.com/decap-cms@^3/dist/decap-cms.js',
         'https://cdn.jsdelivr.net/npm/decap-cms@3/dist/decap-cms.js',
@@ -37,461 +47,86 @@
           console.error('All Decap CMS CDN sources failed to load.');
           return;
         }
+        
         const src = sources[i];
-        const s = document.createElement('script');
-        s.src = src;
-        s.async = true;
-        s.crossOrigin = 'anonymous';
-        s.onload = async function () {
-          console.log('Decap CMS loaded from', src);
-          if (typeof CMS !== 'undefined') {
-            // The OAuth configuration for GitHub
-            const oauthConfig = {
-              base_url: 'https://joru10-cms-oauth.onrender.com',
-              auth_endpoint: 'auth',
-              app_id: 'Ov23liC4fJrNvQIAjDiy',
-              auth_type: 'pkce',
-              token_endpoint: 'callback',
-              name: 'github',
-              scope: 'repo,user',
-              redirect_uri: window.location.origin + '/callback'
-            };
-
-            // Allow passing public client_id via query param or localStorage for PKCE fallback
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        script.crossOrigin = 'anonymous';
+        
+        script.onload = function() {
+          if (window.CMS) {
             try {
-              const qp = new URLSearchParams(location.search);
-              const qid = qp.get('client_id');
-              if (qid) {
-                window.CMS_GITHUB_CLIENT_ID = qid;
-                try { localStorage.setItem('CMS_GITHUB_CLIENT_ID', qid); } catch(_) {}
-              }
-              if (!window.CMS_GITHUB_CLIENT_ID) {
-                try { const v = localStorage.getItem('CMS_GITHUB_CLIENT_ID'); if (v) window.CMS_GITHUB_CLIENT_ID = v; } catch(_) {}
-              }
-            } catch(_) {}
-            // Initialize the CMS with our configuration
-            CMS.init({
-              config: {
+              const config = {
                 backend: {
                   name: 'github',
                   repo: 'joru10/website_CMS',
                   branch: 'main',
-                  base_url: oauthConfig.base_url,
-                  auth_endpoint: oauthConfig.auth_endpoint,
-                  token_endpoint: oauthConfig.token_endpoint,
-                  auth_type: oauthConfig.auth_type,
-                  app_id: oauthConfig.app_id,
-                  proxy_url: oauthConfig.base_url,
-                  auth: oauthConfig
-                },
-                local_backend: false,
-                i18n: {
-                  structure: 'multiple_files',
-                  locales: ['en', 'es', 'fr'],
-                  default_locale: 'en',
+                  base_url: 'https://joru10-cms-oauth.onrender.com',
+                  auth_endpoint: 'auth',
+                  token_endpoint: 'access_token',
+                  auth_type: 'pkce',
+                  app_id: 'Ov23lilcBd8JkV3HWZbE',
+                  site_domain: 'https://comfy-panda-0d488a.netlify.app'
                 },
                 media_folder: 'static/uploads',
                 public_folder: '/uploads',
                 collections: [
                   {
-                    name: 'services',
-                    label: 'Services',
-                    folder: 'content/services',
-                    nested: { depth: 1 },
-                    extension: 'md',
-                    path: '{{slug}}/index',
+                    name: 'test',
+                    label: 'Test',
+                    folder: 'content/test',
                     create: true,
-                    slug: '{{slug}}',
-                    i18n: true,
-                    format: 'frontmatter',
-                    fields: [
-                      { label: 'Title', name: 'title', widget: 'string', i18n: true },
-                      { label: 'Description', name: 'description', widget: 'markdown', i18n: true },
-                      { label: 'Icon', name: 'icon', widget: 'string' },
-                      { label: 'Order', name: 'order', widget: 'number', value_type: 'int' },
-                      { label: 'Featured', name: 'featured', widget: 'boolean' },
-                      { label: 'Feature 1', name: 'feature1', widget: 'string', i18n: true },
-                      { label: 'Feature 2', name: 'feature2', widget: 'string', i18n: true },
-                      { label: 'Feature 3', name: 'feature3', widget: 'string', i18n: true },
-                    ],
-                  },
-                  {
-                    name: 'translations',
-                    label: 'Translations',
-                    label_singular: 'Translation file',
-                    delete: false,
-                    files: [
-                      {
-                        file: 'translations/en.json',
-                        name: 'en',
-                        label: 'English',
-                        format: 'json',
-                        fields: [
-                          {
-                            label: 'Strings',
-                            name: 'strings',
-                            widget: 'list',
-                            summary: '{{fields.key}}',
-                            fields: [
-                              { label: 'Key', name: 'key', widget: 'string' },
-                              { label: 'Value', name: 'value', widget: 'string' },
-                            ],
-                          },
-                        ],
-                      },
-                      {
-                        file: 'translations/es.json',
-                        name: 'es',
-                        label: 'Español (EU)',
-                        format: 'json',
-                        fields: [
-                          {
-                            label: 'Strings',
-                            name: 'strings',
-                            widget: 'list',
-                            summary: '{{fields.key}}',
-                            fields: [
-                              { label: 'Key', name: 'key', widget: 'string' },
-                              { label: 'Value', name: 'value', widget: 'string' },
-                            ],
-                          },
-                        ],
-                      },
-                      {
-                        file: 'translations/fr.json',
-                        name: 'fr',
-                        label: 'Français (EU)',
-                        format: 'json',
-                        fields: [
-                          {
-                            label: 'Strings',
-                            name: 'strings',
-                            widget: 'list',
-                            summary: '{{fields.key}}',
-                            fields: [
-                              { label: 'Key', name: 'key', widget: 'string' },
-                              { label: 'Value', name: 'value', widget: 'string' },
-                            ],
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                  {
-                    name: 'blog',
-                    label: 'Blog Posts',
-                    folder: 'blog',
-                    create: true,
-                    slug: '{{slug}}',
-                    format: 'frontmatter',
                     fields: [
                       { label: 'Title', name: 'title', widget: 'string' },
-                      { label: 'Date', name: 'date', widget: 'datetime' },
-                      { label: 'Summary', name: 'summary', widget: 'text' },
-                      { label: 'Body', name: 'body', widget: 'markdown' },
-                    ],
-                  },
-                  {
-                    name: 'education',
-                    label: 'Education Articles',
-                    folder: 'education',
-                    create: true,
-                    slug: '{{slug}}',
-                    format: 'frontmatter',
-                    fields: [
-                      { label: 'Title', name: 'title', widget: 'string' },
-                      { label: 'Date', name: 'date', widget: 'datetime' },
-                      { label: 'Summary', name: 'summary', widget: 'text' },
-                      { label: 'Body', name: 'body', widget: 'markdown' },
-                    ],
-                  },
-                  {
-                    name: 'news',
-                    label: 'News',
-                    folder: 'news',
-                    create: true,
-                    slug: '{{slug}}',
-                    format: 'frontmatter',
-                    fields: [
-                      { label: 'Title', name: 'title', widget: 'string' },
-                      { label: 'Date', name: 'date', widget: 'datetime' },
-                      { label: 'Summary', name: 'summary', widget: 'text' },
-                      { label: 'Body', name: 'body', widget: 'markdown' },
-                    ],
-                  },
-                  {
-                    name: 'cases',
-                    label: 'Case Studies',
-                    folder: 'cases',
-                    create: true,
-                    slug: '{{slug}}',
-                    format: 'json',
-                    fields: [
-                      { label: 'Title', name: 'title', widget: 'string' },
-                      { label: 'Industry', name: 'industry', widget: 'string' },
-                      { label: 'Challenge', name: 'challenge', widget: 'markdown' },
-                      { label: 'Solution', name: 'solution', widget: 'markdown' },
-                      { label: 'Outcome', name: 'outcome', widget: 'markdown' },
-                    ],
-                  },
-                  {
-                    name: 'content',
-                    label: 'Site Content (claims, stats)',
-                    delete: false,
-                    files: [
-                      {
-                        file: 'content.json',
-                        label: 'Claims & Stats',
-                        name: 'claims',
-                        format: 'json',
-                        fields: [
-                          {
-                            label: 'Data',
-                            name: 'data',
-                            widget: 'list',
-                            summary: '{{fields.key}}: {{fields.value}}',
-                            fields: [
-                              { label: 'Key', name: 'key', widget: 'string' },
-                              { label: 'Value', name: 'value', widget: 'string' },
-                            ],
-                          },
-                        ],
-                      },
+                      { label: 'Body', name: 'body', widget: 'markdown' }
                     ]
                   }
                 ]
-              },
-              load_config_file: false,
-              display_url: window.location.origin,
-              site_url: window.location.origin,
-              locale: 'en'
-            });
-              // Optional fallback: allow setting public client_id via global for PKCE
-              if (!backend.app_id && typeof window !== 'undefined' && window.CMS_GITHUB_CLIENT_ID) {
-                backend.auth_type = 'pkce';
-                backend.app_id = window.CMS_GITHUB_CLIENT_ID;
-                backend.token_endpoint = '/access_token';
-                console.log('Decap backend: using PKCE (window.CMS_GITHUB_CLIENT_ID) suffix', String(backend.app_id).slice(-4));
-              }
-              return backend;
-            }
-            const config = {
-              backend: await buildBackend(),
-              local_backend: false,
-              i18n: {
-                structure: 'multiple_files',
-                locales: ['en', 'es', 'fr'],
-                default_locale: 'en',
-              },
-              media_folder: 'static/uploads',
-              public_folder: '/uploads',
-              collections: [
-                {
-                  name: 'services',
-                  label: 'Services',
-                  folder: 'content/services',
-                  nested: { depth: 1 },
-                  extension: 'md',
-                  path: '{{slug}}/index',
-                  create: true,
-                  slug: '{{slug}}',
-                  i18n: true,
-                  format: 'frontmatter',
-                  fields: [
-                    { label: 'Title', name: 'title', widget: 'string', i18n: true },
-                    { label: 'Description', name: 'description', widget: 'markdown', i18n: true },
-                    { label: 'Icon', name: 'icon', widget: 'string' },
-                    { label: 'Order', name: 'order', widget: 'number', value_type: 'int' },
-                    { label: 'Featured', name: 'featured', widget: 'boolean' },
-                    { label: 'Feature 1', name: 'feature1', widget: 'string', i18n: true },
-                    { label: 'Feature 2', name: 'feature2', widget: 'string', i18n: true },
-                    { label: 'Feature 3', name: 'feature3', widget: 'string', i18n: true },
-                  ],
-                },
-                {
-                  name: 'translations',
-                  label: 'Translations',
-                  label_singular: 'Translation file',
-                  delete: false,
-                  files: [
-                    {
-                      file: 'translations/en.json',
-                      name: 'en',
-                      label: 'English',
-                      format: 'json',
-                      fields: [
-                        {
-                          label: 'Strings',
-                          name: 'strings',
-                          widget: 'list',
-                          summary: '{{fields.key}}',
-                          fields: [
-                            { label: 'Key', name: 'key', widget: 'string' },
-                            { label: 'Value', name: 'value', widget: 'string' },
-                          ],
-                        },
-                      ],
-                    },
-                    {
-                      file: 'translations/es.json',
-                      name: 'es',
-                      label: 'Español (EU)',
-                      format: 'json',
-                      fields: [
-                        {
-                          label: 'Strings',
-                          name: 'strings',
-                          widget: 'list',
-                          summary: '{{fields.key}}',
-                          fields: [
-                            { label: 'Key', name: 'key', widget: 'string' },
-                            { label: 'Value', name: 'value', widget: 'string' },
-                          ],
-                        },
-                      ],
-                    },
-                    {
-                      file: 'translations/fr.json',
-                      name: 'fr',
-                      label: 'Français (EU)',
-                      format: 'json',
-                      fields: [
-                        {
-                          label: 'Strings',
-                          name: 'strings',
-                          widget: 'list',
-                          summary: '{{fields.key}}',
-                          fields: [
-                            { label: 'Key', name: 'key', widget: 'string' },
-                            { label: 'Value', name: 'value', widget: 'string' },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
-                {
-                  name: 'blog',
-                  label: 'Blog Posts',
-                  folder: 'blog',
-                  create: true,
-                  slug: '{{slug}}',
-                  format: 'frontmatter',
-                  fields: [
-                    { label: 'Title', name: 'title', widget: 'string' },
-                    { label: 'Date', name: 'date', widget: 'datetime' },
-                    { label: 'Summary', name: 'summary', widget: 'text' },
-                    { label: 'Body', name: 'body', widget: 'markdown' },
-                  ],
-                },
-                {
-                  name: 'education',
-                  label: 'Education Articles',
-                  folder: 'education',
-                  create: true,
-                  slug: '{{slug}}',
-                  format: 'frontmatter',
-                  fields: [
-                    { label: 'Title', name: 'title', widget: 'string' },
-                    { label: 'Date', name: 'date', widget: 'datetime' },
-                    { label: 'Summary', name: 'summary', widget: 'text' },
-                    { label: 'Body', name: 'body', widget: 'markdown' },
-                  ],
-                },
-                {
-                  name: 'news',
-                  label: 'News',
-                  folder: 'news',
-                  create: true,
-                  slug: '{{slug}}',
-                  format: 'frontmatter',
-                  fields: [
-                    { label: 'Title', name: 'title', widget: 'string' },
-                    { label: 'Date', name: 'date', widget: 'datetime' },
-                    { label: 'Summary', name: 'summary', widget: 'text' },
-                    { label: 'Body', name: 'body', widget: 'markdown' },
-                  ],
-                },
-                {
-                  name: 'cases',
-                  label: 'Case Studies',
-                  folder: 'cases',
-                  create: true,
-                  slug: '{{slug}}',
-                  format: 'json',
-                  fields: [
-                    { label: 'Title', name: 'title', widget: 'string' },
-                    { label: 'Industry', name: 'industry', widget: 'string' },
-                    { label: 'Challenge', name: 'challenge', widget: 'markdown' },
-                    { label: 'Solution', name: 'solution', widget: 'markdown' },
-                    { label: 'Outcome', name: 'outcome', widget: 'markdown' },
-                  ],
-                },
-                {
-                  name: 'content',
-                  label: 'Site Content (claims, stats)',
-                  delete: false,
-                  files: [
-                    {
-                      file: 'content.json',
-                      label: 'Claims & Stats',
-                      name: 'claims',
-                      format: 'json',
-                      fields: [
-                        {
-                          label: 'Data',
-                          name: 'data',
-                          widget: 'list',
-                          summary: '{{fields.key}}: {{fields.value}}',
-                          fields: [
-                            { label: 'Key', name: 'key', widget: 'string' },
-                            { label: 'Value', name: 'value', widget: 'string' },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            };
-            // Diagnostics: log duplicates prior to init
-            try {
-              const locales = (config.i1n && config.i1n.locales) || [];
-              const dupLocales = locales.filter((v, i, a) => a.indexOf(v) !== i);
-              const names = (config.collections || []).map(c => c.name);
-              const dupCollections = names.filter((v, i, a) => a.indexOf(v) !== i);
-              console.log('Decap inline config summary', { locales, dupLocales, collectionCount: names.length, dupCollections });
-            } catch (e) {
-              console.warn('Config diagnostics failed', e);
-            }
-            console.log('Initializing Decap CMS with inline config (load_config_file=false)');
-            try {
-              // Make config available for any consumers checking the global
+              };
+              
+              // Initialize CMS with the config
               window.CMS_CONFIG = config;
               CMS.init({ config, load_config_file: false });
+              
+              // Show the CMS UI now that it's initialized
+              document.getElementById('nc-root').style.display = 'block';
+              
+              // Debug: Log the config
+              try {
+                const cfg = CMS.getConfig ? CMS.getConfig() : null;
+                const js = cfg && typeof cfg.toJS === 'function' ? cfg.toJS() : cfg;
+                console.log('CMS initialized with config:', js || cfg);
+              } catch (e) {
+                console.warn('Could not log CMS config:', e);
+              }
+              
             } catch (e) {
-              console.error('CMS.init failed', e);
+              console.error('CMS initialization failed:', e);
+              loadNext(i + 1);
             }
-            // One-time snapshot for diagnostics
-            try {
-              const cfg = CMS && CMS.getConfig ? CMS.getConfig() : null;
-              const js = cfg && typeof cfg.toJS === 'function' ? cfg.toJS() : cfg;
-              console.log('CMS.getConfig() after init', js || cfg);
-            } catch (_) {}
           } else {
             console.error('CMS global not found after loading', src);
+            loadNext(i + 1);
           }
         };
-        s.onerror = function () {
-          console.warn('Failed to load', src, '— trying next CDN');
+        
+        script.onerror = function() {
+          console.warn('Failed to load', src, '- trying next CDN');
           loadNext(i + 1);
         };
-        document.head.appendChild(s);
+        
+        document.head.appendChild(script);
       }
-
-      document.addEventListener('DOMContentLoaded', function () {
+      
+      // Start loading the first source
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          loadNext(0);
+        });
+      } else {
         loadNext(0);
-      });
+      }
     })();
   </script>
 </body>
