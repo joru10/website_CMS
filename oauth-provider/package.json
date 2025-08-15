@@ -1,16 +1,19 @@
 {
-  "name": "decap-cms-oauth-provider",
+  "name": "oauth-proxy",
   "version": "1.0.0",
-  "description": "OAuth provider for Decap CMS",
-  "main": "server.js",
-  "type": "module",
+  "description": "OAuth proxy for Netlify CMS with GitHub",
+  "main": "new-server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node new-server.js"
   },
   "dependencies": {
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^2.6.7"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }
