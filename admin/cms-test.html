@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CMS Test</title>
+  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; padding: 20px; }
+    #cms { max-width: 800px; margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <h1>CMS Test Page</h1>
+  <div id="cms"></div>
+  
+  <script>
+    console.log('Initializing CMS...');
+    
+    // Simple configuration
+    const config = {
+      backend: {
+        name: 'github',
+        repo: 'joru10/website_CMS',
+        branch: 'main',
+        base_url: 'https://joru10-cms-oauth.onrender.com',
+        auth_endpoint: 'auth',
+        token_endpoint: 'callback',
+        auth_type: 'pkce',
+        app_id: 'Ov23liC4fJrNvQIAjDiy'
+      },
+      media_folder: 'static/uploads',
+      public_folder: '/uploads',
+      collections: [
+        {
+          name: 'test',
+          label: 'Test',
+          folder: 'content/test',
+          create: true,
+          fields: [
+            { label: 'Title', name: 'title', widget: 'string' },
+            { label: 'Body', name: 'body', widget: 'markdown' }
+          ]
+        }
+      ]
+    };
+
+    // Initialize CMS
+    CMS.init({
+      config,
+      load_config_file: false,
+      local_backend: false
+    });
+    
+    console.log('CMS initialization complete');
+  </script>
+</body>
+</html>
