@@ -1,26 +1,69 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Content Manager</title>
-  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
-  <script>
-    // Wait for CMS to be fully loaded
-    document.addEventListener('DOMContentLoaded', function() {
-    // Initialize CMS with external config
-      // Initialize CMS after it's fully loaded
-      if (window.CMS) {
-        CMS.init({
-          config: '/admin/config.yml',
-          load_config_file: true
-        });
-      } else {
-        console.error('CMS not loaded. Check script loading order.');
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Content Manager</title>
+    <style>
+      #nc-root {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
       }
-    });
-  </script>
-</head>
-<body>
-</body>
+    </style>
+  </head>
+  <body>
+    <!-- Create a mount point for the CMS -->
+    <div id="nc-root"></div>
+    
+    <!-- Load the CMS JavaScript file -->
+    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    
+    <script>
+      // Initialize the CMS manually
+      window.CMS_MANUAL_INIT = true;
+      
+      // Wait for the CMS to be available
+      const loadCMS = function() {
+        if (window.CMS) {
+          CMS.init({
+            config: {
+              backend: {
+                name: 'github',
+                repo: 'joru10/website_CMS',
+                branch: 'main',
+                base_url: 'https://joru10-cms-oauth.onrender.com',
+                auth_endpoint: 'auth',
+                token_endpoint: 'callback',
+                auth_type: 'pkce',
+                app_id: 'Ov23liC4fJrNvQIAjDiy'
+              },
+              media_folder: 'static/uploads',
+              public_folder: '/uploads',
+              collections: [
+                {
+                  name: 'test',
+                  label: 'Test',
+                  folder: 'content/test',
+                  create: true,
+                  fields: [
+                    { label: 'Title', name: 'title', widget: 'string' },
+                    { label: 'Body', name: 'body', widget: 'markdown' }
+                  ]
+                }
+              ]
+            }
+          });
+        } else {
+          console.log('CMS not loaded yet, retrying...');
+          setTimeout(loadCMS, 100);
+        }
+      };
+      
+      // Start the loading process
+      loadCMS();
+    </script>
+  </body>
 </html>
