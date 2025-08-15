@@ -59,20 +59,38 @@ app.get('/auth', async (req, res) => {
     const codeChallenge = await generateCodeChallenge(codeVerifier);
     
     // Encode state data in the state parameter
-    const stateData = JSON.stringify({
+    const stateData = {
       s: state, // Original state for CSRF protection
       o: origin, // Origin to redirect back to
       v: codeVerifier // PKCE code verifier
-    });
+    };
+    
+    console.log('State data before encoding:', JSON.stringify(stateData, null, 2));
     
     // URL-encode the state data
-    const encodedState = Buffer.from(stateData).toString('base64');
+    const stateString = JSON.stringify(stateData);
+    const encodedState = Buffer.from(stateString).toString('base64');
     
-    console.log('Encoded state data:', {
+    console.log('State encoding details:', {
       originalState: state,
       origin,
-      hasCodeVerifier: !!codeVerifier
+      hasCodeVerifier: !!codeVerifier,
+      stringLength: stateString.length,
+      encodedLength: encodedState.length,
+      encodedState: encodedState // For debugging the exact value
     });
+    
+    // Verify we can decode it
+    try {
+      const decoded = JSON.parse(Buffer.from(encodedState, 'base64').toString());
+      console.log('Successfully verified state encoding:', {
+        stateMatch: decoded.s === state,
+        originMatch: decoded.o === origin,
+        verifierMatch: decoded.v === codeVerifier
+      });
+    } catch (e) {
+      console.error('Failed to verify state encoding:', e);
+    }
     
     // Build GitHub OAuth URL with PKCE and encoded state
     const params = new URLSearchParams({
@@ -112,21 +130,47 @@ app.get('/callback', async (req, res) => {
     let codeVerifier;
     let state;
     
+    console.log('Raw state parameter:', encodedState);
+    
     try {
-      const decodedState = JSON.parse(Buffer.from(encodedState, 'base64').toString());
+      // First, try to decode the base64
+      let decodedString;
+      try {
+        decodedString = Buffer.from(encodedState, 'base64').toString('utf8');
+        console.log('Decoded state string:', decodedString);
+      } catch (decodeError) {
+        console.error('Base64 decode error:', decodeError);
+        return res.status(400).send(`Failed to decode state parameter: ${decodeError.message}`);
+      }
+      
+      // Then try to parse the JSON
+      let decodedState;
+      try {
+        decodedState = JSON.parse(decodedString);
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        return res.status(400).send(`Failed to parse state JSON: ${parseError.message}`);
+      }
+      
+      // Validate the decoded state structure
+      if (!decodedState || typeof decodedState !== 'object') {
+        console.error('Invalid state format:', decodedState);
+        return res.status(400).send('Invalid state format: expected an object');
+      }
+      
       state = decodedState.s; // Original state
-      origin = decodedState.o || FRONTEND_URL; // Origin to redirect to
+      origin = decodedState.o || FRONTEND_URL;
       codeVerifier = decodedState.v; // PKCE code verifier
       
-      console.log('Decoded state data:', {
+      console.log('Successfully decoded state:', {
         originalState: state,
         origin,
         hasCodeVerifier: !!codeVerifier
       });
       
     } catch (e) {
-      console.error('Error decoding state:', e);
-      return res.status(400).send('Invalid state parameter');
+      console.error('Unexpected error processing state:', e);
+      return res.status(400).send(`Error processing state: ${e.message}`);
     }
     
     // Verify state
