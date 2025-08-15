@@ -21,6 +21,14 @@
   <script>
     // Enable manual initialization
     window.CMS_MANUAL_INIT = true;
+    
+    // Debug OAuth state
+    console.log('CMS_MANUAL_INIT set to true');
+    
+    // Listen for auth events
+    document.addEventListener('cms:auth', function(e) {
+      console.log('CMS Auth Event:', e.detail);
+    });
   </script>
   
   <script>
@@ -67,7 +75,11 @@
                   token_endpoint: 'access_token',
                   auth_type: 'pkce',
                   app_id: 'Ov23lilcBd8JkV3HWZbE',
-                  site_domain: 'https://comfy-panda-0d488a.netlify.app'
+                  site_domain: window.location.origin,
+                  auth_scope: 'repo,user',
+                  cms_label_prefix: '',
+                  use_graphql: true,
+                  proxy_url: 'https://joru10-cms-oauth.onrender.com/auth'
                 },
                 media_folder: 'static/uploads',
                 public_folder: '/uploads',
