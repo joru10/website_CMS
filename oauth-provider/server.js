@@ -23,6 +23,9 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// In-memory storage for code verifiers (in production, use a proper session store)
+const stateToCodeVerifierMap = {};
+
 // Helper function to generate random state
 function randomState(len = 24) {
   const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -58,12 +61,17 @@ app.get('/auth', async (req, res) => {
     const codeVerifier = generateCodeVerifier();
     const codeChallenge = await generateCodeChallenge(codeVerifier);
     
-    // Create state parameter as a simple string format
-    // Format: s=<state>&o=<origin>&v=<codeVerifier>
-    const stateParam = `s=${encodeURIComponent(state)}&o=${encodeURIComponent(origin)}` + 
-      (codeVerifier ? `&v=${encodeURIComponent(codeVerifier)}` : '');
+    // Store the state in a simple format that's easy to validate
+    // We'll store the codeVerifier in memory for this session
+    const stateParam = state;
     
-    console.log('State parameter string:', stateParam);
+    // Store the codeVerifier in memory with the state as the key
+    if (codeVerifier) {
+      stateToCodeVerifierMap[state] = codeVerifier;
+    }
+    
+    console.log('Using state parameter:', stateParam);
+    console.log('Stored codeVerifier for state:', !!codeVerifier);
     
     // Build GitHub OAuth URL with PKCE and encoded state
     const oauthParams = new URLSearchParams({
@@ -104,24 +112,25 @@ app.get('/callback', async (req, res) => {
       return res.status(400).send('Missing state parameter');
     }
     
-    // Parse URL parameters from state
-    let state, origin, codeVerifier;
-    try {
-      // Manually parse the URL-encoded state string
-      const params = new URLSearchParams(stateParam);
-      state = params.get('s') ? decodeURIComponent(params.get('s')) : null;
-      origin = params.get('o') ? decodeURIComponent(params.get('o')) : FRONTEND_URL;
-      codeVerifier = params.get('v') ? decodeURIComponent(params.get('v')) : null;
-      
-      console.log('Parsed state parameters:', {
-        state,
-        origin,
-        hasCodeVerifier: !!codeVerifier
-      });
-      
-      if (!state) {
-        throw new Error('State parameter is missing required data');
-      }
+    // Handle the state parameter
+    const state = stateParam;
+    const origin = req.query.origin || FRONTEND_URL;
+    const codeVerifier = stateToCodeVerifierMap[state];
+    
+    // Clean up the stored code verifier
+    if (codeVerifier) {
+      delete stateToCodeVerifierMap[state];
+    }
+    
+    console.log('Parsed state parameters:', {
+      state,
+      origin,
+      hasCodeVerifier: !!codeVerifier
+    });
+    
+    if (!state) {
+      throw new Error('State parameter is missing required data');
+    }
       
     } catch (e) {
       console.error('Error parsing state parameter:', e);
