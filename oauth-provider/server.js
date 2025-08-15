@@ -126,19 +126,12 @@ app.get('/callback', async (req, res) => {
       console.error('Missing state in URL parameters');
       return res.status(400).send('Invalid state parameter');
     }
-      
-      // State is already parsed from URL parameters
-      
-      console.log('Successfully decoded state:', {
-        originalState: state,
-        origin,
-        hasCodeVerifier: !!codeVerifier
-      });
-      
-    } catch (e) {
-      console.error('Unexpected error processing state:', e);
-      return res.status(400).send(`Error processing state: ${e.message}`);
-    }
+    
+    console.log('Successfully decoded state:', {
+      originalState: state,
+      origin,
+      hasCodeVerifier: !!codeVerifier
+    });
     
     // Verify state
     if (!state) {
