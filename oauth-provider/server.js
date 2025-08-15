@@ -37,8 +37,17 @@ app.get('/auth', (req, res) => {
   const origin = req.query.origin || 'https://comfy-panda-0d488a.netlify.app';
   
   // Store state and origin in cookies
-  res.cookie('oauth_state', state, { httpOnly: true, secure: true });
-  res.cookie('oauth_origin', origin, { httpOnly: true, secure: true });
+  const cookieOptions = {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+    maxAge: 60000, // 1 minute
+    path: '/',
+    domain: '.onrender.com' // Allow subdomains to access the cookie
+  };
+  
+  res.cookie('oauth_state', state, cookieOptions);
+  res.cookie('oauth_origin', origin, cookieOptions);
   
   const url = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(CALLBACK_URL)}&scope=${encodeURIComponent(SCOPE)}&state=${state}&allow_signup=false`;
   console.log('Redirecting to GitHub OAuth:', url);
