@@ -40,6 +40,19 @@
   to = "/admin/index.html"
   status = 200
 
+# Block access to environment files
+[[redirects]]
+  from = "/.env"
+  to = "/404"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/oauth-provider/.env"
+  to = "/404"
+  status = 404
+  force = true
+
 # SPA catch-all LAST
 [[redirects]]
   from = "/*"

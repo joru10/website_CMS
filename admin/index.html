@@ -49,7 +49,6 @@
           branch: 'main',
           base_url: '/oauth',
           auth_endpoint: 'auth',
-          auth_scope: 'public_repo',
           auth_type: 'pkce',
           token_endpoint: 'access_token',
           cms_label_prefix: 'CMS',
@@ -317,7 +316,7 @@
         if (userData) {
           try {
             const user = JSON.parse(userData);
-            if (user.access_token) {
+            if (user.token || user.access_token) {
               console.log('Found existing auth token after redirect');
               whenCMSReady(initializeCMS);
               return;
