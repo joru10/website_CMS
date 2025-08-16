@@ -189,6 +189,10 @@
   <script>
     // Handle OAuth popup messages
     window.authSuccess = false;
+    // De-dup flags to avoid repeated exchanges/messages
+    window._exchangeInProgress = false;
+    window._oauthProcessed = false;
+    window._processedStates = new Set();
     
     // Listen for messages from the OAuth popup
     window.addEventListener('message', function(event) {
@@ -198,6 +202,18 @@
       if (event.origin !== window.location.origin) return;
 
       const message = event.data || {};
+
+      // Ignore further messages after we've completed OAuth
+      if (window._oauthProcessed || window.authSuccess) {
+        try { console.log('Auth already completed; ignoring message'); } catch (e) {}
+        return;
+      }
+
+      // If this message has a state we've already handled, ignore
+      if (message.state && window._processedStates.has(message.state)) {
+        try { console.log('State already processed; ignoring message'); } catch (e) {}
+        return;
+      }
 
       // Legacy success path (server already exchanged code for access_token)
       if (message.type === 'authorization:github:success' && message.response) {
@@ -214,6 +230,9 @@
       // Decap CMS style message: { source: 'decap-cms', code, state }
       // Fallback: complete the token exchange via our OAuth function
       if (message.source === 'decap-cms' && message.code && message.state) {
+        if (window._exchangeInProgress) { try { console.log('Exchange in progress; ignoring duplicate'); } catch(e){} return; }
+        window._exchangeInProgress = true;
+        window._processedStates.add(message.state);
         console.log('Decap-style message detected; completing token exchange via /oauth/access_token');
         fetch('/oauth/access_token', {
           method: 'POST',
@@ -233,7 +252,8 @@
         .catch(err => {
           console.error('Token exchange failed:', err);
           alert('Authentication failed during token exchange');
-        });
+        })
+        .finally(() => { window._exchangeInProgress = false; });
       }
     });
     
@@ -245,6 +265,7 @@
       
       if (response && response.access_token) {
         // Store the token in both localStorage and sessionStorage
+        window._oauthProcessed = true;
         const userData = {
           access_token: response.access_token,
           token_type: response.token_type || 'bearer',
@@ -307,12 +328,22 @@
           }
           window.close();
         } else {
-          // If not in a popup, immediately initialize CMS without page reload
+          // If not in a popup, complete CMS login without a page reload
           try {
-            console.log('Initializing CMS after auth (no reload)');
-            whenCMSReady(initializeCMS);
+            console.log('Completing CMS login with token (no reload)');
+            whenCMSReady(function() {
+              if (window.CMS && CMS.auth && typeof CMS.auth.completeLogin === 'function') {
+                CMS.auth.completeLogin({
+                  token: response.access_token,
+                  provider: 'github',
+                  user: cmsUser
+                });
+              } else {
+                console.warn('CMS auth API not ready; UI may require a reload');
+              }
+            });
           } catch (e) {
-            console.warn('Immediate CMS init failed, falling back to reload', e);
+            console.warn('Immediate CMS login completion failed, falling back to reload', e);
             window.location.href = window.location.pathname + '?auth=success&t=' + Date.now();
           }
         }
