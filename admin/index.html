@@ -192,21 +192,48 @@
     
     // Listen for messages from the OAuth popup
     window.addEventListener('message', function(event) {
+      // Debug incoming messages
+      try { console.log('OAuth postMessage received:', { origin: event.origin, data: event.data }); } catch (e) {}
       // Only process messages from our own origin
       if (event.origin !== window.location.origin) return;
-      
-      const message = event.data;
-      
-      // Handle successful authentication
-      if (message.type === 'authorization:github:success') {
-        handleAuthSuccess(message.response);
+
+      const message = event.data || {};
+
+      // Legacy success path (server already exchanged code for access_token)
+      if (message.type === 'authorization:github:success' && message.response) {
+        return handleAuthSuccess(message.response);
       }
-      
-      // Handle authentication errors
+
+      // Legacy error path
       if (message.type === 'authorization:github:error') {
         console.error('GitHub OAuth error:', message.error, message.error_description);
-        // You could show an error message to the user here
         alert(`Authentication failed: ${message.error_description || 'Unknown error'}`);
+        return;
+      }
+
+      // Decap CMS style message: { source: 'decap-cms', code, state }
+      // Fallback: complete the token exchange via our OAuth function
+      if (message.source === 'decap-cms' && message.code && message.state) {
+        console.log('Decap-style message detected; completing token exchange via /oauth/access_token');
+        fetch('/oauth/access_token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include', // include HttpOnly PKCE cookie
+          body: JSON.stringify({ code: message.code, state: message.state })
+        })
+        .then(r => r.ok ? r.json() : r.text().then(t => { throw new Error(`HTTP ${r.status}: ${t}`); }))
+        .then(json => {
+          if (json && json.access_token) {
+            handleAuthSuccess(json);
+          } else {
+            console.error('Token response missing access_token:', json);
+            alert('Authentication failed: missing access token in response');
+          }
+        })
+        .catch(err => {
+          console.error('Token exchange failed:', err);
+          alert('Authentication failed during token exchange');
+        });
       }
     });
     
