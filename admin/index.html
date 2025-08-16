@@ -36,10 +36,37 @@
     const inFrame = window.self !== window.top;
     const isAuthPopup = window.opener && window.opener !== window && window.opener.CMS;
     const shouldInitCMS = !inFrame && !isAuthPopup;
+    // If URL contains auth=success, clean it immediately to avoid reload loops
+    try {
+      const _p = new URLSearchParams(window.location.search);
+      if (_p.get('auth') === 'success') {
+        console.log('Cleaning auth=success from URL');
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    } catch (e) { /* ignore */ }
     
     function whenCMSReady(cb) {
       if (window.CMS && typeof window.CMS.init === 'function') return cb();
       setTimeout(() => whenCMSReady(cb), 50);
+    }
+
+    // Wait for CMS.auth.completeLogin to be available, then complete login without reloading
+    function waitForCMSAuthAndComplete(token, user, attempts = 50, interval = 200) {
+      if (!window._cmsLoginRetryCount) window._cmsLoginRetryCount = 0;
+      if (window.CMS && CMS.auth && typeof CMS.auth.completeLogin === 'function') {
+        try {
+          CMS.auth.completeLogin({ token: token, provider: 'github', user: user });
+          return;
+        } catch (e) {
+          try { console.warn('CMS.auth.completeLogin threw, will retry shortly', e); } catch(err){}
+        }
+      }
+      if (window._cmsLoginRetryCount >= attempts) {
+        try { console.warn('CMS auth API not ready after retries; leaving page loaded without further reloads'); } catch(err){}
+        return;
+      }
+      window._cmsLoginRetryCount++;
+      setTimeout(function(){ waitForCMSAuthAndComplete(token, user, attempts, interval); }, interval);
     }
 
     function initializeCMS() {
@@ -363,13 +390,13 @@
                   user: cmsUser
                 });
               } else {
-                console.warn('CMS auth API not ready; forcing reload to complete login');
-                window.location.href = window.location.pathname + '?auth=success&t=' + Date.now();
+                console.warn('CMS auth API not ready; will retry without reload');
+                waitForCMSAuthAndComplete(response.access_token, cmsUser);
               }
             });
           } catch (e) {
-            console.warn('Immediate CMS login completion failed, falling back to reload', e);
-            window.location.href = window.location.pathname + '?auth=success&t=' + Date.now();
+            console.warn('Immediate CMS login completion failed, retrying without reload', e);
+            waitForCMSAuthAndComplete(response.access_token, cmsUser);
           }
         }
       } else {
@@ -433,9 +460,8 @@
                 user: storedUser
               });
             } else {
-              console.warn('CMS auth API not ready after init; forcing reload to complete login');
-              // Force a reload similar to the immediate auth-success path
-              window.location.href = window.location.pathname + '?auth=success&t=' + Date.now();
+              console.warn('CMS auth API not ready after init; will retry without reload');
+              waitForCMSAuthAndComplete(storedToken, storedUser);
             }
           }, 50);
         });
