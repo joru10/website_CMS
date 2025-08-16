@@ -3,11 +3,36 @@
   command = ""
   functions = "netlify/functions"
 
-# Handle SPA routing - redirect all 404s to index.html
+# OAuth: specific routes first (before SPA catch-all)
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
+  from = "/oauth/*"
+  to = "/.netlify/functions/oauth/:splat"
   status = 200
+  force = true
+
+[[redirects]]
+  from = "/auth"
+  to = "/.netlify/functions/oauth/auth"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/callback"
+  to = "/.netlify/functions/oauth/callback"
+  status = 200
+
+# Optional: direct function paths and dev convenience
+[[redirects]]
+  from = "/api/oauth/*"
+  to = "/.netlify/functions/oauth/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/.netlify/functions/oauth/*"
+  to = "/.netlify/functions/oauth/:splat"
+  status = 200
+  force = true
 
 # Admin panel
 [[redirects]]
@@ -15,31 +40,10 @@
   to = "/admin/index.html"
   status = 200
 
-# OAuth endpoints
+# SPA catch-all LAST
 [[redirects]]
-  from = "/.netlify/functions/oauth/*"
-  to = "/.netlify/functions/oauth/:splat"
-  status = 200
-  force = true
-
-# For Decap CMS OAuth flow
-[[redirects]]
-  from = "/oauth/*"
-  to = "/.netlify/functions/oauth/:splat"
-  status = 200
-  force = true
-
-# For direct function access (development)
-[[redirects]]
-  from = "/api/oauth/*"
-  to = "/.netlify/functions/oauth/:splat"
-  status = 200
-  force = true
-
-# Handle OAuth callbacks
-[[redirects]]
-  from = "/callback"
-  to = "/.netlify/functions/oauth/callback"
+  from = "/*"
+  to = "/index.html"
   status = 200
 
 # Security headers

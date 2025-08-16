@@ -9,14 +9,12 @@
   <!-- Include the script that loads the Decap CMS configuration. -->
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
   <style>
-    /* Hide any potential flash of the CMS loading animation */
-    #nc-root {
-      display: none;
-    }
+    /* Keep root visible so CMS can render */
+    #nc-root { min-height: 100vh; }
   </style>
 </head>
 <body>
-  <div id="nc-root" style="min-height: 100vh; display: none;"></div>
+  <div id="nc-root" style="min-height: 100vh;"></div>
   
   <script>
     // Enable manual initialization
@@ -33,38 +31,141 @@
     // Check if we're in an iframe (preview) or popup (auth)
     const inFrame = window.self !== window.top;
     const isAuthPopup = window.opener && window.opener !== window && window.opener.CMS;
-    
+
     // Only initialize CMS if we're not in an iframe or auth popup
     if (!inFrame && !isAuthPopup) {
-      // Initialize CMS manually
-      window.initCMS({
-        config: {
-          backend: {
-            name: 'github',
-            repo: 'joru10/website_CMS', // Replace with your GitHub repo
-            branch: 'main',
-            base_url: '/oauth',
-            auth_endpoint: 'auth',
-            app_id: 'decap-cms',
-            auth_type: 'pkce',
-            token_endpoint: 'access_token',
-            cms_label_prefix: 'CMS',
-            commit_messages: {
-              create: 'Create {{collection}} “{{slug}}”',
-              update: 'Update {{collection}} “{{slug}}”',
-              delete: 'Delete {{collection}} “{{slug}}”',
-              uploadMedia: 'Upload “{{path}}”',
-              deleteMedia: 'Delete “{{path}}”',
-              openAuthoring: '{{message}}'
-            }
+      initializeCMS();
+    }
+    
+    function initializeCMS() {
+      const cmsConfig = {
+        backend: {
+          name: 'github',
+          repo: 'joru10/website_CMS',
+          branch: 'main',
+          base_url: '/oauth',
+          auth_endpoint: 'auth',
+          auth_type: 'pkce',
+          token_endpoint: 'access_token',
+          cms_label_prefix: 'CMS',
+          commit_messages: {
+            create: 'Create {{collection}} “{{slug}}”',
+            update: 'Update {{collection}} “{{slug}}”',
+            delete: 'Delete {{collection}} “{{slug}}”',
+            uploadMedia: 'Upload “{{path}}”',
+            deleteMedia: 'Delete “{{path}}”',
+            openAuthoring: '{{message}}'
+          }
+        },
+        media_folder: 'static/uploads',
+        public_folder: '/uploads',
+        collections: [
+          {
+            name: 'content',
+            label: 'Site Content (claims, stats)',
+            delete: false,
+            files: [
+              {
+                file: 'content.json',
+                label: 'Claims & Stats',
+                name: 'claims',
+                format: 'json',
+                fields: [
+                  { label: 'Data', name: 'data', widget: 'list', summary: '{{fields.key}}: {{fields.value}}', fields: [
+                    { label: 'Key', name: 'key', widget: 'string' },
+                    { label: 'Value', name: 'value', widget: 'string' }
+                  ]}
+                ]
+              }
+            ]
           },
-          media_folder: 'public/images',
-          public_folder: '/images',
-          collections: [
-            // Your collections configuration here
-          ]
-        }
-      });
+          {
+            name: 'translations',
+            label: 'Translations',
+            label_singular: 'Translation file',
+            delete: false,
+            files: [
+              { file: 'translations/en.json', name: 'en', label: 'English', format: 'json', fields: [
+                { label: 'Strings', name: 'strings', widget: 'list', summary: '{{fields.key}}', fields: [
+                  { label: 'Key', name: 'key', widget: 'string' },
+                  { label: 'Value', name: 'value', widget: 'string' }
+                ]}
+              ]},
+              { file: 'translations/es.json', name: 'es', label: 'Español (EU)', format: 'json', fields: [
+                { label: 'Strings', name: 'strings', widget: 'list', summary: '{{fields.key}}', fields: [
+                  { label: 'Key', name: 'key', widget: 'string' },
+                  { label: 'Value', name: 'value', widget: 'string' }
+                ]}
+              ]},
+              { file: 'translations/fr.json', name: 'fr', label: 'Français (EU)', format: 'json', fields: [
+                { label: 'Strings', name: 'strings', widget: 'list', summary: '{{fields.key}}', fields: [
+                  { label: 'Key', name: 'key', widget: 'string' },
+                  { label: 'Value', name: 'value', widget: 'string' }
+                ]}
+              ]}
+            ]
+          },
+          {
+            name: 'blog',
+            label: 'Blog Posts',
+            folder: 'blog',
+            create: true,
+            slug: '{{slug}}',
+            format: 'frontmatter',
+            fields: [
+              { label: 'Title', name: 'title', widget: 'string' },
+              { label: 'Date', name: 'date', widget: 'datetime' },
+              { label: 'Summary', name: 'summary', widget: 'text' },
+              { label: 'Body', name: 'body', widget: 'markdown' }
+            ]
+          },
+          {
+            name: 'education',
+            label: 'Education Articles',
+            folder: 'education',
+            create: true,
+            slug: '{{slug}}',
+            format: 'frontmatter',
+            fields: [
+              { label: 'Title', name: 'title', widget: 'string' },
+              { label: 'Date', name: 'date', widget: 'datetime' },
+              { label: 'Summary', name: 'summary', widget: 'text' },
+              { label: 'Body', name: 'body', widget: 'markdown' }
+            ]
+          },
+          {
+            name: 'news',
+            label: 'News',
+            folder: 'news',
+            create: true,
+            slug: '{{slug}}',
+            format: 'frontmatter',
+            fields: [
+              { label: 'Title', name: 'title', widget: 'string' },
+              { label: 'Date', name: 'date', widget: 'datetime' },
+              { label: 'Summary', name: 'summary', widget: 'text' },
+              { label: 'Body', name: 'body', widget: 'markdown' }
+            ]
+          },
+          {
+            name: 'cases',
+            label: 'Case Studies',
+            folder: 'cases',
+            create: true,
+            slug: '{{slug}}',
+            format: 'json',
+            fields: [
+              { label: 'Title', name: 'title', widget: 'string' },
+              { label: 'Industry', name: 'industry', widget: 'string' },
+              { label: 'Challenge', name: 'challenge', widget: 'markdown' },
+              { label: 'Solution', name: 'solution', widget: 'markdown' },
+              { label: 'Outcome', name: 'outcome', widget: 'markdown' }
+            ]
+          }
+        ]
+      };
+      CMS.init({ config: cmsConfig });
+      console.log('CMS initialized with config:', cmsConfig);
     }
   </script>
   
