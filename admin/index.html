@@ -62,11 +62,25 @@
         }
       }
       if (window._cmsLoginRetryCount >= attempts) {
-        try { console.warn('CMS auth API not ready after retries; leaving page loaded without further reloads'); } catch(err){}
+        try { console.warn('CMS auth API not ready after retries; emitting legacy success fallback'); } catch(err){}
+        // As a last resort, emit a legacy success message so Decap CMS can complete login internally
+        emitLegacySuccess(token, user);
         return;
       }
       window._cmsLoginRetryCount++;
       setTimeout(function(){ waitForCMSAuthAndComplete(token, user, attempts, interval); }, interval);
+    }
+
+    // Fallback: emit a legacy success event to let Decap CMS finish login itself
+    function emitLegacySuccess(token, user) {
+      try { console.log('Emitting legacy authorization:github:success to CMS'); } catch(e){}
+      const resp = {
+        access_token: token,
+        token_type: (user && (user.token_type || user.tokenType)) || 'bearer',
+        scope: (user && (user.scope || 'repo,user')) || 'repo,user'
+      };
+      // Post to same-origin so the CMS internal listener can receive it
+      window.postMessage({ type: 'authorization:github:success', response: resp }, window.location.origin);
     }
 
     function initializeCMS() {
