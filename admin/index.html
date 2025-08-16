@@ -65,6 +65,16 @@
         try { console.warn('CMS auth API not ready after retries; emitting legacy success fallback'); } catch(err){}
         // As a last resort, emit a legacy success message so Decap CMS can complete login internally
         emitLegacySuccess(token, user);
+        // If CMS still doesn't surface, perform a one-time clean reload so Decap reboots and reads stored user
+        setTimeout(function(){
+          try {
+            if (!sessionStorage.getItem('_cmsReloadedOnce')) {
+              sessionStorage.setItem('_cmsReloadedOnce','1');
+              console.warn('Reloading once to allow CMS to pick up stored auth');
+              window.location.reload();
+            }
+          } catch(e){}
+        }, 400);
         return;
       }
       window._cmsLoginRetryCount++;
@@ -79,7 +89,21 @@
         token_type: (user && (user.token_type || user.tokenType)) || 'bearer',
         scope: (user && (user.scope || 'repo,user')) || 'repo,user'
       };
-      // Post to same-origin so the CMS internal listener can receive it
+      // 1) Preferred: open a tiny popup that posts the legacy success back to this window (matches Decap's expected popup flow)
+      try {
+        const popup = window.open('/admin/callback.html#' + encodeURIComponent(token), 'cms_auth_cb', 'width=450,height=200,menubar=no,toolbar=no,location=no,status=no');
+        if (popup) {
+          console.log('Opened legacy success callback popup');
+          // Give popup a moment; also send a direct postMessage in case popup blockers prevent open
+          setTimeout(function(){
+            try { window.postMessage({ type: 'authorization:github:success', response: resp }, window.location.origin); } catch(e){}
+          }, 300);
+          return;
+        }
+      } catch (e) {
+        try { console.warn('Popup open failed, falling back to same-window postMessage', e); } catch(_){}
+      }
+      // 2) Fallback: post to same-origin so the CMS internal listener can receive it
       window.postMessage({ type: 'authorization:github:success', response: resp }, window.location.origin);
     }
 
@@ -459,6 +483,7 @@
         // Mark OAuth as completed to ignore any late popup messages on this reload
         window._oauthProcessed = true;
         window.authSuccess = true;
+        try { sessionStorage.removeItem('_cmsReloadedOnce'); } catch(e){}
         if (window._fallbackTimers && window._fallbackTimers.size) {
           try { window._fallbackTimers.forEach((t) => clearTimeout(t)); } catch(e) {}
           window._fallbackTimers = new Map();
