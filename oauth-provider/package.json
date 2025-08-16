@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "OAuth proxy for Netlify CMS with GitHub",
   "type": "module",
-  "main": "server.cjs",
+  "main": "server.js",
   "scripts": {
-    "start": "node server.cjs"
+    "start": "node server.js"
   },
   "dependencies": {
     "axios": "^1.11.0",
