@@ -87,32 +87,120 @@ exports.handler = async (event, context) => {
   if (path.endsWith('/callback')) {
     const { code, state, error, error_description } = params;
 
-    // If GitHub sent an error, still notify Decap CMS via postMessage
+    // Parse cookies to retrieve PKCE verifier, and infer state if missing
+    let cookies = {};
+    try {
+      const cookieHeader = event.headers.cookie || event.headers.Cookie || '';
+      cookies = Object.fromEntries(
+        cookieHeader
+          .split(';')
+          .map(c => c.trim())
+          .filter(Boolean)
+          .map(c => {
+            const idx = c.indexOf('=');
+            const k = idx >= 0 ? c.slice(0, idx) : c;
+            const v = idx >= 0 ? c.slice(idx + 1) : '';
+            return [k, decodeURIComponent(v)];
+          })
+      );
+    } catch (_) {}
+
+    let effectiveState = state;
+    if (!effectiveState) {
+      const pkceKey = Object.keys(cookies).find(k => k.startsWith('oauth_pkce_'));
+      if (pkceKey) effectiveState = pkceKey.replace('oauth_pkce_', '');
+    }
+    const verifier = effectiveState ? cookies[`oauth_pkce_${effectiveState}`] : undefined;
+
+    // Attempt server-side PKCE exchange when possible
+    let tokenData = null;
+    let tokenErr = null;
+    if (!error && code && verifier) {
+      try {
+        const tokenResponse = await axios.post(
+          'https://github.com/login/oauth/access_token',
+          {
+            client_id: process.env.GITHUB_CLIENT_ID || process.env.OAUTH_CLIENT_ID,
+            code,
+            redirect_uri: getRedirectUri(protocol, host),
+            code_verifier: verifier,
+          },
+          {
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        const { access_token, token_type, scope, error: ghErr, error_description: ghErrDesc } = tokenResponse.data || {};
+        if (ghErr || !access_token) {
+          tokenErr = { error: ghErr || 'invalid_grant', error_description: ghErrDesc || 'Failed to obtain access token' };
+        } else {
+          tokenData = {
+            access_token,
+            token_type: token_type || 'bearer',
+            scope: scope || 'repo,user',
+          };
+        }
+      } catch (ex) {
+        tokenErr = { error: 'server_error', error_description: ex.message || 'Token exchange failed' };
+      }
+    }
+
+    // Build HTML that posts messages back to opener and closes
+    const clearCookieHeader = effectiveState
+      ? { 'Set-Cookie': `oauth_pkce_${effectiveState}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0` }
+      : {};
+
     const html = `
       <!DOCTYPE html>
       <html>
       <head><title>Authenticating…</title></head>
       <body>
+        <div style="font-family: sans-serif; padding: 16px;">
+          <h3>Authenticating…</h3>
+          <p>You can close this window.</p>
+        </div>
         <script>
           (function() {
             function send(msg) {
-              if (window.opener) {
-                // Decap CMS listens for { source: 'decap-cms', ... }
-                window.opener.postMessage(msg, '*');
+              try {
+                console.log('[oauth/callback] posting message to opener', msg);
+                if (window.opener) {
+                  window.opener.postMessage(msg, '*');
+                } else {
+                  console.warn('[oauth/callback] no opener window');
+                }
+              } catch (e) {
+                console.error('[oauth/callback] postMessage failed', e);
               }
-              // Always close popup
-              window.close();
             }
             var params = new URLSearchParams(window.location.search);
             var err = params.get('error');
-            if (err) {
-              send({ source: 'decap-cms', error: err, error_description: params.get('error_description') || '' });
-              return;
-            }
             var code = params.get('code');
             var state = params.get('state');
-            // Inform Decap to call /oauth/access_token with code+state
-            send({ source: 'decap-cms', code: code, state: state });
+            // Always send Decap message so CMS can complete exchange if needed
+            if (code && state) {
+              var decapMsg = { source: 'decap-cms', code: code, state: state };
+              send(decapMsg);
+              setTimeout(function(){ send(decapMsg); }, 300);
+            }
+            // If server-side token exchange succeeded, also send legacy success
+            var token = ${JSON.stringify(tokenData || null)};
+            if (token) {
+              var successMsg = { type: 'authorization:github:success', provider: 'github', response: token };
+              send(successMsg);
+            }
+            // If there was an error (GitHub or server), notify parent too
+            var tokenErr = ${JSON.stringify(tokenErr || (error ? { error: error, error_description: error_description || '' } : null))};
+            if (tokenErr) {
+              var errMsgLegacy = { type: 'authorization:github:error', error: tokenErr.error, error_description: tokenErr.error_description };
+              send(errMsgLegacy);
+              var errMsgDecap = { source: 'decap-cms', error: tokenErr.error, error_description: tokenErr.error_description };
+              send(errMsgDecap);
+            }
+            // Close with a small delay to allow the parent to process
+            setTimeout(function(){ window.close(); }, 1500);
           })();
         </script>
       </body>
@@ -120,7 +208,7 @@ exports.handler = async (event, context) => {
 
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'text/html' },
+      headers: { 'Content-Type': 'text/html', ...clearCookieHeader },
       body: html,
     };
   }
@@ -129,24 +217,24 @@ exports.handler = async (event, context) => {
   if (path.endsWith('/access_token')) {
     try {
       const body = JSON.parse(event.body || '{}');
-      const { code, state } = body;
+      let { code, state, code_verifier: clientCodeVerifier, verifier: clientVerifier } = body;
       
-      if (!code || !state) {
+      if (!code) {
         return {
           statusCode: 400,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             error: 'invalid_request',
-            error_description: 'Missing required parameters: code and state'
+            error_description: 'Missing required parameter: code'
           })
         };
       }
       
-      // Try retrieving verifier from cookie first (reliable across invocations)
-      let verifier;
+      // Parse cookies once, and discover state if missing
+      let cookies = {};
       try {
         const cookieHeader = event.headers.cookie || event.headers.Cookie || '';
-        const cookies = Object.fromEntries(
+        cookies = Object.fromEntries(
           cookieHeader.split(';').map(c => c.trim()).filter(Boolean).map(c => {
             const idx = c.indexOf('=');
             const k = idx >= 0 ? c.slice(0, idx) : c;
@@ -154,19 +242,26 @@ exports.handler = async (event, context) => {
             return [k, decodeURIComponent(v)];
           })
         );
-        verifier = cookies[`oauth_pkce_${state}`];
       } catch (e) {
         // ignore cookie parse errors
       }
-      // Fallback to in-memory map as best-effort (may not exist due to cold starts)
-      if (!verifier) verifier = codeVerifiers.get(state);
+      if (!state) {
+        // Try to infer state from PKCE cookie name
+        const pkceKey = Object.keys(cookies).find(k => k.startsWith('oauth_pkce_'));
+        if (pkceKey) state = pkceKey.replace('oauth_pkce_', '');
+      }
+      // Prefer server-stored verifier from cookie; fallback to client-provided, then memory
+      let verifier = undefined;
+      if (state) verifier = cookies[`oauth_pkce_${state}`];
+      if (!verifier) verifier = clientCodeVerifier || clientVerifier;
+      if (!verifier && state) verifier = codeVerifiers.get(state);
       if (!verifier) {
         return {
           statusCode: 400,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             error: 'invalid_grant',
-            error_description: 'Invalid or expired state parameter'
+            error_description: 'Missing code_verifier and no server verifier cookie found'
           })
         };
       }
@@ -215,7 +310,7 @@ exports.handler = async (event, context) => {
       }
       
       // Clean up the verifier (memory and cookie)
-      codeVerifiers.delete(state);
+      if (state) codeVerifiers.delete(state);
 
       return {
         statusCode: 200,
@@ -224,8 +319,8 @@ exports.handler = async (event, context) => {
           'Access-Control-Allow-Origin': '*',
           'Cache-Control': 'no-store',
           'Pragma': 'no-cache',
-          // Expire the cookie
-          'Set-Cookie': `oauth_pkce_${state}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`
+          // Expire the cookie when we know the state
+          ...(state ? { 'Set-Cookie': `oauth_pkce_${state}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0` } : {})
         },
         body: JSON.stringify({
           access_token,
