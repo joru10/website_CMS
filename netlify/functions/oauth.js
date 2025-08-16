@@ -83,165 +83,43 @@ exports.handler = async (event, context) => {
   // Handle OAuth callback from GitHub
   if (path.endsWith('/callback')) {
     const { code, state, error, error_description } = params;
-    
-    // Handle errors from GitHub
-    if (error) {
-      return {
-        statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          error: 'OAuth Error',
-          error_description: error_description || 'Unknown error during OAuth flow'
-        })
-      };
-    }
-    
-    const verifier = codeVerifiers.get(state);
-    codeVerifiers.delete(state); // Clean up the verifier after use
 
-    if (!code || !verifier) {
-      return {
-        statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          error: 'Invalid Request',
-          error_description: 'Missing or invalid code/state parameters'
-        })
-      };
-    }
-
-    try {
-      // Exchange code for access token
-      const tokenResponse = await axios.post(
-        'https://github.com/login/oauth/access_token',
-        {
-          client_id: process.env.GITHUB_CLIENT_ID || process.env.OAUTH_CLIENT_ID,
-          code,
-          redirect_uri: getRedirectUri(protocol, host),
-          code_verifier: verifier,
-          client_secret: process.env.GITHUB_CLIENT_SECRET, // Optional for PKCE, but some apps might need it
-        },
-        {
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      const { access_token, token_type, scope, error, error_description } = tokenResponse.data;
-
-      if (error) {
-        console.error('GitHub token error:', error, error_description);
-        return {
-          statusCode: 400,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            error: 'GitHub Token Error',
-            error_description: error_description || 'Failed to obtain access token from GitHub'
-          })
-        };
-      }
-
-      if (!access_token) {
-        console.error('No access token in response:', tokenResponse.data);
-        return {
-          statusCode: 500,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            error: 'No Access Token',
-            error_description: 'GitHub did not return an access token'
-          })
-        };
-      }
-
-      // Create a simple HTML page that will post the token back to the parent window
-      const html = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Authenticating...</title>
-          <script>
-            // Post the token to the parent window and close
-            window.opener.postMessage({
-              type: 'authorization:github:success',
-              response: {
-                access_token: '${access_token}',
-                token_type: '${token_type || 'bearer'}',
-                scope: '${scope || ''}'
+    // If GitHub sent an error, still notify Decap CMS via postMessage
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head><title>Authenticating…</title></head>
+      <body>
+        <script>
+          (function() {
+            function send(msg) {
+              if (window.opener) {
+                // Decap CMS listens for { source: 'decap-cms', ... }
+                window.opener.postMessage(msg, '*');
               }
-            }, window.location.origin);
-            
-            // Close the popup
-            window.close();
-          </script>
-        </head>
-        <body>
-          <p>Authentication successful! You can close this window.</p>
-          <button onclick="window.close()">Close Window</button>
-        </body>
-        </html>
-      `;
+              // Always close popup
+              window.close();
+            }
+            var params = new URLSearchParams(window.location.search);
+            var err = params.get('error');
+            if (err) {
+              send({ source: 'decap-cms', error: err, error_description: params.get('error_description') || '' });
+              return;
+            }
+            var code = params.get('code');
+            var state = params.get('state');
+            // Inform Decap to call /oauth/access_token with code+state
+            send({ source: 'decap-cms', code: code, state: state });
+          })();
+        </script>
+      </body>
+      </html>`;
 
-      return {
-        statusCode: 200,
-        headers: { 'Content-Type': 'text/html' },
-        body: html
-      };
-    } catch (error) {
-      console.error('Token exchange error:', error);
-      
-      // Create an error page that will show the error to the user
-      const errorHtml = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Authentication Error</title>
-          <style>
-            body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-            .error { color: #d73a49; background: #ffebee; padding: 20px; border-radius: 4px; margin: 20px auto; max-width: 600px; }
-            .details { color: #666; font-size: 0.9em; margin-top: 20px; }
-            button { 
-              background: #0366d6; 
-              color: white; 
-              border: none; 
-              padding: 10px 20px; 
-              border-radius: 4px; 
-              cursor: pointer; 
-              margin-top: 20px;
-            }
-            button:hover { background: #0356b6; }
-          </style>
-          <script>
-            // Try to notify the parent window about the error
-            if (window.opener) {
-              window.opener.postMessage({
-                type: 'authorization:github:error',
-                error: 'Authentication Failed',
-                error_description: '${error.message.replace(/'/g, '\'')}'
-              }, window.location.origin);
-            }
-          </script>
-        </head>
-        <body>
-          <h1>Authentication Error</h1>
-          <div class="error">
-            <p>We couldn't log you in. Please try again later.</p>
-            <div class="details">
-              <p><strong>Error:</strong> ${error.message}</p>
-            </div>
-          </div>
-          <button onclick="window.close()">Close Window</button>
-        </body>
-        </html>
-      `;
-      
-      return {
-        statusCode: 400,
-        headers: { 'Content-Type': 'text/html' },
-        body: errorHtml
-      };
-    }
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'text/html' },
+      body: html,
+    };
   }
 
   // Handle token endpoint (used by Decap CMS for token exchange)
@@ -273,12 +151,11 @@ exports.handler = async (event, context) => {
         };
       }
       
-      // Exchange the code for a token
+      // Exchange the code for a token (PKCE: no client_secret)
       const tokenResponse = await axios.post(
         'https://github.com/login/oauth/access_token',
         {
           client_id: process.env.GITHUB_CLIENT_ID || process.env.OAUTH_CLIENT_ID,
-          client_secret: process.env.GITHUB_CLIENT_SECRET,
           code,
           redirect_uri: getRedirectUri(protocol, host),
           code_verifier: verifier
