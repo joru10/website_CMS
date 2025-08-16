@@ -6,6 +6,8 @@
   <title>Content Manager</title>
   <!-- Include the script that enables Netlify Identity on this page. -->
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <!-- Set manual init BEFORE loading Decap CMS to prevent auto init -->
+  <script>window.CMS_MANUAL_INIT = true;</script>
   <!-- Include the script that loads the Decap CMS configuration. -->
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
   <style>
@@ -17,8 +19,7 @@
   <div id="nc-root" style="min-height: 100vh;"></div>
   
   <script>
-    // Enable manual initialization
-    window.CMS_MANUAL_INIT = true;
+    // Manual initialization is enabled before loading the CMS script
     
     // Debug OAuth state
     console.log('CMS_MANUAL_INIT set to true');
@@ -31,13 +32,16 @@
     // Check if we're in an iframe (preview) or popup (auth)
     const inFrame = window.self !== window.top;
     const isAuthPopup = window.opener && window.opener !== window && window.opener.CMS;
-
-    // Only initialize CMS if we're not in an iframe or auth popup
-    if (!inFrame && !isAuthPopup) {
-      initializeCMS();
-    }
+    const shouldInitCMS = !inFrame && !isAuthPopup;
     
+    function whenCMSReady(cb) {
+      if (window.CMS && typeof window.CMS.init === 'function') return cb();
+      setTimeout(() => whenCMSReady(cb), 50);
+    }
+
     function initializeCMS() {
+      if (window.__cmsInitDone) return;
+      window.__cmsInitDone = true;
       const cmsConfig = {
         backend: {
           name: 'github',
@@ -45,6 +49,7 @@
           branch: 'main',
           base_url: '/oauth',
           auth_endpoint: 'auth',
+          auth_scope: 'public_repo',
           auth_type: 'pkce',
           token_endpoint: 'access_token',
           cms_label_prefix: 'CMS',
@@ -297,7 +302,7 @@
       console.log('Received cms:oauth:success event', e.detail);
     });
     
-    // Check for existing auth token on load
+    // Check for existing auth token on load and initialize after DOM + CMS are ready
     document.addEventListener('DOMContentLoaded', function() {
       // First check URL for token
       const urlParams = new URLSearchParams(window.location.search);
@@ -314,7 +319,7 @@
             const user = JSON.parse(userData);
             if (user.access_token) {
               console.log('Found existing auth token after redirect');
-              initializeCMS();
+              whenCMSReady(initializeCMS);
               return;
             }
           } catch (e) {
@@ -323,9 +328,9 @@
         }
       }
       
-      // Initialize CMS if not already done
-      if (!window.CMS || !window.CMS.initialized) {
-        initializeCMS();
+      // Initialize CMS if needed
+      if (shouldInitCMS) {
+        whenCMSReady(initializeCMS);
       }
     });
     
