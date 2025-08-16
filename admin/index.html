@@ -165,17 +165,21 @@
         script.onload = function() {
           if (window.CMS) {
             try {
+              // Determine if we're in development or production
+              const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+              const siteUrl = isLocal ? 'http://localhost:8081' : 'https://comfy-panda-0d488a.netlify.app';
+              
               const config = {
                 backend: {
                   name: 'github',
                   repo: 'joru10/website_CMS',
                   branch: 'main',
-                  base_url: window.location.origin,
-                  auth_endpoint: '.netlify/functions/oauth/auth',
-                  token_endpoint: '.netlify/functions/oauth/access_token',
+                  base_url: isLocal ? 'http://localhost:8081' : 'https://comfy-panda-0d488a.netlify.app',
+                  auth_endpoint: isLocal ? 'auth' : '.netlify/functions/oauth/auth',
+                  token_endpoint: isLocal ? 'access_token' : '.netlify/functions/oauth/access_token',
                   auth_type: 'pkce',
                   app_id: 'Ov23lilcBd8JkV3HWZbE',
-                  site_domain: window.location.origin,
+                  site_domain: siteUrl,
                   auth_scope: 'repo,user',
                   debug: true
                 },
