@@ -3,21 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CMS Test</title>
+  <title>Content Manager - Test</title>
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; padding: 20px; }
-    #cms { max-width: 800px; margin: 0 auto; }
-  </style>
 </head>
 <body>
-  <h1>CMS Test Page</h1>
-  <div id="cms"></div>
-  
   <script>
-    console.log('Initializing CMS...');
-    
-    // Simple configuration
+    // Simple CMS configuration for testing OAuth
     const config = {
       backend: {
         name: 'github',
@@ -28,6 +19,7 @@
         token_endpoint: 'callback',
         auth_type: 'pkce',
         app_id: 'Ov23lilcBd8JkV3HWZbE
+        proxy_url: 'https://joru10-cms-oauth.onrender.com'
       },
       media_folder: 'static/uploads',
       public_folder: '/uploads',
@@ -46,13 +38,7 @@
     };
 
     // Initialize CMS
-    CMS.init({
-      config,
-      load_config_file: false,
-      local_backend: false
-    });
-    
-    console.log('CMS initialization complete');
+    CMS.init({ config });
   </script>
 </body>
 </html>

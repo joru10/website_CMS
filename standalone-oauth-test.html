@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Standalone OAuth Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px;
+            line-height: 1.6;
+        }
+        button { 
+            padding: 10px 20px; 
+            font-size: 16px;
+            background: #2ea44f;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #2c974b;
+        }
+        pre { 
+            background: #f5f5f5; 
+            padding: 15px; 
+            border-radius: 4px; 
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        .container {
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>GitHub OAuth Test</h1>
+    <div class="container">
+        <button id="startOAuth">Start GitHub OAuth Flow</button>
+    </div>
+    
+    <h3>Debug Log:</h3>
+    <pre id="log">Click the button above to start the OAuth flow...</pre>
+
+    <script>
+        // Simple logging function
+        const log = document.getElementById('log');
+        function logMessage(message) {
+            const timestamp = new Date().toISOString().substring(11, 23);
+            log.textContent += `[${timestamp}] ${message}\n`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // OAuth Configuration
+        const config = {
+            clientId: 'Ov23lilcBd8JkV3HWZbE',
+            redirectUri: 'https://joru10-cms-oauth.onrender.com/callback',
+            scope: 'repo',
+            state: Math.random().toString(36).substring(2, 15)
+        };
+
+        // Initialize the OAuth flow
+        document.getElementById('startOAuth').addEventListener('click', () => {
+            logMessage('Starting OAuth flow...');
+            
+            // Store state in sessionStorage
+            sessionStorage.setItem('oauth_state', config.state);
+            logMessage(`State stored: ${config.state}`);
+            
+            // Build the authorization URL
+            const authUrl = new URL('https://github.com/login/oauth/authorize');
+            authUrl.searchParams.append('client_id', config.clientId);
+            authUrl.searchParams.append('redirect_uri', config.redirectUri);
+            authUrl.searchParams.append('scope', config.scope);
+            authUrl.searchParams.append('state', config.state);
+            
+            logMessage(`Redirecting to: ${authUrl.toString()}`);
+            
+            // Redirect to GitHub
+            window.location.href = authUrl.toString();
+        });
+
+        // Initial log
+        logMessage('Page loaded. Ready to start OAuth flow.');
+    </script>
+</body>
+</html>

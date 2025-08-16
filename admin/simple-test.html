@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CMS Test</title>
+  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+</head>
+<body>
+  <script>
+    console.log('Script loaded, initializing CMS...');
+    
+    // Simple configuration
+    const config = {
+      backend: {
+        name: 'github',
+        repo: 'joru10/website_CMS',
+        branch: 'main',
+        base_url: 'https://joru10-cms-oauth.onrender.com',
+        auth_endpoint: 'auth',
+      },
+      local_backend: false,
+      media_folder: 'static/img',
+      public_folder: '/img',
+      collections: [
+        {
+          name: 'posts',
+          label: 'Posts',
+          folder: 'content/posts',
+          create: true,
+          fields: [
+            { label: 'Title', name: 'title', widget: 'string' },
+            { label: 'Body', name: 'body', widget: 'markdown' },
+          ],
+        },
+      ],
+    };
+
+    // Initialize CMS
+    CMS.init({ config });
+    console.log('CMS initialized');
+  </script>
+</body>
+</html>

@@ -1,8 +1,53 @@
 [build]
   publish = "."
   command = ""
+  functions = "netlify/functions"
 
+# Handle SPA routing - redirect all 404s to index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Admin panel
 [[redirects]]
   from = "/admin/*"
   to = "/admin/index.html"
   status = 200
+
+# OAuth endpoints
+[[redirects]]
+  from = "/.netlify/functions/oauth/*"
+  to = "/.netlify/functions/oauth/:splat"
+  status = 200
+  force = true
+
+# For Decap CMS OAuth flow
+[[redirects]]
+  from = "/oauth/*"
+  to = "/.netlify/functions/oauth/:splat"
+  status = 200
+  force = true
+
+# For direct function access (development)
+[[redirects]]
+  from = "/api/oauth/*"
+  to = "/.netlify/functions/oauth/:splat"
+  status = 200
+  force = true
+
+# Handle OAuth callbacks
+[[redirects]]
+  from = "/callback"
+  to = "/.netlify/functions/oauth/callback"
+  status = 200
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:; img-src 'self' https: data:;"

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Static OAuth Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    a { color: #0366d6; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    pre { background: #f6f8fa; padding: 16px; border-radius: 6px; overflow-x: auto; }
+    code { font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace; }
+  </style>
+</head>
+<body>
+  <h1>GitHub OAuth Test</h1>
+  
+  <h2>Test OAuth Flow</h2>
+  <p>Click the link below to test the OAuth flow:</p>
+  
+  <p>
+    <a href="https://github.com/login/oauth/authorize?client_id=Ov23lilcBd8JkV3HWZbE 
+       target="_blank">
+      Start GitHub OAuth Flow
+    </a>
+  </p>
+  
+  <h2>What to expect:</h2>
+  <ol>
+    <li>You'll be redirected to GitHub to authorize the application</li>
+    <li>After authorizing, you'll be redirected back to the OAuth proxy</li>
+    <li>The OAuth proxy should handle the token exchange and redirect you back to the CMS</li>
+  </ol>
+  
+  <h2>If you see an error:</h2>
+  <p>Please check the URL after you're redirected back. It might contain an error message.</p>
+  
+  <h2>Common Issues:</h2>
+  <ul>
+    <li>Make sure the GitHub OAuth App has the correct callback URL: <code>https://joru10-cms-oauth.onrender.com/callback</code></li>
+    <li>Check that the client ID matches: <code>Ov23lilcBd8JkV3HWZbE
+    <li>Verify that the OAuth proxy is running and accessible</li>
+  </ul>
+</body>
+</html>

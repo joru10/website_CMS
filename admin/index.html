@@ -41,25 +41,35 @@
       
       console.log('GitHub OAuth successful:', response);
       
-      // Store the token in localStorage for the CMS to pick up
       if (response && response.access_token) {
+        // Store the token in both localStorage and sessionStorage
         const userData = {
           access_token: response.access_token,
           token_type: response.token_type,
           scope: response.scope,
           created_at: Date.now()
         };
+        
+        // Store in localStorage for persistence
         localStorage.setItem('netlify-cms-user', JSON.stringify(userData));
         
-        // Also set in sessionStorage for immediate access
+        // Also store in sessionStorage for immediate access
         sessionStorage.setItem('netlify-cms-user', JSON.stringify(userData));
         
-        // Trigger a custom event that the CMS can listen to
-        document.dispatchEvent(new CustomEvent('cms:oauth:success', { detail: response }));
+        // Store in a more accessible location for the CMS
+        localStorage.setItem('netlify-cms-auth', JSON.stringify({
+          token: response.access_token,
+          provider: 'github',
+          user: { name: 'GitHub User' }
+        }));
+        
+        console.log('Stored auth data, reloading page...');
+        
+        // Force reload the page to ensure clean initialization
+        window.location.href = window.location.pathname + '?auth=success&t=' + Date.now();
+      } else {
+        console.error('No access token in response:', response);
       }
-      
-      // Force reload the page to ensure clean initialization
-      window.location.href = window.location.pathname + '?auth=success&t=' + Date.now();
     }
     
     // Listen for messages from the popup
@@ -92,17 +102,33 @@
     
     // Check for existing auth token on load
     document.addEventListener('DOMContentLoaded', function() {
-      const userData = localStorage.getItem('netlify-cms-user');
-      if (userData) {
-        try {
-          const user = JSON.parse(userData);
-          if (user.access_token) {
-            console.log('Found existing auth token');
-            handleAuthSuccess(user);
+      // First check URL for token
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('auth') === 'success') {
+        // Clean up the URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        // Check for stored auth data
+        const userData = localStorage.getItem('netlify-cms-user') || 
+                        sessionStorage.getItem('netlify-cms-user');
+        
+        if (userData) {
+          try {
+            const user = JSON.parse(userData);
+            if (user.access_token) {
+              console.log('Found existing auth token after redirect');
+              initializeCMS();
+              return;
+            }
+          } catch (e) {
+            console.error('Error parsing user data:', e);
           }
-        } catch (e) {
-          console.error('Error parsing user data:', e);
         }
+      }
+      
+      // Initialize CMS if not already done
+      if (!window.CMS || !window.CMS.initialized) {
+        initializeCMS();
       }
     });
     
@@ -144,7 +170,7 @@
                   name: 'github',
                   repo: 'joru10/website_CMS',
                   branch: 'main',
-                  base_url: 'https://joru10-cms-oauth.onrender.com',
+                  base_url: window.location.origin,
                   auth_endpoint: 'auth',
                   token_endpoint: 'access_token',
                   auth_type: 'pkce',
@@ -153,11 +179,20 @@
                   auth_scope: 'repo,user',
                   cms_label_prefix: '',
                   use_graphql: true,
-                  proxy_url: 'https://joru10-cms-oauth.onrender.com/auth',
-                  // Important: Ensure the CMS knows we're using a proxy
-                  api_root: 'https://joru10-cms-oauth.onrender.com',
                   // Debug options
-                  debug: true
+                  debug: true,
+                  // Handle the auth callback
+                  auth_callback: function({ tokenData, options }) {
+                    console.log('Auth callback triggered with token:', tokenData);
+                    if (tokenData && tokenData.access_token) {
+                      // Store the token
+                      localStorage.setItem('netlify-cms-user', JSON.stringify(tokenData));
+                      // Redirect to clean URL
+                      window.history.replaceState({}, document.title, window.location.pathname);
+                      return true;
+                    }
+                    return false;
+                  }
                 },
                 // Enable debug mode
                 debug: true,
@@ -180,15 +215,26 @@
               // Store config for later use
               window.CMS_CONFIG = config;
               
-              // Check if we're coming back from OAuth
-              const urlParams = new URLSearchParams(window.location.search);
-              if (urlParams.get('code') && urlParams.get('state')) {
-                // Let the CMS handle the OAuth callback
-                CMS.init({ config, load_config_file: false });
-              } else {
-                // Initialize CMS without OAuth flow
-                CMS.init({ config, load_config_file: false });
+              // Check for token in URL
+              const urlParams = new URLSearchParams(window.location.hash.substring(1));
+              const token = urlParams.get('token');
+              
+              if (token) {
+                try {
+                  // Parse the token and store it
+                  const tokenData = JSON.parse(decodeURIComponent(token));
+                  if (tokenData.access_token) {
+                    localStorage.setItem('netlify-cms-user', JSON.stringify(tokenData));
+                    // Clean up the URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                  }
+                } catch (e) {
+                  console.error('Error parsing token:', e);
+                }
               }
+              
+              // Initialize CMS
+              CMS.init({ config, load_config_file: false });
               
               // Show the CMS UI
               const rootEl = document.getElementById('nc-root');

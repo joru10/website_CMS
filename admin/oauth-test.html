@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OAuth Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px; margin: 10px 0; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>OAuth Test</h1>
+    <button id="startOAuth">Start OAuth Flow</button>
+    <h3>Logs:</h3>
+    <pre id="log"></pre>
+
+    <script>
+        const log = document.getElementById('log');
+        const appendLog = (msg) => {
+            log.textContent += msg + '\n';
+            log.scrollTop = log.scrollHeight;
+        };
+
+        document.getElementById('startOAuth').addEventListener('click', () => {
+            const clientId = 'Ov23lilcBd8JkV3HWZbE
+            const redirectUri = 'https://joru10-cms-oauth.onrender.com/callback';
+            const state = Math.random().toString(36).substr(2);
+            
+            // Store state in sessionStorage
+            sessionStorage.setItem('oauth_state', state);
+            
+            // Generate PKCE code verifier and challenge
+            const codeVerifier = generateCodeVerifier();
+            sessionStorage.setItem('code_verifier', codeVerifier);
+            
+            generateCodeChallenge(codeVerifier).then(codeChallenge => {
+                const url = new URL('https://github.com/login/oauth/authorize');
+                url.searchParams.append('client_id', clientId);
+                url.searchParams.append('redirect_uri', redirectUri);
+                url.searchParams.append('scope', 'repo');
+                url.searchParams.append('state', state);
+                url.searchParams.append('code_challenge', codeChallenge);
+                url.searchParams.append('code_challenge_method', 'S256');
+                
+                appendLog('Redirecting to: ' + url.toString());
+                window.location.href = url.toString();
+            });
+        });
+
+        function generateCodeVerifier() {
+            const array = new Uint8Array(32);
+            window.crypto.getRandomValues(array);
+            return Array.from(array, byte => ('0' + byte.toString(16)).slice(-2)).join('');
+        }
+
+        async function generateCodeChallenge(verifier) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(verifier);
+            const digest = await window.crypto.subtle.digest('SHA-256', data);
+            return btoa(String.fromCharCode(...new Uint8Array(digest)))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=+$/, '');
+        }
+    </script>
+</body>
+</html>
