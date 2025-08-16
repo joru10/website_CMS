@@ -128,6 +128,8 @@ exports.handler = async (event, context) => {
         form.append('code', code);
         form.append('redirect_uri', getRedirectUri(protocol, host));
         form.append('code_verifier', verifier);
+        if (effectiveState) form.append('state', effectiveState);
+        form.append('grant_type', 'authorization_code');
         const tokenResponse = await axios.post(
           'https://github.com/login/oauth/access_token',
           form.toString(),
@@ -149,7 +151,11 @@ exports.handler = async (event, context) => {
           };
         }
       } catch (ex) {
-        tokenErr = { error: 'server_error', error_description: ex.message || 'Token exchange failed' };
+        let gh = null;
+        try { gh = ex.response && ex.response.data ? ex.response.data : null; } catch(_) {}
+        tokenErr = gh && (gh.error || gh.error_description)
+          ? { error: gh.error || 'server_error', error_description: gh.error_description || 'Token exchange failed' }
+          : { error: 'server_error', error_description: ex.message || 'Token exchange failed' };
       }
     }
 
@@ -262,6 +268,7 @@ token_error: ${JSON.stringify(tokenErr || null)}
       } catch (e) {
         // ignore cookie parse errors
       }
+      if (typeof state === 'string') state = state.trim();
       if (!state) {
         // Try to infer state from PKCE cookie name
         const pkceKey = Object.keys(cookies).find(k => k.startsWith('oauth_pkce_'));
@@ -289,6 +296,8 @@ token_error: ${JSON.stringify(tokenErr || null)}
       form2.append('code', code);
       form2.append('redirect_uri', getRedirectUri(protocol, host));
       form2.append('code_verifier', verifier);
+      if (state) form2.append('state', state);
+      form2.append('grant_type', 'authorization_code');
       const tokenResponse = await axios.post(
         'https://github.com/login/oauth/access_token',
         form2.toString(),
@@ -303,7 +312,7 @@ token_error: ${JSON.stringify(tokenErr || null)}
       const { access_token, token_type, scope, error, error_description } = tokenResponse.data;
       
       if (error) {
-        console.error('GitHub token error:', error, error_description);
+        console.error('GitHub token error:', error, error_description, 'raw:', tokenResponse.data);
         return {
           statusCode: 400,
           headers: { 'Content-Type': 'application/json' },
