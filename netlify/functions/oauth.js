@@ -252,17 +252,16 @@ token_error: ${JSON.stringify(tokenErr || null)}
             var err = params.get('error');
             var code = params.get('code');
             var state = params.get('state');
-            // Always send Decap message so CMS can complete exchange if needed
-            if (code && state) {
-              var decapMsg = { source: 'decap-cms', code: code, state: state };
-              send(decapMsg);
-              setTimeout(function(){ send(decapMsg); }, 300);
-            }
-            // If server-side token exchange succeeded, also send legacy success
+            // If server-side token exchange succeeded, send legacy success only
             var token = ${JSON.stringify(tokenData || null)};
             if (token) {
               var successMsg = { type: 'authorization:github:success', provider: 'github', response: token };
               send(successMsg);
+            } else if (code && state) {
+              // Only send Decap message when server-side exchange did not produce a token
+              var decapMsg = { source: 'decap-cms', code: code, state: state };
+              send(decapMsg);
+              setTimeout(function(){ send(decapMsg); }, 300);
             }
             // If there was an error (GitHub or server), notify parent too
             var tokenErr = ${JSON.stringify(tokenErr || (error ? { error: error, error_description: error_description || '' } : null))};
