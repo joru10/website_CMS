@@ -307,8 +307,14 @@
           }
           window.close();
         } else {
-          // If not in a popup, redirect to the admin page to refresh the CMS
-          window.location.href = window.location.pathname + '?auth=success&t=' + Date.now();
+          // If not in a popup, immediately initialize CMS without page reload
+          try {
+            console.log('Initializing CMS after auth (no reload)');
+            whenCMSReady(initializeCMS);
+          } catch (e) {
+            console.warn('Immediate CMS init failed, falling back to reload', e);
+            window.location.href = window.location.pathname + '?auth=success&t=' + Date.now();
+          }
         }
       } else {
         console.error('No access token in response:', response);
