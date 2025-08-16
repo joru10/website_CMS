@@ -2,7 +2,7 @@ const { URL } = require('url');
 const axios = require('axios');
 const crypto = require('crypto');
 
-// In-memory store for code verifiers (use a proper cache in production)
+// In-memory store for code verifiers (best-effort). We also persist via cookies.
 const codeVerifiers = new Map();
 
 // Generate a random string for PKCE
@@ -68,6 +68,9 @@ exports.handler = async (event, context) => {
         headers: {
           Location: redirectUrl.toString(),
           'Cache-Control': 'no-cache',
+          // Persist verifier in a secure, short-lived cookie keyed by state
+          // Path=/ ensures it's sent to /oauth/access_token as well
+          'Set-Cookie': `oauth_pkce_${state}=${verifier}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=600`,
         },
         body: '',
       };
@@ -139,7 +142,24 @@ exports.handler = async (event, context) => {
         };
       }
       
-      const verifier = codeVerifiers.get(state);
+      // Try retrieving verifier from cookie first (reliable across invocations)
+      let verifier;
+      try {
+        const cookieHeader = event.headers.cookie || event.headers.Cookie || '';
+        const cookies = Object.fromEntries(
+          cookieHeader.split(';').map(c => c.trim()).filter(Boolean).map(c => {
+            const idx = c.indexOf('=');
+            const k = idx >= 0 ? c.slice(0, idx) : c;
+            const v = idx >= 0 ? c.slice(idx + 1) : '';
+            return [k, decodeURIComponent(v)];
+          })
+        );
+        verifier = cookies[`oauth_pkce_${state}`];
+      } catch (e) {
+        // ignore cookie parse errors
+      }
+      // Fallback to in-memory map as best-effort (may not exist due to cold starts)
+      if (!verifier) verifier = codeVerifiers.get(state);
       if (!verifier) {
         return {
           statusCode: 400,
@@ -194,16 +214,18 @@ exports.handler = async (event, context) => {
         };
       }
       
-      // Clean up the verifier
+      // Clean up the verifier (memory and cookie)
       codeVerifiers.delete(state);
-      
+
       return {
         statusCode: 200,
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',
           'Cache-Control': 'no-store',
-          'Pragma': 'no-cache'
+          'Pragma': 'no-cache',
+          // Expire the cookie
+          'Set-Cookie': `oauth_pkce_${state}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`
         },
         body: JSON.stringify({
           access_token,
