@@ -193,6 +193,7 @@
     window._exchangeInProgress = false;
     window._oauthProcessed = false;
     window._processedStates = new Set();
+    window._fallbackTimers = new Map();
     
     // Listen for messages from the OAuth popup
     window.addEventListener('message', function(event) {
@@ -231,29 +232,40 @@
       // Fallback: complete the token exchange via our OAuth function
       if (message.source === 'decap-cms' && message.code && message.state) {
         if (window._exchangeInProgress) { try { console.log('Exchange in progress; ignoring duplicate'); } catch(e){} return; }
-        window._exchangeInProgress = true;
         window._processedStates.add(message.state);
-        console.log('Decap-style message detected; completing token exchange via /oauth/access_token');
-        fetch('/oauth/access_token', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include', // include HttpOnly PKCE cookie
-          body: JSON.stringify({ code: message.code, state: message.state })
-        })
-        .then(r => r.ok ? r.json() : r.text().then(t => { throw new Error(`HTTP ${r.status}: ${t}`); }))
-        .then(json => {
-          if (json && json.access_token) {
-            handleAuthSuccess(json);
-          } else {
-            console.error('Token response missing access_token:', json);
-            alert('Authentication failed: missing access token in response');
+        // Delay fallback exchange to allow legacy success to arrive first (server-side exchange)
+        try { console.log('Decap-style message detected; waiting briefly for legacy success before fallback exchange'); } catch(e){}
+        if (window._fallbackTimers.has(message.state)) return; // already scheduled
+        const t = setTimeout(function() {
+          if (window._oauthProcessed || window.authSuccess) {
+            try { console.log('Legacy success detected during wait; skipping fallback exchange'); } catch(e){}
+            window._fallbackTimers.delete(message.state);
+            return;
           }
-        })
-        .catch(err => {
-          console.error('Token exchange failed:', err);
-          alert('Authentication failed during token exchange');
-        })
-        .finally(() => { window._exchangeInProgress = false; });
+          window._exchangeInProgress = true;
+          try { console.log('Proceeding with fallback token exchange via /oauth/access_token'); } catch(e){}
+          fetch('/oauth/access_token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include', // include HttpOnly PKCE cookie
+            body: JSON.stringify({ code: message.code, state: message.state })
+          })
+          .then(r => r.ok ? r.json() : r.text().then(t => { throw new Error(`HTTP ${r.status}: ${t}`); }))
+          .then(json => {
+            if (json && json.access_token) {
+              handleAuthSuccess(json);
+            } else {
+              console.error('Token response missing access_token:', json);
+              alert('Authentication failed: missing access token in response');
+            }
+          })
+          .catch(err => {
+            console.error('Token exchange failed:', err);
+            alert('Authentication failed during token exchange');
+          })
+          .finally(() => { window._exchangeInProgress = false; window._fallbackTimers.delete(message.state); });
+        }, 400); // 400ms grace period
+        window._fallbackTimers.set(message.state, t);
       }
     });
     
@@ -370,9 +382,8 @@
         scope: urlParams.get('scope') || 'repo,user'
       });
     } else if (urlParams.get('auth') === 'success') {
-      // If we were redirected back after successful auth, reload the CMS
+      // Clean URL; we'll complete login from stored token during DOMContentLoaded
       window.history.replaceState({}, document.title, window.location.pathname);
-      window.location.reload();
     }
     
     // Listen for the custom success event
@@ -382,31 +393,33 @@
     
     // Check for existing auth token on load and initialize after DOM + CMS are ready
     document.addEventListener('DOMContentLoaded', function() {
-      // First check URL for token
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('auth') === 'success') {
-        // Clean up the URL
-        window.history.replaceState({}, document.title, window.location.pathname);
-        
-        // Check for stored auth data
-        const userData = localStorage.getItem('netlify-cms-user') || 
-                        sessionStorage.getItem('netlify-cms-user');
-        
-        if (userData) {
-          try {
-            const user = JSON.parse(userData);
-            if (user.token || user.access_token) {
-              console.log('Found existing auth token after redirect');
-              whenCMSReady(initializeCMS);
-              return;
+      // Check for stored auth data regardless of URL
+      const userDataRaw = localStorage.getItem('netlify-cms-user') || sessionStorage.getItem('netlify-cms-user');
+      let storedUser = null;
+      try { storedUser = userDataRaw ? JSON.parse(userDataRaw) : null; } catch (e) { console.error('Error parsing user data:', e); }
+      const storedToken = storedUser && (storedUser.token || storedUser.access_token);
+
+      if (storedToken && shouldInitCMS) {
+        console.log('Found stored token; initializing CMS and completing login');
+        whenCMSReady(function() {
+          initializeCMS();
+          // After CMS is initialized, complete login programmatically
+          setTimeout(function() {
+            if (window.CMS && CMS.auth && typeof CMS.auth.completeLogin === 'function') {
+              CMS.auth.completeLogin({
+                token: storedToken,
+                provider: 'github',
+                user: storedUser
+              });
+            } else {
+              console.warn('CMS auth API not ready after init; UI may require a reload');
             }
-          } catch (e) {
-            console.error('Error parsing user data:', e);
-          }
-        }
+          }, 50);
+        });
+        return;
       }
-      
-      // Initialize CMS if needed
+
+      // Initialize CMS if needed (no stored token)
       if (shouldInitCMS) {
         whenCMSReady(initializeCMS);
       }
