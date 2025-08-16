@@ -31,6 +31,14 @@ function getClientId() {
   return typeof raw === 'string' ? raw.trim() : '';
 }
 
+// Optional: client_secret for confidential OAuth App (trimmed)
+function getClientSecret() {
+  const raw = process.env.OAUTH_CLIENT_SECRET || process.env.GITHUB_CLIENT_SECRET || '';
+  return typeof raw === 'string' ? raw.trim() : '';
+}
+
+const BUILD_VERSION = 'oauth_fn_2025-08-16_15:27Z_v1';
+
 exports.handler = async (event, context) => {
   const { path } = event;
   const params = event.queryStringParameters || {};
@@ -39,16 +47,41 @@ exports.handler = async (event, context) => {
   const protocol = headers['x-forwarded-proto'] || 'https';
   const baseUrl = `${protocol}://${host}`;
 
+  // Entry log for debugging deployments
+  try {
+    console.log('[oauth] invocation', { path, BUILD_VERSION });
+  } catch (_) {}
+
   // Handle preflight requests
   if (event.httpMethod === 'OPTIONS') {
     return {
-      statusCode: 200,
+      statusCode: 204,
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Credentials': 'true',
       },
-      body: '',
+      body: ''
+    };
+  }
+
+  // Diagnostics endpoint to verify deployed function
+  if (path.endsWith('/version')) {
+    const info = {
+      BUILD_VERSION,
+      client_id_length: getClientId().length,
+      client_id_prefix: getClientId().slice(0, 4),
+      client_secret_present: !!getClientSecret(),
+      client_secret_length: getClientSecret() ? getClientSecret().length : 0,
+      redirect_uri: getRedirectUri(protocol, host),
+      now: new Date().toISOString(),
+    };
+    console.log('[oauth/version]', info);
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      body: JSON.stringify(info),
     };
   }
 
@@ -130,6 +163,14 @@ exports.handler = async (event, context) => {
         form.append('code_verifier', verifier);
         if (effectiveState) form.append('state', effectiveState);
         form.append('grant_type', 'authorization_code');
+        const secret = getClientSecret();
+        if (secret) form.append('client_secret', secret);
+        console.log('[oauth/callback] exchanging code with GitHub', {
+          has_verifier: !!verifier,
+          client_id_length: getClientId().length,
+          client_secret_present: !!getClientSecret(),
+          redirect_uri: getRedirectUri(protocol, host),
+        });
         const tokenResponse = await axios.post(
           'https://github.com/login/oauth/access_token',
           form.toString(),
@@ -142,8 +183,10 @@ exports.handler = async (event, context) => {
         );
         const { access_token, token_type, scope, error: ghErr, error_description: ghErrDesc } = tokenResponse.data || {};
         if (ghErr || !access_token) {
+          console.error('[oauth/callback] GitHub token error', { ghErr, ghErrDesc });
           tokenErr = { error: ghErr || 'invalid_grant', error_description: ghErrDesc || 'Failed to obtain access token' };
         } else {
+          console.log('[oauth/callback] GitHub token success');
           tokenData = {
             access_token,
             token_type: token_type || 'bearer',
@@ -156,6 +199,7 @@ exports.handler = async (event, context) => {
         tokenErr = gh && (gh.error || gh.error_description)
           ? { error: gh.error || 'server_error', error_description: gh.error_description || 'Token exchange failed' }
           : { error: 'server_error', error_description: ex.message || 'Token exchange failed' };
+        console.error('[oauth/callback] token exchange exception', { message: ex.message, gh });
       }
     }
 
@@ -175,8 +219,11 @@ exports.handler = async (event, context) => {
           <details open style="margin-top:12px;">
             <summary>OAuth debug</summary>
             <pre style="white-space:pre-wrap;word-break:break-word;background:#f6f8fa;padding:8px;border-radius:6px;border:1px solid #ddd;">
+build_version: ${BUILD_VERSION}
 client_id: ${JSON.stringify(getClientId())}
 client_id_length: ${String(getClientId().length)}
+client_secret_present: ${String(!!getClientSecret())}
+client_secret_length: ${String(getClientSecret() ? getClientSecret().length : 0)}
 redirect_uri: ${JSON.stringify(getRedirectUri(protocol, host))}
 state (query): ${JSON.stringify(state || '')}
 verifier cookie found: ${JSON.stringify(!!verifier)}
@@ -298,6 +345,14 @@ token_error: ${JSON.stringify(tokenErr || null)}
       form2.append('code_verifier', verifier);
       if (state) form2.append('state', state);
       form2.append('grant_type', 'authorization_code');
+      const secret2 = getClientSecret();
+      if (secret2) form2.append('client_secret', secret2);
+      console.log('[oauth/access_token] exchanging code with GitHub', {
+        has_verifier: !!verifier,
+        client_id_length: getClientId().length,
+        client_secret_present: !!getClientSecret(),
+        redirect_uri: getRedirectUri(protocol, host),
+      });
       const tokenResponse = await axios.post(
         'https://github.com/login/oauth/access_token',
         form2.toString(),
@@ -312,7 +367,7 @@ token_error: ${JSON.stringify(tokenErr || null)}
       const { access_token, token_type, scope, error, error_description } = tokenResponse.data;
       
       if (error) {
-        console.error('GitHub token error:', error, error_description, 'raw:', tokenResponse.data);
+        console.error('[oauth/access_token] GitHub token error', { error, error_description, raw: tokenResponse.data });
         return {
           statusCode: 400,
           headers: { 'Content-Type': 'application/json' },
