@@ -16,9 +16,10 @@ app.get('/test', (req, res) => {
 });
 
 // Configuration
-const CLIENT_ID = process.env.GITHUB_CLIENT_ID || 'Ov23lihO7foR9SHf6I3s';
-const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:8080';
+// Note: Using OAUTH_CLIENT_ID to match Netlify environment variable name
+const CLIENT_ID = process.env.OAUTH_CLIENT_ID || 'Ov23lilcBd8JkV3HWZbE'; // Using the correct client ID
+// No client secret needed for PKCE flow
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5501'; // Changed to 5501 as agreed
 const REDIRECT_URI = `${FRONTEND_URL}/admin`;
 
 // In-memory store for code verifiers (use a proper cache in production)

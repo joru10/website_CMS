@@ -22,8 +22,8 @@
         };
 
         document.getElementById('startOAuth').addEventListener('click', () => {
-            const clientId = 'Ov23lilcBd8JkV3HWZbE
-            const redirectUri = 'https://joru10-cms-oauth.onrender.com/callback';
+            const clientId = process.env.OAUTH_CLIENT_ID || 'Ov23lilcBd8JkV3HWZbE';
+            const redirectUri = window.location.origin + '/.netlify/functions/oauth/callback';
             const state = Math.random().toString(36).substr(2);
             
             // Store state in sessionStorage
@@ -37,7 +37,7 @@
                 const url = new URL('https://github.com/login/oauth/authorize');
                 url.searchParams.append('client_id', clientId);
                 url.searchParams.append('redirect_uri', redirectUri);
-                url.searchParams.append('scope', 'repo');
+                url.searchParams.append('scope', 'repo,user');
                 url.searchParams.append('state', state);
                 url.searchParams.append('code_challenge', codeChallenge);
                 url.searchParams.append('code_challenge_method', 'S256');

@@ -171,28 +171,13 @@
                   repo: 'joru10/website_CMS',
                   branch: 'main',
                   base_url: window.location.origin,
-                  auth_endpoint: 'auth',
-                  token_endpoint: 'access_token',
+                  auth_endpoint: '.netlify/functions/oauth/auth',
+                  token_endpoint: '.netlify/functions/oauth/access_token',
                   auth_type: 'pkce',
                   app_id: 'Ov23lilcBd8JkV3HWZbE',
                   site_domain: window.location.origin,
                   auth_scope: 'repo,user',
-                  cms_label_prefix: '',
-                  use_graphql: true,
-                  // Debug options
-                  debug: true,
-                  // Handle the auth callback
-                  auth_callback: function({ tokenData, options }) {
-                    console.log('Auth callback triggered with token:', tokenData);
-                    if (tokenData && tokenData.access_token) {
-                      // Store the token
-                      localStorage.setItem('netlify-cms-user', JSON.stringify(tokenData));
-                      // Redirect to clean URL
-                      window.history.replaceState({}, document.title, window.location.pathname);
-                      return true;
-                    }
-                    return false;
-                  }
+                  debug: true
                 },
                 // Enable debug mode
                 debug: true,

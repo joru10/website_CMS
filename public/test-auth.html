@@ -13,10 +13,18 @@
   <p>Click the link below to test the OAuth flow:</p>
   
   <p>
-    <a href="https://github.com/login/oauth/authorize?client_id=Ov23lilcBd8JkV3HWZbE&redirect_uri=https%3A%2F%2Fjoru10-cms-oauth.onrender.com%2Fcallback&scope=repo,user&state=test123" 
-       target="_blank">
+    <a id="oauth-link" href="#" target="_blank">
       Test GitHub OAuth
     </a>
+    <script>
+      // Set the OAuth URL with the client ID from environment
+      document.getElementById('oauth-link').href = 
+        'https://github.com/login/oauth/authorize' +
+        '?client_id=' + (process.env.OAUTH_CLIENT_ID || 'Ov23lilcBd8JkV3HWZbE') +
+        '&redirect_uri=' + encodeURIComponent(window.location.origin + '/.netlify/functions/oauth/callback') +
+        '&scope=repo,user' +
+        '&state=test123';
+    </script>
   </p>
   
   <h2>What to expect:</h2>

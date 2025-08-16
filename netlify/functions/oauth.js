@@ -49,7 +49,7 @@ exports.handler = async (event, context) => {
     codeVerifiers.set(state, verifier);
 
     const redirectUrl = new URL('https://github.com/login/oauth/authorize');
-    redirectUrl.searchParams.append('client_id', process.env.GITHUB_CLIENT_ID);
+    redirectUrl.searchParams.append('client_id', process.env.OAUTH_CLIENT_ID);
     redirectUrl.searchParams.append('redirect_uri', `${baseUrl}/.netlify/functions/oauth/callback`);
     redirectUrl.searchParams.append('scope', 'repo,user');
     redirectUrl.searchParams.append('state', state);
@@ -83,8 +83,7 @@ exports.handler = async (event, context) => {
       const tokenResponse = await axios.post(
         'https://github.com/login/oauth/access_token',
         {
-          client_id: process.env.GITHUB_CLIENT_ID,
-          client_secret: process.env.GITHUB_CLIENT_SECRET,
+          client_id: process.env.OAUTH_CLIENT_ID,
           code,
           redirect_uri: `${baseUrl}/.netlify/functions/oauth/callback`,
           code_verifier: verifier,
@@ -153,7 +152,7 @@ exports.handler = async (event, context) => {
         'Access-Control-Allow-Origin': '*',
       },
       body: JSON.stringify({
-        client_id: process.env.GITHUB_CLIENT_ID,
+        client_id: process.env.OAUTH_CLIENT_ID,
         auth_type: 'pkce',
         token_endpoint: `${baseUrl}/.netlify/functions/oauth/access_token`,
       }),
