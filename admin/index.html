@@ -168,8 +168,9 @@
           }
         ]
       };
-      CMS.init({ config: cmsConfig });
-      console.log('CMS initialized with config:', cmsConfig);
+      // Force inline config only; ignore admin/config.yml to avoid schema conflicts
+      CMS.init({ config: cmsConfig, load_config_file: false });
+      console.log('CMS initialized with inline config (load_config_file:false):', cmsConfig);
     }
   </script>
   
