@@ -40,6 +40,13 @@
   to = "/admin/index.html"
   status = 200
 
+# Explicitly block the legacy CMS config file
+[[redirects]]
+  from = "/admin/config.yml"
+  to = "/404"
+  status = 404
+  force = true
+
 # Block access to environment files
 [[redirects]]
   from = "/.env"

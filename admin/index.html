@@ -3,6 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Content Manager</title>
   <!-- Include the script that enables Netlify Identity on this page. -->
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
@@ -171,6 +174,15 @@
       // Force inline config only; ignore admin/config.yml to avoid schema conflicts
       CMS.init({ config: cmsConfig, load_config_file: false });
       console.log('CMS initialized with inline config (load_config_file:false):', cmsConfig);
+      // Debug: log the effective config Decap is using
+      try {
+        setTimeout(function(){
+          if (window.CMS && CMS.getConfig) {
+            var cfg = CMS.getConfig();
+            console.log('Effective CMS config:', (cfg && cfg.toJS) ? cfg.toJS() : cfg);
+          }
+        }, 50);
+      } catch (e) { console.warn('Could not log effective CMS config', e); }
     }
   </script>
   
