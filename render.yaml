@@ -8,3 +8,18 @@ services:
       - key: NODE_VERSION
         value: 18.x
     staticPublishPath: ./
+
+  - type: web
+    name: oauth-provider
+    env: node
+    buildCommand: cd oauth-provider && npm install
+    startCommand: cd oauth-provider && node server.cjs
+    envVars:
+      - key: NODE_VERSION
+        value: 18.x
+      - key: GITHUB_CLIENT_ID
+        sync: false
+      - key: GITHUB_CLIENT_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        value: https://comfy-panda-0d488a.netlify.app
