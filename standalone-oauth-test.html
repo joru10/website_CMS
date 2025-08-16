@@ -55,7 +55,7 @@
         // OAuth Configuration
         const config = {
             clientId: 'Ov23lilcBd8JkV3HWZbE',
-            redirectUri: 'https://joru10-cms-oauth.onrender.com/callback',
+            redirectUri: window.location.origin + '/.netlify/functions/oauth/callback',
             scope: 'repo',
             state: Math.random().toString(36).substring(2, 15)
         };
