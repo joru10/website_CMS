@@ -25,6 +25,12 @@ function getRedirectUri(protocol, host) {
   return `${baseUrl}/.netlify/functions/oauth/callback`;
 }
 
+// Read client_id from env and trim to avoid hidden whitespace issues
+function getClientId() {
+  const raw = process.env.OAUTH_CLIENT_ID || process.env.GITHUB_CLIENT_ID || '';
+  return typeof raw === 'string' ? raw.trim() : '';
+}
+
 exports.handler = async (event, context) => {
   const { path } = event;
   const params = event.queryStringParameters || {};
@@ -56,7 +62,7 @@ exports.handler = async (event, context) => {
       codeVerifiers.set(state, verifier);
 
       const redirectUrl = new URL('https://github.com/login/oauth/authorize');
-      redirectUrl.searchParams.append('client_id', process.env.OAUTH_CLIENT_ID || process.env.GITHUB_CLIENT_ID);
+      redirectUrl.searchParams.append('client_id', getClientId());
       redirectUrl.searchParams.append('redirect_uri', getRedirectUri(protocol, host));
       redirectUrl.searchParams.append('scope', 'repo,user');
       redirectUrl.searchParams.append('state', state);
@@ -117,18 +123,18 @@ exports.handler = async (event, context) => {
     let tokenErr = null;
     if (!error && code && verifier) {
       try {
+        const form = new URLSearchParams();
+        form.append('client_id', getClientId());
+        form.append('code', code);
+        form.append('redirect_uri', getRedirectUri(protocol, host));
+        form.append('code_verifier', verifier);
         const tokenResponse = await axios.post(
           'https://github.com/login/oauth/access_token',
-          {
-            client_id: process.env.OAUTH_CLIENT_ID || process.env.GITHUB_CLIENT_ID,
-            code,
-            redirect_uri: getRedirectUri(protocol, host),
-            code_verifier: verifier,
-          },
+          form.toString(),
           {
             headers: {
               Accept: 'application/json',
-              'Content-Type': 'application/json',
+              'Content-Type': 'application/x-www-form-urlencoded',
             },
           }
         );
@@ -163,7 +169,8 @@ exports.handler = async (event, context) => {
           <details open style="margin-top:12px;">
             <summary>OAuth debug</summary>
             <pre style="white-space:pre-wrap;word-break:break-word;background:#f6f8fa;padding:8px;border-radius:6px;border:1px solid #ddd;">
-client_id: ${JSON.stringify(process.env.OAUTH_CLIENT_ID || process.env.GITHUB_CLIENT_ID || '')}
+client_id: ${JSON.stringify(getClientId())}
+client_id_length: ${String(getClientId().length)}
 redirect_uri: ${JSON.stringify(getRedirectUri(protocol, host))}
 state (query): ${JSON.stringify(state || '')}
 verifier cookie found: ${JSON.stringify(!!verifier)}
@@ -277,18 +284,18 @@ token_error: ${JSON.stringify(tokenErr || null)}
       }
       
       // Exchange the code for a token (PKCE: no client_secret)
+      const form2 = new URLSearchParams();
+      form2.append('client_id', getClientId());
+      form2.append('code', code);
+      form2.append('redirect_uri', getRedirectUri(protocol, host));
+      form2.append('code_verifier', verifier);
       const tokenResponse = await axios.post(
         'https://github.com/login/oauth/access_token',
-        {
-          client_id: process.env.GITHUB_CLIENT_ID || process.env.OAUTH_CLIENT_ID,
-          code,
-          redirect_uri: getRedirectUri(protocol, host),
-          code_verifier: verifier
-        },
+        form2.toString(),
         {
           headers: {
             Accept: 'application/json',
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
           },
         }
       );
@@ -354,7 +361,7 @@ token_error: ${JSON.stringify(tokenErr || null)}
 
   // Handle client ID endpoint (used by Decap CMS to get the client ID)
   if (path.endsWith('/client_id')) {
-    const clientId = process.env.OAUTH_CLIENT_ID || process.env.GITHUB_CLIENT_ID;
+    const clientId = getClientId();
     
     if (!clientId) {
       console.error('No client ID found in environment variables');
