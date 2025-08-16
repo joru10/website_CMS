@@ -56,7 +56,7 @@ exports.handler = async (event, context) => {
       codeVerifiers.set(state, verifier);
 
       const redirectUrl = new URL('https://github.com/login/oauth/authorize');
-      redirectUrl.searchParams.append('client_id', process.env.GITHUB_CLIENT_ID || process.env.OAUTH_CLIENT_ID);
+      redirectUrl.searchParams.append('client_id', process.env.OAUTH_CLIENT_ID || process.env.GITHUB_CLIENT_ID);
       redirectUrl.searchParams.append('redirect_uri', getRedirectUri(protocol, host));
       redirectUrl.searchParams.append('scope', 'repo,user');
       redirectUrl.searchParams.append('state', state);
@@ -120,7 +120,7 @@ exports.handler = async (event, context) => {
         const tokenResponse = await axios.post(
           'https://github.com/login/oauth/access_token',
           {
-            client_id: process.env.GITHUB_CLIENT_ID || process.env.OAUTH_CLIENT_ID,
+            client_id: process.env.OAUTH_CLIENT_ID || process.env.GITHUB_CLIENT_ID,
             code,
             redirect_uri: getRedirectUri(protocol, host),
             code_verifier: verifier,
@@ -159,7 +159,17 @@ exports.handler = async (event, context) => {
       <body>
         <div style="font-family: sans-serif; padding: 16px;">
           <h3>Authenticating…</h3>
-          <p>You can close this window.</p>
+          <p>If this window doesn't close automatically, you can close it.</p>
+          <details open style="margin-top:12px;">
+            <summary>OAuth debug</summary>
+            <pre style="white-space:pre-wrap;word-break:break-word;background:#f6f8fa;padding:8px;border-radius:6px;border:1px solid #ddd;">
+client_id: ${JSON.stringify(process.env.OAUTH_CLIENT_ID || process.env.GITHUB_CLIENT_ID || '')}
+redirect_uri: ${JSON.stringify(getRedirectUri(protocol, host))}
+state (query): ${JSON.stringify(state || '')}
+verifier cookie found: ${JSON.stringify(!!verifier)}
+token_error: ${JSON.stringify(tokenErr || null)}
+            </pre>
+          </details>
         </div>
         <script>
           (function() {
@@ -199,8 +209,8 @@ exports.handler = async (event, context) => {
               var errMsgDecap = { source: 'decap-cms', error: tokenErr.error, error_description: tokenErr.error_description };
               send(errMsgDecap);
             }
-            // Close with a small delay to allow the parent to process
-            setTimeout(function(){ window.close(); }, 1500);
+            // Close with a slightly longer delay to allow inspection if needed
+            setTimeout(function(){ window.close(); }, 6000);
           })();
         </script>
       </body>
@@ -344,7 +354,7 @@ exports.handler = async (event, context) => {
 
   // Handle client ID endpoint (used by Decap CMS to get the client ID)
   if (path.endsWith('/client_id')) {
-    const clientId = process.env.GITHUB_CLIENT_ID || process.env.OAUTH_CLIENT_ID;
+    const clientId = process.env.OAUTH_CLIENT_ID || process.env.GITHUB_CLIENT_ID;
     
     if (!clientId) {
       console.error('No client ID found in environment variables');
