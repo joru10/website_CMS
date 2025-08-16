@@ -13,7 +13,7 @@ services:
     name: oauth-provider
     env: node
     buildCommand: cd oauth-provider && npm install
-    startCommand: cd oauth-provider && node server.cjs
+    startCommand: cd oauth-provider && npm start
     envVars:
       - key: NODE_VERSION
         value: 18.x
