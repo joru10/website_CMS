@@ -195,6 +195,17 @@
     window._processedStates = new Set();
     window._fallbackTimers = new Map();
     
+    // Early check: if a token already exists in storage, mark auth as complete immediately
+    try {
+      const earlyUserRaw = localStorage.getItem('netlify-cms-user') || sessionStorage.getItem('netlify-cms-user');
+      const earlyUser = earlyUserRaw ? JSON.parse(earlyUserRaw) : null;
+      const earlyToken = earlyUser && (earlyUser.token || earlyUser.access_token);
+      if (earlyToken) {
+        window._oauthProcessed = true;
+        window.authSuccess = true;
+      }
+    } catch (e) { /* ignore */ }
+    
     // Listen for messages from the OAuth popup
     window.addEventListener('message', function(event) {
       // Debug incoming messages
@@ -264,7 +275,7 @@
             alert('Authentication failed during token exchange');
           })
           .finally(() => { window._exchangeInProgress = false; window._fallbackTimers.delete(message.state); });
-        }, 400); // 400ms grace period
+        }, 800); // 800ms grace period to avoid racing server-side success
         window._fallbackTimers.set(message.state, t);
       }
     });
@@ -382,6 +393,9 @@
         scope: urlParams.get('scope') || 'repo,user'
       });
     } else if (urlParams.get('auth') === 'success') {
+      // Mark auth as completed immediately to ignore any late popup messages
+      window._oauthProcessed = true;
+      window.authSuccess = true;
       // Clean URL; we'll complete login from stored token during DOMContentLoaded
       window.history.replaceState({}, document.title, window.location.pathname);
     }
@@ -401,6 +415,13 @@
 
       if (storedToken && shouldInitCMS) {
         console.log('Found stored token; initializing CMS and completing login');
+        // Mark OAuth as completed to ignore any late popup messages on this reload
+        window._oauthProcessed = true;
+        window.authSuccess = true;
+        if (window._fallbackTimers && window._fallbackTimers.size) {
+          try { window._fallbackTimers.forEach((t) => clearTimeout(t)); } catch(e) {}
+          window._fallbackTimers = new Map();
+        }
         whenCMSReady(function() {
           initializeCMS();
           // After CMS is initialized, complete login programmatically
@@ -412,7 +433,9 @@
                 user: storedUser
               });
             } else {
-              console.warn('CMS auth API not ready after init; UI may require a reload');
+              console.warn('CMS auth API not ready after init; forcing reload to complete login');
+              // Force a reload similar to the immediate auth-success path
+              window.location.href = window.location.pathname + '?auth=success&t=' + Date.now();
             }
           }, 50);
         });
