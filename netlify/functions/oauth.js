@@ -204,12 +204,10 @@ exports.handler = async (event, context) => {
     }
 
     // Build HTML that posts messages back to opener and closes
-    // IMPORTANT: Only clear the PKCE cookie here if the server-side exchange succeeded.
-    // If we failed to exchange on the server, the admin client may still complete
-    // the exchange via POST /oauth/access_token which needs the verifier cookie.
-    const clearCookieHeader = (tokenData && effectiveState)
-      ? { 'Set-Cookie': `oauth_pkce_${effectiveState}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0` }
-      : {};
+    // IMPORTANT: Do NOT clear the PKCE cookie here. Decap CMS may still perform its own
+    // token exchange via POST /oauth/access_token using the verifier cookie. The
+    // /oauth/access_token endpoint will clear the cookie upon successful exchange.
+    const clearCookieHeader = {};
 
     const html = `
       <!DOCTYPE html>
@@ -252,13 +250,15 @@ token_error: ${JSON.stringify(tokenErr || null)}
             var err = params.get('error');
             var code = params.get('code');
             var state = params.get('state');
-            // If server-side token exchange succeeded, send legacy success only
+            // If server-side token exchange succeeded, send legacy success
             var token = ${JSON.stringify(tokenData || null)};
             if (token) {
               var successMsg = { type: 'authorization:github:success', provider: 'github', response: token };
               send(successMsg);
-            } else if (code && state) {
-              // Only send Decap message when server-side exchange did not produce a token
+            }
+            // Always also send the Decap message when code/state are available so Decap can
+            // complete its own token exchange and update internal auth state.
+            if (code && state) {
               var decapMsg = { source: 'decap-cms', code: code, state: state };
               send(decapMsg);
               setTimeout(function(){ send(decapMsg); }, 300);

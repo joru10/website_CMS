@@ -366,30 +366,15 @@
           // Notify opener (Decap will read from storage on refresh cycle)
           window.close();
         } else {
-          // If not in a popup, initialize CMS; it will pick the token from storage
-          console.log('Initializing CMS; relying on stored token in localStorage');
-          whenCMSReady(function() {
-          initializeCMS();
-          setTimeout(function(){
-            try {
-              console.log('CMS API keys after init (popup-closed path):', Object.keys(window.CMS || {}));
-              if (window.CMS && window.CMS.auth && typeof window.CMS.auth.completeLogin === 'function') {
-                console.log('Calling CMS.auth.completeLogin with popup token');
-                window.CMS.auth.completeLogin({ token: response.access_token, provider: 'github', user: cmsUser });
-              } else {
-                console.warn('CMS.auth.completeLogin not available after init (popup-closed path)');
-              }
-              // Force route to collections if no route is selected
-              try {
-                const h = (window.location.hash || '').replace(/^#!/, '#');
-                if (!h || h === '#/' || h === '#') {
-                  console.log('Routing to first collection: translations');
-                  window.location.hash = '#/collections/translations';
-                }
-              } catch(_e) {}
-            } catch(e) { console.warn('CMS introspection/completeLogin failed (popup-closed path)', e); }
-          }, 150);
-        });
+          // If not in a popup, perform a one-time reload so Decap restores session from storage
+          console.log('Token stored; reloading once to let Decap restore session');
+          try { sessionStorage.setItem('_cms_reload_after_auth', '1'); } catch(e){}
+          try {
+            const h = (window.location.hash || '').replace(/^#!/, '#');
+            // Route to a valid collection on reload to avoid login overlay
+            const target = (!h || h === '#/' || h === '#') ? '#/collections/translations' : h;
+            window.location.replace(window.location.pathname + target);
+          } catch(e) { window.location.reload(); }
         }
       } else {
         console.error('No access token in response:', response);
@@ -426,6 +411,26 @@
     
     // Check for existing auth token on load and initialize after DOM + CMS are ready
     document.addEventListener('DOMContentLoaded', function() {
+      // Detect and handle one-time reload after auth
+      let afterAuthReload = false;
+      try {
+        if (sessionStorage.getItem('_cms_reload_after_auth') === '1') {
+          afterAuthReload = true;
+          sessionStorage.removeItem('_cms_reload_after_auth');
+          window._skipOAuthPopup = true; // don’t reopen popup immediately after reload
+          console.log('Post-auth reload detected; skipping popup open');
+        }
+      } catch(e) {}
+
+      // Ensure decap-cms-user exists if netlify-cms-user is present (Decap 3.x reads either)
+      try {
+        const u1 = localStorage.getItem('netlify-cms-user');
+        const u2 = localStorage.getItem('decap-cms-user');
+        if (u1 && !u2) {
+          localStorage.setItem('decap-cms-user', u1);
+          console.log('Mirrored netlify-cms-user -> decap-cms-user at load');
+        }
+      } catch(e){}
       // Check for stored auth data regardless of URL
       const userDataRaw = localStorage.getItem('netlify-cms-user') || sessionStorage.getItem('netlify-cms-user');
       let storedUser = null;
@@ -484,7 +489,7 @@
           // And finally, open the REAL OAuth popup to /oauth/auth to let Decap complete login internally
           setTimeout(function(){
             try {
-              if (window.authSuccess) return;
+              if (window.authSuccess || window._skipOAuthPopup) { if (window._skipOAuthPopup) console.log('Skipping /oauth/auth popup after post-auth reload'); return; }
               const popup = window.open('/oauth/auth', 'cms_auth', 'width=948,height=1200,menubar=no,toolbar=no,location=no,status=no');
               if (!popup) console.warn('OAuth popup was blocked; click the Login button to proceed.');
               else console.log('Opened /oauth/auth popup to trigger Decap login flow');
