@@ -53,9 +53,9 @@
     // Wait for CMS.auth.completeLogin to be available, then complete login without reloading
     function waitForCMSAuthAndComplete(token, user, attempts = 12, interval = 150) {
       if (!window._cmsLoginRetryCount) window._cmsLoginRetryCount = 0;
-      if (window.CMS && CMS.auth && typeof CMS.auth.completeLogin === 'function') {
+      if (window.CMS && window.CMS.auth && typeof window.CMS.auth.completeLogin === 'function') {
         try {
-          CMS.auth.completeLogin({ token: token, provider: 'github', user: user });
+          window.CMS.auth.completeLogin({ token: token, provider: 'github', user: user });
           return;
         } catch (e) {
           try { console.warn('CMS.auth.completeLogin threw, will retry shortly', e); } catch(err){}
@@ -232,13 +232,13 @@
         ]
       };
       // Force inline config only; ignore admin/config.yml to avoid schema conflicts
-      CMS.init({ config: cmsConfig, load_config_file: false });
+      window.CMS.init({ config: cmsConfig, load_config_file: false });
       console.log('CMS initialized with inline config (load_config_file:false):', cmsConfig);
       // Debug: log the effective config Decap is using
       try {
         setTimeout(function(){
-          if (window.CMS && CMS.getConfig) {
-            var cfg = CMS.getConfig();
+          if (window.CMS && window.CMS.getConfig) {
+            var cfg = window.CMS.getConfig();
             console.log('Effective CMS config:', (cfg && cfg.toJS) ? cfg.toJS() : cfg);
           }
         }, 50);
@@ -375,10 +375,10 @@
           initializeCMS();
           setTimeout(function(){
             try {
-              console.log('CMS API keys after init (popup-closed path):', Object.keys(CMS || {}));
-              if (window.CMS && CMS.auth && typeof CMS.auth.completeLogin === 'function') {
+              console.log('CMS API keys after init (popup-closed path):', Object.keys(window.CMS || {}));
+              if (window.CMS && window.CMS.auth && typeof window.CMS.auth.completeLogin === 'function') {
                 console.log('Calling CMS.auth.completeLogin with popup token');
-                CMS.auth.completeLogin({ token: response.access_token, provider: 'github', user: cmsUser });
+                window.CMS.auth.completeLogin({ token: response.access_token, provider: 'github', user: cmsUser });
               } else {
                 console.warn('CMS.auth.completeLogin not available after init (popup-closed path)');
               }
@@ -436,6 +436,13 @@
           try { window._fallbackTimers.forEach((t) => clearTimeout(t)); } catch(e) {}
           window._fallbackTimers = new Map();
         }
+        // Normalize stored user to minimal shape Decap expects
+        try {
+          const minimalUser = { token: storedToken, provider: 'github', login: 'github', user: { login: 'github' } };
+          localStorage.setItem('netlify-cms-user', JSON.stringify(minimalUser));
+          sessionStorage.setItem('netlify-cms-user', JSON.stringify(minimalUser));
+          storedUser = minimalUser;
+        } catch(e) { console.warn('Failed to normalize stored user', e); }
         whenCMSReady(function() {
           initializeCMS();
           try { console.log('Initialized CMS; relying on stored token in storage (no manual completeLogin)'); } catch(e){}
@@ -444,9 +451,35 @@
             setTimeout(function(){
               const resp = { access_token: storedToken, token_type: storedUser && (storedUser.token_type || 'bearer'), scope: 'repo,user' };
               window.postMessage({ type: 'authorization:github:success', response: resp }, window.location.origin);
-              console.log('Reposted legacy success to Decap after init');
+              // Also send string legacy format Decap expects
+              window.postMessage('authorization:github:success:' + JSON.stringify({ token: storedToken }), window.location.origin);
+              console.log('Reposted legacy success (object + string) to Decap after init');
             }, 200);
           } catch(e){}
+          // Also introspect CMS APIs and try to complete login directly
+          setTimeout(function(){
+            try {
+              console.log('CMS API keys after init (stored-token path):', Object.keys(window.CMS || {}));
+              if (window.CMS && window.CMS.auth && typeof window.CMS.auth.completeLogin === 'function') {
+                console.log('Calling CMS.auth.completeLogin with stored token');
+                window.CMS.auth.completeLogin({ token: storedToken, provider: 'github', user: storedUser });
+              } else {
+                console.warn('CMS.auth.completeLogin not available after init (stored-token path)');
+              }
+            } catch(e) { console.warn('CMS introspection/completeLogin failed (stored-token path)', e); }
+          }, 300);
+          // And finally, open the legacy success popup to match Decap popup flow
+          try { emitLegacySuccess(storedToken, storedUser); } catch(e){}
+          // One-time reload if CMS global still missing after init
+          setTimeout(function(){
+            try {
+              if (!window.CMS && !sessionStorage.getItem('_cms_one_reload_after_init')) {
+                sessionStorage.setItem('_cms_one_reload_after_init','1');
+                console.warn('CMS global missing after init; performing one-time reload to finalize auth');
+                window.location.reload();
+              }
+            } catch(e){}
+          }, 800);
         });
         return;
       }
