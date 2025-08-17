@@ -125,6 +125,11 @@
         },
         media_folder: 'static/uploads',
         public_folder: '/uploads',
+        i18n: {
+          structure: 'multiple_files',
+          locales: ['en', 'es', 'fr'],
+          default_locale: 'en'
+        },
         collections: [
           {
             name: 'content',
@@ -172,60 +177,82 @@
             ]
           },
           {
-            name: 'blog',
-            label: 'Blog Posts',
-            folder: 'blog',
+            name: 'services',
+            label: 'Services',
+            label_singular: 'Service',
+            folder: 'content/services',
             create: true,
             slug: '{{slug}}',
             format: 'frontmatter',
+            path: '{{slug}}/index',
+            i18n: true,
             fields: [
-              { label: 'Title', name: 'title', widget: 'string' },
-              { label: 'Date', name: 'date', widget: 'datetime' },
-              { label: 'Summary', name: 'summary', widget: 'text' },
-              { label: 'Body', name: 'body', widget: 'markdown' }
+              { label: 'Title', name: 'title', widget: 'string', i18n: true },
+              { label: 'Description', name: 'description', widget: 'text', i18n: true },
+              { label: 'Icon (CSS class)', name: 'icon', widget: 'string', required: false, hint: 'e.g., fas fa-brain', i18n: 'duplicate' },
+              { label: 'Order', name: 'order', widget: 'number', value_type: 'int', min: 1, i18n: 'duplicate' },
+              { label: 'Featured', name: 'featured', widget: 'boolean', default: false, i18n: 'duplicate' }
+            ]
+          },
+          {
+            name: 'blog',
+            label: 'Blog Posts',
+            folder: 'content/blog',
+            create: true,
+            slug: '{{slug}}',
+            format: 'frontmatter',
+            i18n: true,
+            fields: [
+              { label: 'Title', name: 'title', widget: 'string', i18n: true },
+              { label: 'Date', name: 'date', widget: 'datetime', i18n: 'duplicate' },
+              { label: 'Summary', name: 'summary', widget: 'text', i18n: true },
+              { label: 'Body', name: 'body', widget: 'markdown', i18n: true }
             ]
           },
           {
             name: 'education',
             label: 'Education Articles',
-            folder: 'education',
+            folder: 'content/education',
             create: true,
             slug: '{{slug}}',
             format: 'frontmatter',
+            i18n: true,
             fields: [
-              { label: 'Title', name: 'title', widget: 'string' },
-              { label: 'Date', name: 'date', widget: 'datetime' },
-              { label: 'Summary', name: 'summary', widget: 'text' },
-              { label: 'Body', name: 'body', widget: 'markdown' }
+              { label: 'Title', name: 'title', widget: 'string', i18n: true },
+              { label: 'Date', name: 'date', widget: 'datetime', i18n: 'duplicate' },
+              { label: 'Summary', name: 'summary', widget: 'text', i18n: true },
+              { label: 'Body', name: 'body', widget: 'markdown', i18n: true }
             ]
           },
           {
             name: 'news',
             label: 'News',
-            folder: 'news',
+            folder: 'content/news',
             create: true,
             slug: '{{slug}}',
             format: 'frontmatter',
+            i18n: true,
             fields: [
-              { label: 'Title', name: 'title', widget: 'string' },
-              { label: 'Date', name: 'date', widget: 'datetime' },
-              { label: 'Summary', name: 'summary', widget: 'text' },
-              { label: 'Body', name: 'body', widget: 'markdown' }
+              { label: 'Title', name: 'title', widget: 'string', i18n: true },
+              { label: 'Date', name: 'date', widget: 'datetime', i18n: 'duplicate' },
+              { label: 'Summary', name: 'summary', widget: 'text', i18n: true },
+              { label: 'Body', name: 'body', widget: 'markdown', i18n: true }
             ]
           },
           {
             name: 'cases',
             label: 'Case Studies',
-            folder: 'cases',
+            folder: 'content/cases',
             create: true,
             slug: '{{slug}}',
             format: 'json',
+            i18n: true,
             fields: [
-              { label: 'Title', name: 'title', widget: 'string' },
-              { label: 'Industry', name: 'industry', widget: 'string' },
-              { label: 'Challenge', name: 'challenge', widget: 'markdown' },
-              { label: 'Solution', name: 'solution', widget: 'markdown' },
-              { label: 'Outcome', name: 'outcome', widget: 'markdown' }
+              { label: 'Title', name: 'title', widget: 'string', i18n: true },
+              { label: 'Industry', name: 'industry', widget: 'string', i18n: true },
+              { label: 'Challenge', name: 'challenge', widget: 'markdown', i18n: true },
+              { label: 'Solution', name: 'solution', widget: 'markdown', i18n: true },
+              { label: 'Outcome', name: 'outcome', widget: 'markdown', i18n: true }
             ]
           }
         ]
