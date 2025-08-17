@@ -437,10 +437,8 @@
       const storedToken = storedUser && (storedUser.token || storedUser.access_token);
 
       if (storedToken && shouldInitCMS) {
-        console.log('Found stored token; initializing CMS and completing login');
-        // Mark OAuth as completed to ignore any late popup messages on this reload
-        window._oauthProcessed = true;
-        window.authSuccess = true;
+        console.log('Found stored token; initializing CMS and attempting to trigger Decap login');
+        // Do NOT pre-mark OAuth as completed; let Decap process messages/popup to update its auth state
         if (window._fallbackTimers && window._fallbackTimers.size) {
           try { window._fallbackTimers.forEach((t) => clearTimeout(t)); } catch(e) {}
           window._fallbackTimers = new Map();
@@ -455,9 +453,10 @@
         whenCMSReady(function() {
           initializeCMS();
           try { console.log('Initialized CMS; relying on stored token in storage (no manual completeLogin)'); } catch(e){}
-          // Nudge Decap's internal auth listener by reposting legacy success from main window
+          // Nudge Decap's internal auth listener by reposting legacy success from main window (fallback only)
           try {
             setTimeout(function(){
+              if (window.authSuccess) return;
               const resp = { access_token: storedToken, token_type: storedUser && (storedUser.token_type || 'bearer'), scope: 'repo,user' };
               window.postMessage({ type: 'authorization:github:success', response: resp }, window.location.origin);
               // Also send string legacy format Decap expects
@@ -485,8 +484,15 @@
               } catch(_e) {}
             } catch(e) { console.warn('CMS introspection/completeLogin failed (stored-token path)', e); }
           }, 300);
-          // And finally, open the legacy success popup to match Decap popup flow
-          try { emitLegacySuccess(storedToken, storedUser); } catch(e){}
+          // And finally, open the REAL OAuth popup to /oauth/auth to let Decap complete login internally
+          setTimeout(function(){
+            try {
+              if (window.authSuccess) return;
+              const popup = window.open('/oauth/auth', 'cms_auth', 'width=948,height=1200,menubar=no,toolbar=no,location=no,status=no');
+              if (!popup) console.warn('OAuth popup was blocked; click the Login button to proceed.');
+              else console.log('Opened /oauth/auth popup to trigger Decap login flow');
+            } catch(e) { console.warn('Failed to open /oauth/auth popup', e); }
+          }, 350);
           // One-time reload if CMS global still missing after init
           setTimeout(function(){
             try {
