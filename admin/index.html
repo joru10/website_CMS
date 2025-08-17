@@ -62,19 +62,11 @@
         }
       }
       if (window._cmsLoginRetryCount >= attempts) {
-        try { console.warn('CMS auth API not ready after retries; emitting legacy success fallback'); } catch(err){}
+        try { console.warn('CMS auth API not ready after retries; emitting legacy success fallback (no reload)'); } catch(err){}
         // As a last resort, emit a legacy success message so Decap CMS can complete login internally
         emitLegacySuccess(token, user);
-        // If CMS still doesn't surface, perform a one-time clean reload so Decap reboots and reads stored user
-        setTimeout(function(){
-          try {
-            if (!sessionStorage.getItem('_cmsReloadedOnce')) {
-              sessionStorage.setItem('_cmsReloadedOnce','1');
-              console.warn('Reloading once to allow CMS to pick up stored auth');
-              window.location.reload();
-            }
-          } catch(e){}
-        }, 400);
+        // Stop further retries in this session
+        window._cmsLoginGaveUp = true;
         return;
       }
       window._cmsLoginRetryCount++;
@@ -84,6 +76,8 @@
 
     // Fallback: emit a legacy success event to let Decap CMS finish login itself
     function emitLegacySuccess(token, user) {
+      if (window._legacySuccessEmitted) { try { console.debug('Legacy success already emitted; skipping'); } catch(e){} return; }
+      window._legacySuccessEmitted = true;
       try { console.log('Emitting legacy authorization:github:success to CMS'); } catch(e){}
       const resp = {
         access_token: token,
@@ -355,88 +349,29 @@
       if (response && response.access_token) {
         // Store the token in both localStorage and sessionStorage
         window._oauthProcessed = true;
-        const userData = {
-          access_token: response.access_token,
-          token: response.access_token, // alias for Decap CMS compatibility
-          token_type: response.token_type || 'bearer',
-          scope: response.scope || 'repo,user',
-          created_at: Date.now()
-        };
-        
-        // Store in localStorage for persistence
-        // Store in a more accessible location for the CMS
-        window.netlifyIdentity = window.netlifyIdentity || {};
-        window.netlifyIdentity.currentUser = () => ({
-          jwt: () => response.access_token,
-          user_metadata: { 
-            name: 'GitHub User',
-            email: 'user@example.com', // Placeholder email
-            full_name: 'GitHub User'
-          }
-        });
-        
-        // Store the token in a format that Decap CMS expects
+        // Shape used by Decap's lib-auth for GitHub backend
         const cmsUser = {
-          app_metadata: {
-            provider: 'github',
-            roles: ['admin']
-          },
-          user_metadata: {
-            name: 'GitHub User',
-            email: 'user@example.com', // Placeholder email
-            full_name: 'GitHub User'
-          },
           token: response.access_token,
-          token_type: response.token_type || 'bearer',
-          expires_at: Date.now() + (24 * 60 * 60 * 1000) // 24 hours from now
+          login: 'github',
+          provider: 'github',
+          user: { login: 'github', name: 'GitHub User' },
+          token_type: response.token_type || 'bearer'
         };
-        
-        // Store the user data in localStorage for persistence
+        // Persist
         localStorage.setItem('netlify-cms-user', JSON.stringify(cmsUser));
-        
-        // Also store in sessionStorage for immediate access
         sessionStorage.setItem('netlify-cms-user', JSON.stringify(cmsUser));
-        
-        // Trigger a custom event that the CMS can listen to
+        // Signal success for any listeners
         document.dispatchEvent(new CustomEvent('cms:auth:success', { 
-          detail: { 
-            token: response.access_token,
-            provider: 'github',
-            user: cmsUser
-          } 
+          detail: { token: response.access_token, provider: 'github', user: cmsUser } 
         }));
-        
         // Close the popup if this is in a popup
         if (window.opener) {
-          // Notify the opener about the successful authentication
-          if (window.opener.CMS) {
-            window.opener.CMS.auth.completeLogin({
-              token: response.access_token,
-              provider: 'github',
-              user: cmsUser
-            });
-          }
+          // Notify opener (Decap will read from storage on refresh cycle)
           window.close();
         } else {
-          // If not in a popup, complete CMS login without a page reload
-          try {
-            console.log('Completing CMS login with token (no reload)');
-            whenCMSReady(function() {
-              if (window.CMS && CMS.auth && typeof CMS.auth.completeLogin === 'function') {
-                CMS.auth.completeLogin({
-                  token: response.access_token,
-                  provider: 'github',
-                  user: cmsUser
-                });
-              } else {
-                console.warn('CMS auth API not ready; will retry without reload');
-                waitForCMSAuthAndComplete(response.access_token, cmsUser);
-              }
-            });
-          } catch (e) {
-            console.warn('Immediate CMS login completion failed, retrying without reload', e);
-            waitForCMSAuthAndComplete(response.access_token, cmsUser);
-          }
+          // If not in a popup, initialize CMS; it will pick the token from storage
+          console.log('Initializing CMS; relying on stored token in localStorage');
+          whenCMSReady(function() { initializeCMS(); });
         }
       } else {
         console.error('No access token in response:', response);
@@ -490,19 +425,15 @@
         }
         whenCMSReady(function() {
           initializeCMS();
-          // After CMS is initialized, complete login programmatically
-          setTimeout(function() {
-            if (window.CMS && CMS.auth && typeof CMS.auth.completeLogin === 'function') {
-              CMS.auth.completeLogin({
-                token: storedToken,
-                provider: 'github',
-                user: storedUser
-              });
-            } else {
-              console.warn('CMS auth API not ready after init; will retry without reload');
-              waitForCMSAuthAndComplete(storedToken, storedUser);
-            }
-          }, 50);
+          try { console.log('Initialized CMS; relying on stored token in storage (no manual completeLogin)'); } catch(e){}
+          // Nudge Decap's internal auth listener by reposting legacy success from main window
+          try {
+            setTimeout(function(){
+              const resp = { access_token: storedToken, token_type: storedUser && (storedUser.token_type || 'bearer'), scope: 'repo,user' };
+              window.postMessage({ type: 'authorization:github:success', response: resp }, window.location.origin);
+              console.log('Reposted legacy success to Decap after init');
+            }, 200);
+          } catch(e){}
         });
         return;
       }
