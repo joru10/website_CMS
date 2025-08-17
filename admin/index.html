@@ -354,6 +354,7 @@
           token: response.access_token,
           login: 'github',
           provider: 'github',
+          backendName: 'github',
           user: { login: 'github', name: 'GitHub User' },
           token_type: response.token_type || 'bearer'
         };
@@ -438,7 +439,7 @@
         }
         // Normalize stored user to minimal shape Decap expects
         try {
-          const minimalUser = { token: storedToken, provider: 'github', login: 'github', user: { login: 'github' } };
+          const minimalUser = { token: storedToken, provider: 'github', login: 'github', backendName: 'github', user: { login: 'github' } };
           localStorage.setItem('netlify-cms-user', JSON.stringify(minimalUser));
           sessionStorage.setItem('netlify-cms-user', JSON.stringify(minimalUser));
           storedUser = minimalUser;
