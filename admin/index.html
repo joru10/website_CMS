@@ -383,6 +383,14 @@
               } else {
                 console.warn('CMS.auth.completeLogin not available after init (popup-closed path)');
               }
+              // Force route to collections if no route is selected
+              try {
+                const h = (window.location.hash || '').replace(/^#!/, '#');
+                if (!h || h === '#/' || h === '#') {
+                  console.log('Routing to first collection: translations');
+                  window.location.hash = '#/collections/translations';
+                }
+              } catch(_e) {}
             } catch(e) { console.warn('CMS introspection/completeLogin failed (popup-closed path)', e); }
           }, 150);
         });
@@ -467,6 +475,14 @@
               } else {
                 console.warn('CMS.auth.completeLogin not available after init (stored-token path)');
               }
+              // Force route to collections if no route is selected
+              try {
+                const h = (window.location.hash || '').replace(/^#!/, '#');
+                if (!h || h === '#/' || h === '#') {
+                  console.log('Routing to first collection: translations');
+                  window.location.hash = '#/collections/translations';
+                }
+              } catch(_e) {}
             } catch(e) { console.warn('CMS introspection/completeLogin failed (stored-token path)', e); }
           }, 300);
           // And finally, open the legacy success popup to match Decap popup flow
