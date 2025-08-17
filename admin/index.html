@@ -255,14 +255,13 @@
     window._processedStates = new Set();
     window._fallbackTimers = new Map();
     
-    // Early check: if a token already exists in storage, mark auth as complete immediately
+    // Early check: if a token already exists in storage, just log it; let Decap complete login itself
     try {
-      const earlyUserRaw = localStorage.getItem('netlify-cms-user') || sessionStorage.getItem('netlify-cms-user');
+      const earlyUserRaw = localStorage.getItem('netlify-cms-user') || localStorage.getItem('decap-cms-user') || sessionStorage.getItem('netlify-cms-user');
       const earlyUser = earlyUserRaw ? JSON.parse(earlyUserRaw) : null;
       const earlyToken = earlyUser && (earlyUser.token || earlyUser.access_token);
       if (earlyToken) {
-        window._oauthProcessed = true;
-        window.authSuccess = true;
+        try { console.log('Token present in storage at load; letting Decap complete login'); } catch(_e){}
       }
     } catch (e) { /* ignore */ }
     
@@ -275,11 +274,7 @@
 
       const message = event.data || {};
 
-      // Ignore further messages after we've completed OAuth
-      if (window._oauthProcessed || window.authSuccess) {
-        try { console.log('Auth already completed; ignoring message'); } catch (e) {}
-        return;
-      }
+      // Do not ignore messages solely due to local flags; rely on state de-duplication to avoid repeats
 
       // If this message has a state we've already handled, ignore
       if (message.state && window._processedStates.has(message.state)) {
@@ -358,8 +353,9 @@
           user: { login: 'github', name: 'GitHub User' },
           token_type: response.token_type || 'bearer'
         };
-        // Persist
+        // Persist (mirror to both legacy and Decap 3.x keys)
         localStorage.setItem('netlify-cms-user', JSON.stringify(cmsUser));
+        localStorage.setItem('decap-cms-user', JSON.stringify(cmsUser));
         sessionStorage.setItem('netlify-cms-user', JSON.stringify(cmsUser));
         // Signal success for any listeners
         document.dispatchEvent(new CustomEvent('cms:auth:success', { 
@@ -447,6 +443,7 @@
         try {
           const minimalUser = { token: storedToken, provider: 'github', login: 'github', backendName: 'github', user: { login: 'github' } };
           localStorage.setItem('netlify-cms-user', JSON.stringify(minimalUser));
+          localStorage.setItem('decap-cms-user', JSON.stringify(minimalUser));
           sessionStorage.setItem('netlify-cms-user', JSON.stringify(minimalUser));
           storedUser = minimalUser;
         } catch(e) { console.warn('Failed to normalize stored user', e); }
