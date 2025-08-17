@@ -51,7 +51,7 @@
     }
 
     // Wait for CMS.auth.completeLogin to be available, then complete login without reloading
-    function waitForCMSAuthAndComplete(token, user, attempts = 50, interval = 200) {
+    function waitForCMSAuthAndComplete(token, user, attempts = 12, interval = 150) {
       if (!window._cmsLoginRetryCount) window._cmsLoginRetryCount = 0;
       if (window.CMS && CMS.auth && typeof CMS.auth.completeLogin === 'function') {
         try {
@@ -78,6 +78,7 @@
         return;
       }
       window._cmsLoginRetryCount++;
+      try { console.debug('Retrying CMS auth API', { attempt: window._cmsLoginRetryCount, attempts, interval }); } catch(e){}
       setTimeout(function(){ waitForCMSAuthAndComplete(token, user, attempts, interval); }, interval);
     }
 
@@ -483,7 +484,6 @@
         // Mark OAuth as completed to ignore any late popup messages on this reload
         window._oauthProcessed = true;
         window.authSuccess = true;
-        try { sessionStorage.removeItem('_cmsReloadedOnce'); } catch(e){}
         if (window._fallbackTimers && window._fallbackTimers.size) {
           try { window._fallbackTimers.forEach((t) => clearTimeout(t)); } catch(e) {}
           window._fallbackTimers = new Map();
