@@ -371,7 +371,20 @@
         } else {
           // If not in a popup, initialize CMS; it will pick the token from storage
           console.log('Initializing CMS; relying on stored token in localStorage');
-          whenCMSReady(function() { initializeCMS(); });
+          whenCMSReady(function() {
+          initializeCMS();
+          setTimeout(function(){
+            try {
+              console.log('CMS API keys after init (popup-closed path):', Object.keys(CMS || {}));
+              if (window.CMS && CMS.auth && typeof CMS.auth.completeLogin === 'function') {
+                console.log('Calling CMS.auth.completeLogin with popup token');
+                CMS.auth.completeLogin({ token: response.access_token, provider: 'github', user: cmsUser });
+              } else {
+                console.warn('CMS.auth.completeLogin not available after init (popup-closed path)');
+              }
+            } catch(e) { console.warn('CMS introspection/completeLogin failed (popup-closed path)', e); }
+          }, 150);
+        });
         }
       } else {
         console.error('No access token in response:', response);
