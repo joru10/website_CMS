@@ -403,7 +403,7 @@
           try {
             const h = (window.location.hash || '').replace(/^#!/, '#');
             // Route to a valid collection on reload to avoid login overlay
-            const target = (!h || h === '#/' || h === '#') ? '#/collections/translations' : h;
+            const target = (!h || h === '#/' || h === '#') ? '#/collections/content/entries/claims' : h;
             window.location.replace(window.location.pathname + target);
           } catch(e) { window.location.reload(); }
         }
@@ -511,8 +511,8 @@
               try {
                 const h = (window.location.hash || '').replace(/^#!/, '#');
                 if (!h || h === '#/' || h === '#') {
-                  console.log('Routing to first collection: translations');
-                  window.location.hash = '#/collections/translations';
+                  console.log('Routing to content single entry: claims');
+                  window.location.hash = '#/collections/content/entries/claims';
                 }
               } catch(_e) {}
             } catch(e) { console.warn('CMS introspection/completeLogin failed (stored-token path)', e); }
@@ -543,6 +543,16 @@
       // Initialize CMS if needed (no stored token)
       if (shouldInitCMS) {
         whenCMSReady(initializeCMS);
+        // Proactively open OAuth popup when no stored token to avoid being stuck on login overlay
+        setTimeout(function(){
+          try {
+            if (!window.authSuccess && !window._skipOAuthPopup) {
+              const popup = window.open('/oauth/auth', 'cms_auth', 'width=948,height=1200,menubar=no,toolbar=no,location=no,status=no');
+              if (!popup) console.warn('OAuth popup was blocked; click the Login button to proceed.');
+              else console.log('Opened /oauth/auth popup (no-token path)');
+            }
+          } catch(e) { console.warn('Failed to open /oauth/auth popup (no-token path)', e); }
+        }, 400);
       }
     });
     
