@@ -56,8 +56,10 @@
         window.__ensureSlugFromRoute = function({ entry, collection }) {
           try {
             var collName = collection && (collection.get ? collection.get('name') : collection.name);
+            var current = entry ? (entry.get ? entry.get('slug') : entry.slug) : undefined;
+            console.log('[SlugGuard] event fired', { coll: collName, slug: current });
             if (collName !== 'sitecontent' || !entry) return;
-            var current = entry.get ? entry.get('slug') : entry.slug;
+            // For files collection ensure slug is the file name
             var forced = 'claims';
             if (current !== forced && entry.set) {
               console.log('[SlugGuard] Forcing slug for sitecontent =>', forced, '(was:', current, ')');
@@ -317,14 +319,13 @@
           console.warn('[SlugGuard] Post-init registration skipped (CMS or handler missing)');
         }
       } catch(e) { console.warn('[SlugGuard] Post-init registration error', e); }
-      // Route normalizer: if on the single-entry route, redirect to the collection list; user will click entry to ensure proper editor binding
+      // Route normalizer disabled to preserve slug context on files collection
       try {
         setTimeout(function(){
           var h = (window.location.hash || '').replace(/^#!/, '#');
-          var entryRoute = '#/collections/sitecontent/entries/claims';
-          if (h === entryRoute) {
-            console.log('Normalizing route: redirecting to list to avoid undefined slug state');
-            window.location.hash = '#/collections/sitecontent';
+          if (!h || h === '#/' || h === '#') {
+            console.log('Routing to sitecontent single entry: claims');
+            window.location.hash = '#/collections/sitecontent/entries/claims';
           }
         }, 150);
       } catch(e) { console.warn('Route normalizer failed', e); }
