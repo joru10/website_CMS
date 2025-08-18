@@ -1,0 +1,7 @@
+{
+  "title": "Automatización del Soporte en TechFlow",
+  "industry": "SaaS",
+  "challenge": "La clasificación manual de tickets generaba respuestas lentas y altos costos.",
+  "solution": "Se implementó un triage con IA y un chatbot integrado al sistema de soporte.",
+  "outcome": "80% más rápido en las respuestas y 35% de reducción de costos en 60 días."
+}

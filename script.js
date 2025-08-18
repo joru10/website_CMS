@@ -66,7 +66,9 @@ async function setLanguage(lang) { // <-- 1. Added 'async' here
     await Promise.all([
         loadServicesContent(lang),
         loadBlogContent(lang),
-        loadEducationContent(lang)
+        loadEducationContent(lang),
+        loadNewsContent(lang),
+        loadSuccessStoriesContent(lang)
     ]);
     
     // Apply translations
@@ -1266,6 +1268,169 @@ async function loadEducationContent(lang = 'en') {
             <p class="text-gray-600">${item.description || ''}</p>
         `;
         eduContainer.appendChild(card);
+        if (typeof observer !== 'undefined' && observer instanceof IntersectionObserver) {
+            observer.observe(card);
+            card.classList.add('visible');
+        }
+    });
+}
+
+// Load News (Newsletter) items from /content/news using manifest.json and i18n fallback
+async function loadNewsContent(lang = 'en') {
+    const newsContainer = document.getElementById('news-container');
+    if (!newsContainer) return;
+    newsContainer.innerHTML = `
+        <div class="col-span-3 text-center py-8">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+            <p class="mt-4 text-gray-600" data-translate="loading-news">Loading news...</p>
+        </div>`;
+
+    let slugs = [];
+    try {
+        const res = await fetch('/content/news/manifest.json', { cache: 'no-cache' });
+        if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data.slugs)) slugs = data.slugs;
+        }
+    } catch (e) { /* ignore */ }
+
+    async function fetchNews(slug) {
+        const urls = [
+            `/content/news/${slug}/index.${lang}.md`,
+            `/content/news/${slug}/index.en.md`
+        ];
+        for (const url of urls) {
+            try {
+                const res = await fetch(url, { cache: 'no-cache' });
+                if (!res.ok) continue;
+                const text = await res.text();
+                const { frontmatter, content } = parseFrontmatter(text);
+                if (!frontmatter || !frontmatter.title) continue;
+                const d = frontmatter.date ? new Date(frontmatter.date) : null;
+                return {
+                    slug,
+                    title: frontmatter.title,
+                    summary: frontmatter.summary || frontmatter.description || (content ? (content.slice(0, 160) + '...') : ''),
+                    date: d && !isNaN(d) ? d.getTime() : 0
+                };
+            } catch (e) { /* continue */ }
+        }
+        return null;
+    }
+
+    if (!slugs.length) {
+        newsContainer.innerHTML = `
+            <div class="col-span-3 text-center py-8">
+                <p class="text-gray-600" data-translate="no-news-items">No news items available.</p>
+            </div>`;
+        return;
+    }
+
+    const items = (await Promise.all(slugs.map(fetchNews))).filter(Boolean)
+        .sort((a, b) => (b.date || 0) - (a.date || 0));
+
+    newsContainer.innerHTML = '';
+    if (!items.length) {
+        newsContainer.innerHTML = `
+            <div class="col-span-3 text-center py-8">
+                <p class="text-gray-600" data-translate="no-news-items">No news items available.</p>
+            </div>`;
+        return;
+    }
+
+    items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'bg-white p-8 rounded-2xl shadow-lg card-hover fade-in';
+        const dateStr = item.date ? new Date(item.date).toLocaleDateString() : '';
+        card.innerHTML = `
+            <div class="text-sm text-gray-500 mb-2">${dateStr}</div>
+            <h3 class="text-2xl font-semibold text-gray-800 mb-3">${item.title}</h3>
+            <p class="text-gray-600 mb-4">${item.summary || ''}</p>
+        `;
+        newsContainer.appendChild(card);
+        if (typeof observer !== 'undefined' && observer instanceof IntersectionObserver) {
+            observer.observe(card);
+            card.classList.add('visible');
+        }
+    });
+}
+
+// Load Case Studies (Success Stories) from /content/cases using manifest.json and i18n fallback
+async function loadSuccessStoriesContent(lang = 'en') {
+    const casesContainer = document.getElementById('success-stories-container');
+    if (!casesContainer) return;
+    casesContainer.innerHTML = `
+        <div class="col-span-3 text-center py-8">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+            <p class="mt-4 text-gray-600" data-translate="loading-cases">Loading case studies...</p>
+        </div>`;
+
+    let slugs = [];
+    try {
+        const res = await fetch('/content/cases/manifest.json', { cache: 'no-cache' });
+        if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data.slugs)) slugs = data.slugs;
+        }
+    } catch (e) { /* ignore */ }
+
+    async function fetchCase(slug) {
+        const urls = [
+            `/content/cases/${slug}/index.${lang}.json`,
+            `/content/cases/${slug}/index.en.json`
+        ];
+        for (const url of urls) {
+            try {
+                const res = await fetch(url, { cache: 'no-cache' });
+                if (!res.ok) continue;
+                const json = await res.json();
+                if (!json || !json.title) continue;
+                const excerpt = (s) => (typeof s === 'string' && s.length > 0) ? (s.replace(/[#*>_`\-]/g, '').slice(0, 160) + '...') : '';
+                return {
+                    slug,
+                    title: json.title,
+                    industry: json.industry || '',
+                    challenge: excerpt(json.challenge || ''),
+                    solution: excerpt(json.solution || ''),
+                    outcome: excerpt(json.outcome || '')
+                };
+            } catch (e) { /* continue */ }
+        }
+        return null;
+    }
+
+    if (!slugs.length) {
+        casesContainer.innerHTML = `
+            <div class="col-span-3 text-center py-8">
+                <p class="text-gray-600" data-translate="no-cases">No case studies available.</p>
+            </div>`;
+        return;
+    }
+
+    const items = (await Promise.all(slugs.map(fetchCase))).filter(Boolean);
+
+    casesContainer.innerHTML = '';
+    if (!items.length) {
+        casesContainer.innerHTML = `
+            <div class="col-span-3 text-center py-8">
+                <p class="text-gray-600" data-translate="no-cases">No case studies available.</p>
+            </div>`;
+        return;
+    }
+
+    items.forEach(cs => {
+        const card = document.createElement('div');
+        card.className = 'bg-white p-8 rounded-2xl shadow-lg card-hover fade-in';
+        card.innerHTML = `
+            <div class="text-sm text-gray-500 mb-2">${cs.industry || ''}</div>
+            <h3 class="text-2xl font-semibold text-gray-800 mb-3">${cs.title}</h3>
+            <div class="space-y-2 text-gray-600">
+                ${cs.challenge ? `<p><strong>Challenge:</strong> ${cs.challenge}</p>` : ''}
+                ${cs.solution ? `<p><strong>Solution:</strong> ${cs.solution}</p>` : ''}
+                ${cs.outcome ? `<p><strong>Outcome:</strong> ${cs.outcome}</p>` : ''}
+            </div>
+        `;
+        casesContainer.appendChild(card);
         if (typeof observer !== 'undefined' && observer instanceof IntersectionObserver) {
             observer.observe(card);
             card.classList.add('visible');
