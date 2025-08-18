@@ -1,6 +1,12 @@
 {
   "items": [
-    { "key": "stat-speed", "value": "90% Faster" },
-    { "key": "stat-speed-label", "value": "AI Implementation" }
+    {
+      "key": "stat-speed",
+      "value": "50% Faster"
+    },
+    {
+      "key": "stat-speed-label",
+      "value": "AI Implementation"
+    }
   ]
 }
