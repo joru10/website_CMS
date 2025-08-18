@@ -307,7 +307,13 @@ function applyTranslations(lang) {
             'education-title': 'Education',
             'education-subtitle': 'Learn AI implementation step by step',
             'loading-education': 'Loading education...',
-            'no-education-items': 'No education items available.'
+            'no-education-items': 'No education items available.',
+            // News Section
+            'loading-news': 'Loading news...',
+            'no-news-items': 'No news items available.',
+            // Case Studies Section
+            'loading-cases': 'Loading case studies...',
+            'no-cases': 'No case studies available.'
         },
         'fr': {
             // Navigation
@@ -532,7 +538,13 @@ function applyTranslations(lang) {
             'education-title': 'Éducation',
             'education-subtitle': "Apprenez l'implémentation IA étape par étape",
             'loading-education': 'Chargement des ressources...',
-            'no-education-items': 'Aucune ressource disponible.'
+            'no-education-items': 'Aucune ressource disponible.',
+            // News Section
+            'loading-news': 'Chargement des actualités...',
+            'no-news-items': 'Aucune actualité disponible.',
+            // Case Studies Section
+            'loading-cases': 'Chargement des études de cas...',
+            'no-cases': 'Aucune étude de cas disponible.'
         },
         'es': {
             // Navigation
@@ -757,7 +769,13 @@ function applyTranslations(lang) {
             'education-title': 'Educación',
             'education-subtitle': 'Aprende implementación de IA paso a paso',
             'loading-education': 'Cargando recursos...',
-            'no-education-items': 'No hay recursos disponibles.'
+            'no-education-items': 'No hay recursos disponibles.',
+            // News Section
+            'loading-news': 'Cargando noticias...',
+            'no-news-items': 'No hay noticias disponibles.',
+            // Case Studies Section
+            'loading-cases': 'Cargando estudios de caso...',
+            'no-cases': 'No hay estudios de caso disponibles.'
         }
     };
     
