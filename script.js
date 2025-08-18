@@ -313,7 +313,12 @@ function applyTranslations(lang) {
             'no-news-items': 'No news items available.',
             // Case Studies Section
             'loading-cases': 'Loading case studies...',
-            'no-cases': 'No case studies available.'
+            'no-cases': 'No case studies available.',
+            'case-section-title': 'Case Studies',
+            'case-section-subtitle': 'Real-world results from RapidAI implementations',
+            'case-label-challenge': 'Challenge:',
+            'case-label-solution': 'Solution:',
+            'case-label-outcome': 'Outcome:'
         },
         'fr': {
             // Navigation
@@ -544,7 +549,12 @@ function applyTranslations(lang) {
             'no-news-items': 'Aucune actualité disponible.',
             // Case Studies Section
             'loading-cases': 'Chargement des études de cas...',
-            'no-cases': 'Aucune étude de cas disponible.'
+            'no-cases': 'Aucune étude de cas disponible.',
+            'case-section-title': 'Études de cas',
+            'case-section-subtitle': 'Résultats concrets des implémentations RapidAI',
+            'case-label-challenge': 'Défi :',
+            'case-label-solution': 'Solution :',
+            'case-label-outcome': 'Résultat :'
         },
         'es': {
             // Navigation
@@ -775,7 +785,12 @@ function applyTranslations(lang) {
             'no-news-items': 'No hay noticias disponibles.',
             // Case Studies Section
             'loading-cases': 'Cargando estudios de caso...',
-            'no-cases': 'No hay estudios de caso disponibles.'
+            'no-cases': 'No hay estudios de caso disponibles.',
+            'case-section-title': 'Casos de Estudio',
+            'case-section-subtitle': 'Resultados reales de implementaciones de RapidAI',
+            'case-label-challenge': 'Desafío:',
+            'case-label-solution': 'Solución:',
+            'case-label-outcome': 'Resultado:'
         }
     };
     
@@ -1443,9 +1458,9 @@ async function loadSuccessStoriesContent(lang = 'en') {
             <div class="text-sm text-gray-500 mb-2">${cs.industry || ''}</div>
             <h3 class="text-2xl font-semibold text-gray-800 mb-3">${cs.title}</h3>
             <div class="space-y-2 text-gray-600">
-                ${cs.challenge ? `<p><strong>Challenge:</strong> ${cs.challenge}</p>` : ''}
-                ${cs.solution ? `<p><strong>Solution:</strong> ${cs.solution}</p>` : ''}
-                ${cs.outcome ? `<p><strong>Outcome:</strong> ${cs.outcome}</p>` : ''}
+                ${cs.challenge ? `<p><strong data-translate="case-label-challenge">Challenge:</strong> ${cs.challenge}</p>` : ''}
+                ${cs.solution ? `<p><strong data-translate="case-label-solution">Solution:</strong> ${cs.solution}</p>` : ''}
+                ${cs.outcome ? `<p><strong data-translate="case-label-outcome">Outcome:</strong> ${cs.outcome}</p>` : ''}
             </div>
         `;
         casesContainer.appendChild(card);
