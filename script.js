@@ -805,21 +805,19 @@ function applyTranslations(lang) {
     }); 
 
     // Apply translations to elements with data-translate attributes
-    Object.keys(currentTranslations).forEach(key => {
-        document.querySelectorAll('[data-translate]').forEach(el => {
-            const key = el.getAttribute('data-translate');
-            if (translations[lang][key]) {
-                el.innerHTML = translations[lang][key];
-            }
-        });
+    document.querySelectorAll('[data-translate]').forEach(el => {
+        const tKey = el.getAttribute('data-translate');
+        if (currentTranslations[tKey]) {
+            el.innerHTML = currentTranslations[tKey];
+        }
+    });
 
-        // Apply placeholder translations (e.g., inputs)
-        document.querySelectorAll('[data-translate-placeholder]').forEach(el => {
-            const key = el.getAttribute('data-translate-placeholder');
-            if (translations[lang][key]) {
-                el.setAttribute('placeholder', translations[lang][key]);
-            }
-        });
+    // Apply placeholder translations (e.g., inputs)
+    document.querySelectorAll('[data-translate-placeholder]').forEach(el => {
+        const pKey = el.getAttribute('data-translate-placeholder');
+        if (currentTranslations[pKey]) {
+            el.setAttribute('placeholder', currentTranslations[pKey]);
+        }
     });
 }
 
