@@ -63,10 +63,17 @@ async function setLanguage(lang) { // <-- 1. Added 'async' here
     localStorage.setItem('rapidai-language', lang);
     
     // Load dynamic content from CMS before applying static translations
-    await loadServicesContent(lang); // <-- 2. Added this line
+    await Promise.all([
+        loadServicesContent(lang),
+        loadBlogContent(lang),
+        loadEducationContent(lang)
+    ]);
     
     // Apply translations
     applyTranslations(lang);
+    
+    // Override hero claims with CMS/JSON content
+    await loadClaimsAndStats();
     
     // Show language change confirmation
     showLanguageChangeNotification(lang);
@@ -288,7 +295,17 @@ function applyTranslations(lang) {
             'cta-journey': 'Start Your AI Journey',
             'assessment-preview-title': 'Assessment Preview',
             'assessment-preview-quote': '"Takes 5 minutes, saves months of planning"',
-            'assessment-completed': '500+ completed'
+            'assessment-completed': '500+ completed',
+            // Blog Section
+            'blog-title': 'Latest Blog Posts',
+            'blog-subtitle': 'Insights, guides, and updates from RapidAI',
+            'loading-blog': 'Loading blog...',
+            'no-blog-posts': 'No blog posts available.',
+            // Education Section
+            'education-title': 'Education',
+            'education-subtitle': 'Learn AI implementation step by step',
+            'loading-education': 'Loading education...',
+            'no-education-items': 'No education items available.'
         },
         'fr': {
             // Navigation
@@ -503,7 +520,17 @@ function applyTranslations(lang) {
             'cta-journey': 'Commencer Votre Parcours IA',
             'assessment-preview-title': 'Aperçu de l\'Évaluation',
             'assessment-preview-quote': '"Prend 5 minutes, économise des mois de planification"',
-            'assessment-completed': '500+ complétées'
+            'assessment-completed': '500+ complétées',
+            // Blog Section
+            'blog-title': 'Derniers Articles',
+            'blog-subtitle': 'Analyses, guides et actualités RapidAI',
+            'loading-blog': 'Chargement du blog...',
+            'no-blog-posts': 'Aucun article disponible.',
+            // Education Section
+            'education-title': 'Éducation',
+            'education-subtitle': "Apprenez l'implémentation IA étape par étape",
+            'loading-education': 'Chargement des ressources...',
+            'no-education-items': 'Aucune ressource disponible.'
         },
         'es': {
             // Navigation
@@ -718,7 +745,17 @@ function applyTranslations(lang) {
             'cta-journey': 'Comenzar Tu Viaje IA',
             'assessment-preview-title': 'Vista previa de Evaluación',
             'assessment-preview-quote': '"Toma 5 minutos, ahorra meses de planificación"',
-            'assessment-completed': '500+ completadas'
+            'assessment-completed': '500+ completadas',
+            // Blog Section
+            'blog-title': 'Últimas Publicaciones',
+            'blog-subtitle': 'Ideas, guías y novedades de RapidAI',
+            'loading-blog': 'Cargando blog...',
+            'no-blog-posts': 'No hay publicaciones disponibles.',
+            // Education Section
+            'education-title': 'Educación',
+            'education-subtitle': 'Aprende implementación de IA paso a paso',
+            'loading-education': 'Cargando recursos...',
+            'no-education-items': 'No hay recursos disponibles.'
         }
     };
     
@@ -795,16 +832,9 @@ function initializeLanguage() {
     // Use saved language, or browser language if supported, otherwise default to English
     const defaultLang = savedLang !== 'en' ? savedLang : 
                        (supportedLangs.includes(browserLang) ? browserLang : 'en');
-    
-    // Load services with the default language
-    loadServicesContent(defaultLang);
-    
-    if (defaultLang !== 'en') {
-        setLanguage(defaultLang);
-    } else {
-        // Apply translations for English if it's the default
-        applyTranslations('en');
-    }
+
+    // Initialize all dynamic content and translations for default language
+    setLanguage(defaultLang);
 }
 
 // Form submission
@@ -924,7 +954,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize language support
     initializeLanguage();
-    loadServicesContent('en'); // Load default content
 });
 /**
  * ----------------------------------------------------------------
@@ -1064,20 +1093,188 @@ async function loadServicesContent(lang = 'en') {
 
         if (typeof observer !== 'undefined' && observer instanceof IntersectionObserver) {
             observer.observe(serviceCard);
-            serviceCard.classList.add('visible');
         }
     });
 }
 
-// Initialize the page when DOM is fully loaded
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM fully loaded, initializing language and services...');
-    initializeLanguage();
-    
-    // Also update the setLanguage function to reload services when language changes
-    const originalSetLanguage = window.setLanguage;
-    window.setLanguage = function(lang) {
-        originalSetLanguage(lang);
-        loadServicesContent(lang);
-    };
-});
+async function loadBlogContent(lang = 'en') {
+    const blogContainer = document.getElementById('blog-container');
+    if (!blogContainer) return;
+    blogContainer.innerHTML = `
+        <div class="col-span-3 text-center py-8">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+            <p class="mt-4 text-gray-600" data-translate="loading-blog">Loading blog...</p>
+        </div>`;
+
+    let slugs = [];
+    try {
+        const res = await fetch('/content/blog/manifest.json', { cache: 'no-cache' });
+        if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data.slugs)) slugs = data.slugs;
+        }
+    } catch (e) {
+        // ignore; will show empty state
+    }
+
+    async function fetchPost(slug) {
+        const urls = [
+            `/content/blog/${slug}/index.${lang}.md`,
+            `/content/blog/${slug}/index.en.md`
+        ];
+        for (const url of urls) {
+            try {
+                const res = await fetch(url, { cache: 'no-cache' });
+                if (!res.ok) continue;
+                const text = await res.text();
+                const { frontmatter } = parseFrontmatter(text);
+                if (!frontmatter || !frontmatter.title) continue;
+                const order = parseInt(frontmatter.order, 10);
+                return {
+                    slug,
+                    title: frontmatter.title,
+                    description: frontmatter.description || '',
+                    cover: frontmatter.cover || '',
+                    order: Number.isFinite(order) ? order : 999
+                };
+            } catch (e) { /* continue */ }
+        }
+        return null;
+    }
+
+    if (!slugs.length) {
+        blogContainer.innerHTML = `
+            <div class="col-span-3 text-center py-8">
+                <p class="text-gray-600" data-translate="no-blog-posts">No blog posts available.</p>
+            </div>`;
+        return;
+    }
+
+    const posts = (await Promise.all(slugs.map(fetchPost))).filter(Boolean)
+        .sort((a, b) => (a.order || 999) - (b.order || 999));
+
+    blogContainer.innerHTML = '';
+    if (!posts.length) {
+        blogContainer.innerHTML = `
+            <div class="col-span-3 text-center py-8">
+                <p class="text-gray-600" data-translate="no-blog-posts">No blog posts available.</p>
+            </div>`;
+        return;
+    }
+
+    posts.forEach(post => {
+        const card = document.createElement('div');
+        card.className = 'bg-white p-8 rounded-2xl shadow-lg card-hover fade-in';
+        card.innerHTML = `
+            ${post.cover ? `<img src="${post.cover}" alt="${post.title}" class="rounded-xl mb-4">` : ''}
+            <h3 class="text-2xl font-semibold text-gray-800 mb-3">${post.title}</h3>
+            <p class="text-gray-600 mb-4">${post.description || ''}</p>
+        `;
+        blogContainer.appendChild(card);
+        if (typeof observer !== 'undefined' && observer instanceof IntersectionObserver) {
+            observer.observe(card);
+            card.classList.add('visible');
+        }
+    });
+}
+
+async function loadEducationContent(lang = 'en') {
+    const eduContainer = document.getElementById('education-container');
+    if (!eduContainer) return;
+    eduContainer.innerHTML = `
+        <div class="col-span-3 text-center py-8">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+            <p class="mt-4 text-gray-600">Loading education...</p>
+        </div>`;
+
+    let slugs = [];
+    try {
+        const res = await fetch('/content/education/manifest.json', { cache: 'no-cache' });
+        if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data.slugs)) slugs = data.slugs;
+        }
+    } catch (e) {
+        // no manifest; show empty state later
+    }
+
+    async function fetchItem(slug) {
+        const urls = [
+            `/content/education/${slug}/index.${lang}.md`,
+            `/content/education/${slug}/index.en.md`
+        ];
+        for (const url of urls) {
+            try {
+                const res = await fetch(url, { cache: 'no-cache' });
+                if (!res.ok) continue;
+                const text = await res.text();
+                const { frontmatter, content } = parseFrontmatter(text);
+                if (!frontmatter || !frontmatter.title) continue;
+                const order = parseInt(frontmatter.order, 10);
+                return {
+                    slug,
+                    title: frontmatter.title,
+                    description: frontmatter.description || frontmatter.excerpt || content.slice(0, 160) + '...',
+                    icon: frontmatter.icon || 'fas fa-graduation-cap',
+                    order: Number.isFinite(order) ? order : 999
+                };
+            } catch (e) { /* continue */ }
+        }
+        return null;
+    }
+
+    if (!slugs.length) {
+        eduContainer.innerHTML = `
+            <div class="col-span-3 text-center py-8">
+                <p class="text-gray-600" data-translate="no-education-items">No education items available.</p>
+            </div>`;
+        return;
+    }
+
+    const items = (await Promise.all(slugs.map(fetchItem))).filter(Boolean)
+        .sort((a, b) => (a.order || 999) - (b.order || 999));
+
+    eduContainer.innerHTML = '';
+    if (!items.length) {
+        eduContainer.innerHTML = `
+            <div class="col-span-3 text-center py-8">
+                <p class="text-gray-600" data-translate="no-education-items">No education items available.</p>
+            </div>`;
+        return;
+    }
+
+    items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'bg-white p-8 rounded-2xl shadow-lg card-hover fade-in';
+        card.innerHTML = `
+            <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
+                <i class="${item.icon} text-indigo-600 text-2xl"></i>
+            </div>
+            <h3 class="text-2xl font-semibold text-gray-800 mb-3">${item.title}</h3>
+            <p class="text-gray-600">${item.description || ''}</p>
+        `;
+        eduContainer.appendChild(card);
+        if (typeof observer !== 'undefined' && observer instanceof IntersectionObserver) {
+            observer.observe(card);
+            card.classList.add('visible');
+        }
+    });
+}
+
+async function loadClaimsAndStats() {
+    try {
+        const res = await fetch('/content.json', { cache: 'no-cache' });
+        if (!res.ok) return;
+        const data = await res.json();
+        const items = Array.isArray(data.data) ? data.data : [];
+        const map = new Map(items.map(i => [i.key, i.value]));
+        const statEl = document.querySelector('[data-translate="stat-speed"]');
+        const labelEl = document.querySelector('[data-translate="stat-speed-label"]');
+        if (statEl && map.get('stat-speed')) statEl.textContent = map.get('stat-speed');
+        if (labelEl && map.get('stat-speed-label')) labelEl.textContent = map.get('stat-speed-label');
+    } catch (e) {
+        // ignore
+    }
+}
+
+// Claims and stats are loaded within the main language initialization flow
