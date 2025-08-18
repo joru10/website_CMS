@@ -49,6 +49,46 @@
       setTimeout(() => whenCMSReady(cb), 50);
     }
 
+    function defineSlugGuard() {
+      try {
+        if (window.__slugGuardDefined) return;
+        window.__slugGuardDefined = true;
+        window.__ensureSlugFromRoute = function({ entry, collection }) {
+          try {
+            var collName = collection && (collection.get ? collection.get('name') : collection.name);
+            if (collName !== 'sitecontent' || !entry) return;
+            var current = entry.get ? entry.get('slug') : entry.slug;
+            if (current) return;
+            var h = (window.location.hash || '').replace(/^#!/, '#');
+            var m = h.match(/#\/collections\/[^/]+\/entries\/([^/?#]+)/);
+            var routeSlug = (m && m[1]) ? decodeURIComponent(m[1]) : 'claims';
+            console.log('[SlugGuard] Deriving slug from route =>', routeSlug);
+            if (entry.set) return { entry: entry.set('slug', routeSlug) };
+          } catch (e) { console.warn('[SlugGuard] handler error', e); }
+        };
+        // Also log slug on hash changes for visibility
+        window.addEventListener('hashchange', function(){
+          try {
+            var h = (window.location.hash || '').replace(/^#!/, '#');
+            var m = h.match(/#\/collections\/[^/]+\/entries\/([^/?#]+)/);
+            var routeSlug = (m && m[1]) ? decodeURIComponent(m[1]) : undefined;
+            console.log('[SlugGuard] hashchange route slug =', routeSlug);
+          } catch(e){}
+        });
+      } catch(e) { console.warn('Failed to define slug guard', e); }
+    }
+    // Register the slug guard listeners as early as possible (before init)
+    whenCMSReady(function(){
+      try {
+        defineSlugGuard();
+        if (window.CMS && window.CMS.registerEventListener && window.__ensureSlugFromRoute) {
+          window.CMS.registerEventListener({ name: 'preSave', handler: window.__ensureSlugFromRoute });
+          window.CMS.registerEventListener({ name: 'prePublish', handler: window.__ensureSlugFromRoute });
+          console.log('[SlugGuard] Registered preSave/prePublish listeners');
+        }
+      } catch(e) { console.warn('Failed to register slug guard early', e); }
+    });
+
     // Wait for CMS.auth.completeLogin to be available, then complete login without reloading
     function waitForCMSAuthAndComplete(token, user, attempts = 12, interval = 150) {
       if (!window._cmsLoginRetryCount) window._cmsLoginRetryCount = 0;
@@ -266,19 +306,18 @@
       // Force inline config only; ignore admin/config.yml to avoid schema conflicts
       window.CMS.init({ config: cmsConfig, load_config_file: false });
       console.log('CMS initialized with inline config (load_config_file:false):', cmsConfig);
-      // Route normalizer: if on the single-entry route, briefly navigate to the collection and back to ensure Decap binds the entry state
+      // Route normalizer: if on the single-entry route, redirect to the collection list; user will click entry to ensure proper editor binding
       try {
         setTimeout(function(){
           var h = (window.location.hash || '').replace(/^#!/, '#');
           var entryRoute = '#/collections/sitecontent/entries/claims';
           if (h === entryRoute) {
-            console.log('Normalizing route to rebind entry state');
+            console.log('Normalizing route: redirecting to list to avoid undefined slug state');
             window.location.hash = '#/collections/sitecontent';
-            setTimeout(function(){ window.location.hash = entryRoute; }, 50);
           }
         }, 150);
       } catch(e) { console.warn('Route normalizer failed', e); }
-      // Using route-derived slug for files collection; no custom slug enforcement
+      // Using route-derived slug for files collection; listeners registered earlier
       // Debug: log the effective config Decap is using
       try {
         setTimeout(function(){
