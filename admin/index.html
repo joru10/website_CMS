@@ -143,6 +143,7 @@
                 file: 'content.json',
                 label: 'Claims & Stats',
                 name: 'content',
+                i18n: false,
                 format: 'json',
                 fields: [
                   { label: 'Data', name: 'data', widget: 'list', summary: '{{fields.key}}: {{fields.value}}', fields: [
@@ -265,25 +266,7 @@
       // Force inline config only; ignore admin/config.yml to avoid schema conflicts
       window.CMS.init({ config: cmsConfig, load_config_file: false });
       console.log('CMS initialized with inline config (load_config_file:false):', cmsConfig);
-      // Ensure slug is set for the single-file 'content' collection during persist
-      try {
-        const ensureSlug = function({ entry, collection }) {
-          try {
-            const collName = (collection && collection.get) ? collection.get('name') : (collection && collection.name);
-            if (collName === 'content') {
-              const currentSlug = (entry && entry.get) ? entry.get('slug') : (entry && entry.slug);
-              if (!currentSlug && entry && entry.set) {
-                console.log('Enforcing slug "content" for files collection content');
-                return { entry: entry.set('slug', 'content') };
-              }
-            }
-          } catch (e) { console.warn('ensureSlug handler error', e); }
-        };
-        if (window.CMS && window.CMS.registerEventListener) {
-          window.CMS.registerEventListener({ name: 'preSave', handler: ensureSlug });
-          window.CMS.registerEventListener({ name: 'prePublish', handler: ensureSlug });
-        }
-      } catch (e) { console.warn('Failed to register ensureSlug listeners', e); }
+      // Using route-derived slug for files collection; no custom slug enforcement
       // Debug: log the effective config Decap is using
       try {
         setTimeout(function(){
