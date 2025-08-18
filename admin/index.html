@@ -133,7 +133,7 @@
         publish_mode: 'simple',
         collections: [
           {
-            name: 'content',
+            name: 'sitecontent',
             label: 'Site Content (claims, stats)',
             delete: false,
             create: false,
@@ -403,7 +403,7 @@
           try {
             const h = (window.location.hash || '').replace(/^#!/, '#');
             // Route to a valid collection on reload to avoid login overlay
-            const target = (!h || h === '#/' || h === '#') ? '#/collections/content/entries/claims' : h;
+            const target = (!h || h === '#/' || h === '#') ? '#/collections/sitecontent/entries/claims' : h;
             window.location.replace(window.location.pathname + target);
           } catch(e) { window.location.reload(); }
         }
@@ -511,8 +511,8 @@
               try {
                 const h = (window.location.hash || '').replace(/^#!/, '#');
                 if (!h || h === '#/' || h === '#') {
-                  console.log('Routing to content single entry: claims');
-                  window.location.hash = '#/collections/content/entries/claims';
+                  console.log('Routing to sitecontent single entry: claims');
+                  window.location.hash = '#/collections/sitecontent/entries/claims';
                 }
               } catch(_e) {}
             } catch(e) { console.warn('CMS introspection/completeLogin failed (stored-token path)', e); }
