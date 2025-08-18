@@ -4,4 +4,8 @@ description: We design and build tailor-made AI models and applications to addre
 icon: fas fa-laptop-code
 order: 3
 featured: false
+features:
+  - Machine learning models
+  - Natural language processing
+  - Predictive analytics
 ---

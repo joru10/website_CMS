@@ -4,4 +4,8 @@ description: Identificamos y automatizamos tareas repetitivas y que consumen muc
 icon: fas fa-cogs
 order: 2
 featured: false
+features:
+  - Optimización de flujos de trabajo
+  - Automatización de tareas
+  - Integración con sistemas existentes
 ---

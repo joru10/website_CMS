@@ -933,27 +933,47 @@ document.addEventListener('DOMContentLoaded', function() {
  * This section loads content from Markdown files managed by the CMS.
  */
 
-// A simple utility to parse YAML frontmatter from a Markdown file's text
+// Parse YAML-like frontmatter including simple list fields (e.g., features: - item)
 function parseFrontmatter(text) {
     const frontmatterRegex = /^---\s*([\s\S]*?)\s*---/;
     const match = frontmatterRegex.exec(text);
-    
-    if (!match) {
-        return { frontmatter: {}, content: text };
-    }
-    
-    const frontmatterBlock = match[1];
+    if (!match) return { frontmatter: {}, content: text };
+
+    const block = match[1];
     const content = text.slice(match[0].length);
-    const lines = frontmatterBlock.trim().split('\n');
+    const lines = block.split('\n');
     const data = {};
-    
-    lines.forEach(line => {
-        const [key, ...valueParts] = line.split(':');
-        if (key && valueParts.length > 0) {
-            data[key.trim()] = valueParts.join(':').trim().replace(/^["']|["']$/g, '');
+    let currentKey = null;
+
+    for (let rawLine of lines) {
+        const line = (rawLine || '').replace(/\r$/, '');
+        if (!line.trim()) continue;
+
+        // List item (supports indented "- value" or "- value")
+        if ((/^\s*-\s+/).test(line)) {
+            if (currentKey) {
+                if (!Array.isArray(data[currentKey])) data[currentKey] = [];
+                const val = line.replace(/^\s*-\s+/, '').trim().replace(/^["']|["']$/g, '');
+                data[currentKey].push(val);
+            }
+            continue;
         }
-    });
-    
+
+        // New key: value
+        const idx = line.indexOf(':');
+        if (idx === -1) continue;
+        const key = line.slice(0, idx).trim();
+        let value = line.slice(idx + 1).trim();
+        currentKey = key;
+
+        if (value === '') {
+            // Expecting a list or empty scalar in following lines
+            if (data[currentKey] === undefined) data[currentKey] = '';
+        } else {
+            data[currentKey] = value.replace(/^["']|["']$/g, '');
+        }
+    }
+
     return { frontmatter: data, content };
 }
 
@@ -963,7 +983,7 @@ function parseFrontmatter(text) {
  */
 console.log('Script loaded, initializing services...');
 
-function loadServicesContent(lang = 'en') {
+async function loadServicesContent(lang = 'en') {
     console.log('loadServicesContent called with lang:', lang);
     const servicesContainer = document.getElementById('services-container');
     if (!servicesContainer) {
@@ -978,71 +998,73 @@ function loadServicesContent(lang = 'en') {
             <p class="mt-4 text-gray-600">Loading services...</p>
         </div>`;
 
-    // Hardcoded service data
-    const servicesData = [
-        {
-            name: 'service1',
-            title: 'AI Strategy & Consulting',
-            description: 'We develop comprehensive AI strategies that align with your business goals, ensuring maximum impact and a clear roadmap for implementation.',
-            icon: 'fas fa-brain',
-            features: [
-                'AI opportunity assessment',
-                'Custom implementation roadmap',
-                'ROI analysis & projections'
-            ]
-        },
-        {
-            name: 'service2',
-            title: 'Process Automation',
-            description: 'Streamline your operations with intelligent automation solutions that reduce costs and increase efficiency.',
-            icon: 'fas fa-cogs',
-            features: [
-                'Workflow optimization',
-                'Task automation',
-                'Integration with existing systems'
-            ]
-        },
-        {
-            name: 'service3',
-            title: 'Custom AI Solutions',
-            description: 'Bespoke AI applications designed specifically for your industry and business requirements.',
-            icon: 'fas fa-robot',
-            features: [
-                'Machine learning models',
-                'Natural language processing',
-                'Predictive analytics'
-            ]
+    const slugs = ['service1', 'service2', 'service3'];
+
+    async function fetchService(slug) {
+        const urls = [
+            `/content/services/${slug}/index.${lang}.md`,
+            `/content/services/${slug}/index.en.md`
+        ];
+        for (const url of urls) {
+            try {
+                const res = await fetch(url, { cache: 'no-cache' });
+                if (!res.ok) continue;
+                const text = await res.text();
+                const { frontmatter } = parseFrontmatter(text);
+                if (!frontmatter || !frontmatter.title) continue;
+                const features = Array.isArray(frontmatter.features) ? frontmatter.features : [];
+                const order = parseInt(frontmatter.order, 10);
+                return {
+                    name: slug,
+                    title: frontmatter.title,
+                    description: frontmatter.description || '',
+                    icon: frontmatter.icon || 'fas fa-cube',
+                    order: Number.isFinite(order) ? order : 999,
+                    featured: String(frontmatter.featured).toLowerCase() === 'true',
+                    features
+                };
+            } catch (e) {
+                // ignore and try fallback
+            }
         }
-    ];
-    
+        return null;
+    }
+
+    const results = await Promise.all(slugs.map(fetchService));
+    const servicesData = results.filter(Boolean).sort((a, b) => (a.order || 999) - (b.order || 999));
+
     // Clear loading state and render services
     servicesContainer.innerHTML = '';
-    
+
+    if (!servicesData.length) {
+        servicesContainer.innerHTML = `
+            <div class="col-span-3 text-center py-8">
+                <p class="text-gray-600">No services available.</p>
+            </div>`;
+        return;
+    }
+
     servicesData.forEach(service => {
         const serviceCard = document.createElement('div');
         serviceCard.className = 'bg-white p-8 rounded-2xl shadow-lg card-hover fade-in';
+        const featuresHtml = (service.features && service.features.length)
+            ? `<ul class="space-y-3 text-gray-600">${service.features.map(f => `<li><i class=\"fas fa-check text-green-500 mr-2\"></i>${f}</li>`).join('')}</ul>`
+            : '';
         serviceCard.innerHTML = `
             <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
                 <i class="${service.icon} text-blue-600 text-2xl"></i>
             </div>
             <h3 class="text-2xl font-semibold text-gray-800 mb-4">${service.title}</h3>
             <div class="text-gray-600 mb-6 prose max-w-none">
-                ${service.description}
+                ${service.description || ''}
             </div>
-            <ul class="space-y-3 text-gray-600">
-                ${service.features.map(feature => 
-                    `<li><i class="fas fa-check text-green-500 mr-2"></i>${feature}</li>`
-                ).join('')}
-            </ul>
+            ${featuresHtml}
         `;
-        // Append the card to the container
         servicesContainer.appendChild(serviceCard);
 
-        // Ensure the new element is observed for the fade-in effect
         if (typeof observer !== 'undefined' && observer instanceof IntersectionObserver) {
             observer.observe(serviceCard);
-        // Fallback: force visible immediately so users see content even if observer fails
-        serviceCard.classList.add('visible');
+            serviceCard.classList.add('visible');
         }
     });
 }

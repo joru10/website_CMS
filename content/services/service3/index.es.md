@@ -4,4 +4,8 @@ description: Diseñamos y construimos modelos y aplicaciones de IA a medida para
 icon: fas fa-laptop-code
 order: 3
 featured: false
+features:
+  - Modelos de aprendizaje automático
+  - Procesamiento de lenguaje natural
+  - Análisis predictivo
 ---

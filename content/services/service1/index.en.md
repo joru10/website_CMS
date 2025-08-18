@@ -4,4 +4,8 @@ description: We develop comprehensive AI strategies that align with your busines
 icon: fas fa-brain
 order: 1
 featured: false
+features:
+  - AI opportunity assessment
+  - Custom implementation roadmap
+  - ROI analysis & projections
 ---

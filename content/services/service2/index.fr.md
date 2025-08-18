@@ -4,4 +4,8 @@ description: Nous identifions et automatisons les tâches répétitives et chron
 icon: fas fa-cogs
 order: 2
 featured: false
+features:
+  - Optimisation des flux de travail
+  - Automatisation des tâches
+  - Intégration avec les systèmes existants
 ---

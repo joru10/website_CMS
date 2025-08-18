@@ -4,4 +4,8 @@ description: Nous développons des stratégies d'IA complètes qui s'alignent su
 icon: fas fa-brain
 order: 1
 featured: false
+features:
+  - Évaluation des opportunités IA
+  - Feuille de route personnalisée
+  - Analyse et projections ROI
 ---

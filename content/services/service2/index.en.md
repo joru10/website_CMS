@@ -4,4 +4,8 @@ description: We identify and automate repetitive, time-consuming tasks within yo
 icon: fas fa-cogs
 order: 2
 featured: false
+features:
+  - Workflow optimization
+  - Task automation
+  - Integration with existing systems
 ---
