@@ -130,12 +130,14 @@
           locales: ['en', 'es', 'fr'],
           default_locale: 'en'
         },
+        publish_mode: 'simple',
         collections: [
           {
             name: 'content',
             label: 'Site Content (claims, stats)',
             delete: false,
             create: false,
+            i18n: false,
             files: [
               {
                 file: 'content.json',

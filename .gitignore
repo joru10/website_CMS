@@ -6,6 +6,7 @@ yarn-debug.log*
 yarn-error.log*
 # Local CMS files
 static/uploads/
+!static/uploads/.gitkeep
 
 # Env files
 .env
