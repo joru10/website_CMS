@@ -142,7 +142,7 @@
               {
                 file: 'content.json',
                 label: 'Claims & Stats',
-                name: 'claims',
+                name: 'content',
                 format: 'json',
                 fields: [
                   { label: 'Data', name: 'data', widget: 'list', summary: '{{fields.key}}: {{fields.value}}', fields: [
@@ -273,8 +273,8 @@
             if (collName === 'content') {
               const currentSlug = (entry && entry.get) ? entry.get('slug') : (entry && entry.slug);
               if (!currentSlug && entry && entry.set) {
-                console.log('Enforcing slug "claims" for files collection content');
-                return { entry: entry.set('slug', 'claims') };
+                console.log('Enforcing slug "content" for files collection content');
+                return { entry: entry.set('slug', 'content') };
               }
             }
           } catch (e) { console.warn('ensureSlug handler error', e); }
@@ -422,7 +422,7 @@
           try {
             const h = (window.location.hash || '').replace(/^#!/, '#');
             // Route to a valid collection on reload to avoid login overlay
-            const target = (!h || h === '#/' || h === '#') ? '#/collections/content/entries/claims' : h;
+            const target = (!h || h === '#/' || h === '#') ? '#/collections/content/entries/content' : h;
             window.location.replace(window.location.pathname + target);
           } catch(e) { window.location.reload(); }
         }
@@ -530,8 +530,8 @@
               try {
                 const h = (window.location.hash || '').replace(/^#!/, '#');
                 if (!h || h === '#/' || h === '#') {
-                  console.log('Routing to content single entry: claims');
-                  window.location.hash = '#/collections/content/entries/claims';
+                  console.log('Routing to content single entry: content');
+                  window.location.hash = '#/collections/content/entries/content';
                 }
               } catch(_e) {}
             } catch(e) { console.warn('CMS introspection/completeLogin failed (stored-token path)', e); }
