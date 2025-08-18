@@ -1027,7 +1027,19 @@ async function loadServicesContent(lang = 'en') {
             <p class="mt-4 text-gray-600">Loading services...</p>
         </div>`;
 
-    const slugs = ['service1', 'service2', 'service3'];
+    // Load list of service slugs from manifest with safe fallback
+    let slugs = ['service1', 'service2', 'service3'];
+    try {
+        const res = await fetch('/content/services/manifest.json', { cache: 'no-cache' });
+        if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data.slugs) && data.slugs.length) {
+                slugs = data.slugs;
+            }
+        }
+    } catch (e) {
+        // ignore and use fallback
+    }
 
     async function fetchService(slug) {
         const urls = [
