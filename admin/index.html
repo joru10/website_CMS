@@ -63,7 +63,7 @@
             var forced = 'claims';
             if (current !== forced && entry.set) {
               console.log('[SlugGuard] Forcing slug for sitecontent =>', forced, '(was:', current, ')');
-              return { entry: entry.set('slug', forced) };
+              return entry.set('slug', forced);
             } else {
               console.log('[SlugGuard] Slug already set =>', current);
             }
@@ -189,7 +189,7 @@
                 i18n: false,
                 format: 'json',
                 fields: [
-                  { label: 'Data', name: 'data', widget: 'list', summary: '{{fields.key}}: {{fields.value}}', fields: [
+                  { label: 'Items', name: 'items', widget: 'list', summary: '{{fields.key}}: {{fields.value}}', fields: [
                     { label: 'Key', name: 'key', widget: 'string' },
                     { label: 'Value', name: 'value', widget: 'string' }
                   ]}

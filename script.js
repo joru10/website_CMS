@@ -1266,7 +1266,7 @@ async function loadClaimsAndStats() {
         const res = await fetch('/content.json', { cache: 'no-cache' });
         if (!res.ok) return;
         const data = await res.json();
-        const items = Array.isArray(data.data) ? data.data : [];
+        const items = Array.isArray(data.items) ? data.items : [];
         const map = new Map(items.map(i => [i.key, i.value]));
         const statEl = document.querySelector('[data-translate="stat-speed"]');
         const labelEl = document.querySelector('[data-translate="stat-speed-label"]');
