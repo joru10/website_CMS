@@ -133,7 +133,7 @@
         publish_mode: 'simple',
         collections: [
           {
-            name: 'content',
+            name: 'sitecontent',
             label: 'Site Content (claims, stats)',
             delete: false,
             create: false,
@@ -142,7 +142,7 @@
               {
                 file: 'content.json',
                 label: 'Claims & Stats',
-                name: 'content',
+                name: 'claims',
                 i18n: false,
                 format: 'json',
                 fields: [
@@ -266,6 +266,18 @@
       // Force inline config only; ignore admin/config.yml to avoid schema conflicts
       window.CMS.init({ config: cmsConfig, load_config_file: false });
       console.log('CMS initialized with inline config (load_config_file:false):', cmsConfig);
+      // Route normalizer: if on the single-entry route, briefly navigate to the collection and back to ensure Decap binds the entry state
+      try {
+        setTimeout(function(){
+          var h = (window.location.hash || '').replace(/^#!/, '#');
+          var entryRoute = '#/collections/sitecontent/entries/claims';
+          if (h === entryRoute) {
+            console.log('Normalizing route to rebind entry state');
+            window.location.hash = '#/collections/sitecontent';
+            setTimeout(function(){ window.location.hash = entryRoute; }, 50);
+          }
+        }, 150);
+      } catch(e) { console.warn('Route normalizer failed', e); }
       // Using route-derived slug for files collection; no custom slug enforcement
       // Debug: log the effective config Decap is using
       try {
@@ -405,7 +417,7 @@
           try {
             const h = (window.location.hash || '').replace(/^#!/, '#');
             // Route to a valid collection on reload to avoid login overlay
-            const target = (!h || h === '#/' || h === '#') ? '#/collections/content/entries/content' : h;
+            const target = (!h || h === '#/' || h === '#') ? '#/collections/sitecontent/entries/claims' : h;
             window.location.replace(window.location.pathname + target);
           } catch(e) { window.location.reload(); }
         }
@@ -513,8 +525,8 @@
               try {
                 const h = (window.location.hash || '').replace(/^#!/, '#');
                 if (!h || h === '#/' || h === '#') {
-                  console.log('Routing to content single entry: content');
-                  window.location.hash = '#/collections/content/entries/content';
+                  console.log('Routing to sitecontent single entry: claims');
+                  window.location.hash = '#/collections/sitecontent/entries/claims';
                 }
               } catch(_e) {}
             } catch(e) { console.warn('CMS introspection/completeLogin failed (stored-token path)', e); }
