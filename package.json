@@ -6,7 +6,9 @@
   "scripts": {
     "start": "serve -l 5501 .",
     "cms": "netlify-cms-proxy-server",
-    "dev": "netlify dev"
+    "dev": "netlify dev",
+    "generate:manifests": "node scripts/generate-manifests.js",
+    "build": "node scripts/generate-manifests.js"
   },
   "dependencies": {
     "axios": "^1.6.2",

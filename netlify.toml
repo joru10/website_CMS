@@ -1,6 +1,6 @@
 [build]
   publish = "."
-  command = ""
+  command = "npm run build"
   functions = "netlify/functions"
 
 # OAuth: specific routes first (before SPA catch-all)
