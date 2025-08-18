@@ -133,7 +133,7 @@
         publish_mode: 'simple',
         collections: [
           {
-            name: 'sitecontent',
+            name: 'content',
             label: 'Site Content (claims, stats)',
             delete: false,
             create: false,
@@ -265,6 +265,25 @@
       // Force inline config only; ignore admin/config.yml to avoid schema conflicts
       window.CMS.init({ config: cmsConfig, load_config_file: false });
       console.log('CMS initialized with inline config (load_config_file:false):', cmsConfig);
+      // Ensure slug is set for the single-file 'content' collection during persist
+      try {
+        const ensureSlug = function({ entry, collection }) {
+          try {
+            const collName = (collection && collection.get) ? collection.get('name') : (collection && collection.name);
+            if (collName === 'content') {
+              const currentSlug = (entry && entry.get) ? entry.get('slug') : (entry && entry.slug);
+              if (!currentSlug && entry && entry.set) {
+                console.log('Enforcing slug "claims" for files collection content');
+                return { entry: entry.set('slug', 'claims') };
+              }
+            }
+          } catch (e) { console.warn('ensureSlug handler error', e); }
+        };
+        if (window.CMS && window.CMS.registerEventListener) {
+          window.CMS.registerEventListener({ name: 'preSave', handler: ensureSlug });
+          window.CMS.registerEventListener({ name: 'prePublish', handler: ensureSlug });
+        }
+      } catch (e) { console.warn('Failed to register ensureSlug listeners', e); }
       // Debug: log the effective config Decap is using
       try {
         setTimeout(function(){
@@ -403,7 +422,7 @@
           try {
             const h = (window.location.hash || '').replace(/^#!/, '#');
             // Route to a valid collection on reload to avoid login overlay
-            const target = (!h || h === '#/' || h === '#') ? '#/collections/sitecontent/entries/claims' : h;
+            const target = (!h || h === '#/' || h === '#') ? '#/collections/content/entries/claims' : h;
             window.location.replace(window.location.pathname + target);
           } catch(e) { window.location.reload(); }
         }
@@ -511,8 +530,8 @@
               try {
                 const h = (window.location.hash || '').replace(/^#!/, '#');
                 if (!h || h === '#/' || h === '#') {
-                  console.log('Routing to sitecontent single entry: claims');
-                  window.location.hash = '#/collections/sitecontent/entries/claims';
+                  console.log('Routing to content single entry: claims');
+                  window.location.hash = '#/collections/content/entries/claims';
                 }
               } catch(_e) {}
             } catch(e) { console.warn('CMS introspection/completeLogin failed (stored-token path)', e); }
