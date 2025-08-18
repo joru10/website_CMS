@@ -58,12 +58,13 @@
             var collName = collection && (collection.get ? collection.get('name') : collection.name);
             if (collName !== 'sitecontent' || !entry) return;
             var current = entry.get ? entry.get('slug') : entry.slug;
-            if (current) return;
-            var h = (window.location.hash || '').replace(/^#!/, '#');
-            var m = h.match(/#\/collections\/[^/]+\/entries\/([^/?#]+)/);
-            var routeSlug = (m && m[1]) ? decodeURIComponent(m[1]) : 'claims';
-            console.log('[SlugGuard] Deriving slug from route =>', routeSlug);
-            if (entry.set) return { entry: entry.set('slug', routeSlug) };
+            var forced = 'claims';
+            if (current !== forced && entry.set) {
+              console.log('[SlugGuard] Forcing slug for sitecontent =>', forced, '(was:', current, ')');
+              return { entry: entry.set('slug', forced) };
+            } else {
+              console.log('[SlugGuard] Slug already set =>', current);
+            }
           } catch (e) { console.warn('[SlugGuard] handler error', e); }
         };
         // Also log slug on hash changes for visibility
@@ -306,6 +307,16 @@
       // Force inline config only; ignore admin/config.yml to avoid schema conflicts
       window.CMS.init({ config: cmsConfig, load_config_file: false });
       console.log('CMS initialized with inline config (load_config_file:false):', cmsConfig);
+      // Post-init register of slug guard to ensure handler is active in Decap 3.8.x
+      try {
+        if (window.CMS && window.CMS.registerEventListener && window.__ensureSlugFromRoute) {
+          window.CMS.registerEventListener({ name: 'preSave', handler: window.__ensureSlugFromRoute });
+          window.CMS.registerEventListener({ name: 'prePublish', handler: window.__ensureSlugFromRoute });
+          console.log('[SlugGuard] Re-registered listeners after CMS.init');
+        } else {
+          console.warn('[SlugGuard] Post-init registration skipped (CMS or handler missing)');
+        }
+      } catch(e) { console.warn('[SlugGuard] Post-init registration error', e); }
       // Route normalizer: if on the single-entry route, redirect to the collection list; user will click entry to ensure proper editor binding
       try {
         setTimeout(function(){
