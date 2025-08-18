@@ -135,6 +135,7 @@
             name: 'content',
             label: 'Site Content (claims, stats)',
             delete: false,
+            create: false,
             files: [
               {
                 file: 'content.json',
@@ -155,6 +156,7 @@
             label: 'Translations',
             label_singular: 'Translation file',
             delete: false,
+            create: false,
             files: [
               { file: 'translations/en.json', name: 'en', label: 'English', format: 'json', fields: [
                 { label: 'Strings', name: 'strings', widget: 'list', summary: '{{fields.key}}', fields: [
