@@ -62,8 +62,37 @@ function generateCasesManifest() {
   writeJSON(outPath, { slugs });
 }
 
+function generateTestimonialsManifest() {
+  const testimonialsRoot = path.join(process.cwd(), 'content', 'testimonials');
+  ensureDir(testimonialsRoot);
+
+  const dirs = listDirs(testimonialsRoot);
+  const items = dirs.map((slug) => {
+    const dirPath = path.join(testimonialsRoot, slug);
+    const hasAnyIndex = fs
+      .readdirSync(dirPath)
+      .some((f) => /^index\.[a-z]{2}\.json$/i.test(f));
+    return {
+      slug,
+      mtime: getMTime(dirPath),
+      valid: hasAnyIndex,
+    };
+  });
+
+  const valid = items.filter((x) => x.valid);
+  valid.sort((a, b) => {
+    if (b.mtime !== a.mtime) return b.mtime - a.mtime; // newest first
+    return a.slug.localeCompare(b.slug);
+  });
+
+  const slugs = valid.map((x) => x.slug);
+  const outPath = path.join(testimonialsRoot, 'manifest.json');
+  writeJSON(outPath, { slugs });
+}
+
 function main() {
   generateCasesManifest();
+  generateTestimonialsManifest();
 }
 
 main();

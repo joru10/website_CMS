@@ -68,7 +68,8 @@ async function setLanguage(lang) { // <-- 1. Added 'async' here
         loadBlogContent(lang),
         loadEducationContent(lang),
         loadNewsContent(lang),
-        loadSuccessStoriesContent(lang)
+        loadSuccessStoriesContent(lang),
+        loadTestimonialsContent(lang)
     ]);
     
     // Apply translations
@@ -314,6 +315,9 @@ function applyTranslations(lang) {
             // Case Studies Section
             'loading-cases': 'Loading case studies...',
             'no-cases': 'No case studies available.',
+            // Testimonials Section (dynamic)
+            'loading-testimonials': 'Loading testimonials...',
+            'no-testimonials': 'No testimonials available.',
             'case-section-title': 'Case Studies',
             'case-section-subtitle': 'Real-world results from RapidAI implementations',
             'case-label-challenge': 'Challenge:',
@@ -550,6 +554,9 @@ function applyTranslations(lang) {
             // Case Studies Section
             'loading-cases': 'Chargement des études de cas...',
             'no-cases': 'Aucune étude de cas disponible.',
+            // Testimonials Section (dynamic)
+            'loading-testimonials': 'Chargement des témoignages...',
+            'no-testimonials': 'Aucun témoignage disponible.',
             'case-section-title': 'Études de cas',
             'case-section-subtitle': 'Résultats concrets des implémentations RapidAI',
             'case-label-challenge': 'Défi :',
@@ -786,6 +793,9 @@ function applyTranslations(lang) {
             // Case Studies Section
             'loading-cases': 'Cargando estudios de caso...',
             'no-cases': 'No hay estudios de caso disponibles.',
+            // Testimonials Section (dynamic)
+            'loading-testimonials': 'Cargando testimonios...',
+            'no-testimonials': 'No hay testimonios disponibles.',
             'case-section-title': 'Casos de Estudio',
             'case-section-subtitle': 'Resultados reales de implementaciones de RapidAI',
             'case-label-challenge': 'Desafío:',
@@ -1462,6 +1472,127 @@ async function loadSuccessStoriesContent(lang = 'en') {
             </div>
         `;
         casesContainer.appendChild(card);
+        if (typeof observer !== 'undefined' && observer instanceof IntersectionObserver) {
+            observer.observe(card);
+            card.classList.add('visible');
+        }
+    });
+}
+
+// Load Testimonials from /content/testimonials using manifest.json and i18n fallback
+async function loadTestimonialsContent(lang = 'en') {
+    const container = document.getElementById('testimonials-container');
+    if (!container) return;
+    container.innerHTML = `
+        <div class="col-span-3 text-center py-8">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+            <p class="mt-4 text-gray-600" data-translate="loading-testimonials">Loading testimonials...</p>
+        </div>`;
+
+    let slugs = [];
+    try {
+        const res = await fetch('/content/testimonials/manifest.json', { cache: 'no-cache' });
+        if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data.slugs)) slugs = data.slugs;
+        }
+    } catch (e) { /* ignore */ }
+
+    async function fetchTestimonial(slug) {
+        const urls = [
+            `/content/testimonials/${slug}/index.${lang}.json`,
+            `/content/testimonials/${slug}/index.en.json`
+        ];
+        for (const url of urls) {
+            try {
+                const res = await fetch(url, { cache: 'no-cache' });
+                if (!res.ok) continue;
+                const json = await res.json();
+                if (!json || !json.name || !json.quote) continue;
+                return {
+                    slug,
+                    name: json.name || '',
+                    role: json.role || '',
+                    company: json.company || '',
+                    avatar: json.avatar || '',
+                    badge: json.badge || '',
+                    delivery: json.delivery || '',
+                    stars: Math.min(5, Math.max(1, Number(json.stars || 5))) || 5,
+                    quote: json.quote || '',
+                    metric1_label: json.metric1_label || '',
+                    metric1_value: json.metric1_value || '',
+                    metric2_label: json.metric2_label || '',
+                    metric2_value: json.metric2_value || '',
+                    social_note: json.social_note || '',
+                    linkedin_url: json.linkedin_url || ''
+                };
+            } catch (e) { /* continue */ }
+        }
+        return null;
+    }
+
+    if (!slugs.length) {
+        container.innerHTML = `
+            <div class="col-span-3 text-center py-8">
+                <p class="text-gray-600" data-translate="no-testimonials">No testimonials available.</p>
+            </div>`;
+        return;
+    }
+
+    const items = (await Promise.all(slugs.map(fetchTestimonial))).filter(Boolean);
+
+    container.innerHTML = '';
+    if (!items.length) {
+        container.innerHTML = `
+            <div class="col-span-3 text-center py-8">
+                <p class="text-gray-600" data-translate="no-testimonials">No testimonials available.</p>
+            </div>`;
+        return;
+    }
+
+    items.forEach(t => {
+        const card = document.createElement('div');
+        card.className = 'bg-white p-8 rounded-2xl shadow-lg card-hover fade-in';
+
+        // Build stars
+        const starsHtml = Array.from({ length: t.stars }).map(() => '<i class="fas fa-star text-yellow-400"></i>').join('');
+
+        // Build header badge/delivery if present
+        const badgeHtml = t.badge ? `<div class="bg-blue-100 px-3 py-1 rounded-full"><span class="text-blue-800 text-xs font-semibold">${t.badge}</span></div>` : '';
+        const deliveryHtml = t.delivery ? `<div class="text-green-600 text-sm font-semibold">${t.delivery}</div>` : '';
+
+        // Build LinkedIn/social note
+        const linkedinHtml = t.linkedin_url ? `<a href="${t.linkedin_url}" target="_blank" rel="noopener" class="fab fa-linkedin text-blue-600 text-xs mr-1"></a>` : '<i class="fab fa-linkedin text-blue-600 text-xs mr-1"></i>';
+        const socialNoteHtml = t.social_note ? `<span class="text-xs text-gray-500">${t.social_note}</span>` : '';
+
+        // Metrics blocks
+        const metric1 = (t.metric1_value || t.metric1_label) ? `
+            <div>
+                <div class="text-2xl font-bold text-green-600">${t.metric1_value || ''}</div>
+                <div class="text-xs text-gray-500">${t.metric1_label || ''}</div>
+            </div>` : '';
+        const metric2 = (t.metric2_value || t.metric2_label) ? `
+            <div>
+                <div class="text-2xl font-bold text-blue-600">${t.metric2_value || ''}</div>
+                <div class="text-xs text-gray-500">${t.metric2_label || ''}</div>
+            </div>` : '';
+
+        card.innerHTML = `
+            ${(badgeHtml || deliveryHtml) ? `<div class="flex items-center justify-between mb-4">${badgeHtml}${deliveryHtml}</div>` : ''}
+            <div class="flex items-center mb-4">
+                ${t.avatar ? `<img src="${t.avatar}" alt="${t.name}" class="w-12 h-12 rounded-full mr-4">` : `<div class="w-12 h-12 rounded-full mr-4 bg-gray-200"></div>`}
+                <div>
+                    <h4 class="font-semibold text-gray-800">${t.name}</h4>
+                    <p class="text-sm text-gray-600">${[t.role, t.company].filter(Boolean).join(', ')}</p>
+                    ${(t.linkedin_url || t.social_note) ? `<div class="flex items-center mt-1">${linkedinHtml}${socialNoteHtml}</div>` : ''}
+                </div>
+            </div>
+            <div class="flex mb-4">${starsHtml}</div>
+            <p class="text-gray-600 mb-4">${t.quote}</p>
+            ${(metric1 || metric2) ? `<div class="border-t pt-4 grid grid-cols-2 gap-4 text-center">${metric1}${metric2}</div>` : ''}
+        `;
+
+        container.appendChild(card);
         if (typeof observer !== 'undefined' && observer instanceof IntersectionObserver) {
             observer.observe(card);
             card.classList.add('visible');
