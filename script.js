@@ -144,7 +144,7 @@ function applyTranslations(lang) {
             'about-focus': 'Focus on rapid implementation and quick wins',
             
             // Resources Section
-            'resources-title': 'AI Resources & Insights',
+            'resources-title': 'AI Resources',
             'resources-subtitle': 'Practical AI implementation guides, tools, and case studies for SME leaders',
             
             // Process Section
@@ -271,13 +271,13 @@ function applyTranslations(lang) {
             'resources-issue10-title': 'Issue #10',
             'resources-issue10-desc': 'AI ROI Calculator: Measure Your Success',
             'resources-view-all': 'View All Issues →',
-            'resources-guides-title': 'Implementation Guides',
-            'resources-guides-desc': 'Step-by-step guides for implementing AI solutions in your business operations.',
+            'resources-guides-title': 'Insights & Perspectives',
+            'resources-guides-desc': 'Articles and perspectives on AI implementation for SMEs.',
             'resources-guide1': 'AI Readiness Assessment',
             'resources-guide2': 'Customer Service Automation',
             'resources-guide3': 'Process Optimization Framework',
             'resources-guide4': 'ROI Measurement Templates',
-            'resources-access-guides': 'Access Guides →',
+            'resources-access-guides': 'View Articles →',
             'resources-stories-title': 'Success Stories',
             'resources-stories-desc': 'Real SME case studies with detailed ROI metrics and implementation timelines.',
             'resources-case1-title': 'Manufacturing AI',
@@ -303,7 +303,7 @@ function applyTranslations(lang) {
             'loading-services': 'Loading services...',
             'no-services': 'No services available.',
             // Education Section
-            'education-title': 'Education',
+            'education-title': 'Insights & Perspectives',
             'education-subtitle': 'Learn AI implementation step by step',
             'loading-education': 'Loading education...',
             'no-education-items': 'No education items available.',
@@ -381,7 +381,7 @@ function applyTranslations(lang) {
             'about-focus': 'Focus sur l\'implémentation rapide et les victoires rapides',
             
             // Resources Section
-            'resources-title': 'Ressources et Insights IA',
+            'resources-title': 'Ressources IA',
             'resources-subtitle': 'Guides d\'implémentation IA pratiques, outils et études de cas pour les dirigeants de PME',
             
             // Process Section
@@ -508,13 +508,13 @@ function applyTranslations(lang) {
             'resources-issue10-title': 'Numéro #10',
             'resources-issue10-desc': 'Calculateur ROI IA: Mesurez Votre Succès',
             'resources-view-all': 'Voir Tous les Numéros →',
-            'resources-guides-title': 'Guides d\'Implémentation',
-            'resources-guides-desc': 'Guides étape par étape pour implémenter des solutions IA dans vos opérations commerciales.',
+            'resources-guides-title': 'Analyses & Perspectives',
+            'resources-guides-desc': 'Articles et perspectives sur l\'implémentation de l\'IA pour les PME.',
             'resources-guide1': 'Évaluation de Préparation IA',
             'resources-guide2': 'Automatisation Service Client',
             'resources-guide3': 'Cadre d\'Optimisation des Processus',
             'resources-guide4': 'Modèles de Mesure ROI',
-            'resources-access-guides': 'Accéder aux Guides →',
+            'resources-access-guides': 'Voir les articles →',
             'resources-stories-title': 'Histoires de Succès',
             'resources-stories-desc': 'Études de cas réelles de PME avec métriques ROI détaillées et calendriers d\'implémentation.',
             'resources-case1-title': 'IA Manufacturière',
@@ -540,7 +540,7 @@ function applyTranslations(lang) {
             'loading-services': 'Chargement des services...',
             'no-services': 'Aucun service disponible.',
             // Education Section
-            'education-title': 'Éducation',
+            'education-title': 'Analyses & Perspectives',
             'education-subtitle': "Apprenez l'implémentation IA étape par étape",
             'loading-education': 'Chargement des ressources...',
             'no-education-items': 'Aucune ressource disponible.',
@@ -618,7 +618,7 @@ function applyTranslations(lang) {
             'about-focus': 'Enfoque en implementación rápida y victorias rápidas',
             
             // Resources Section
-            'resources-title': 'Recursos e Insights de IA',
+            'resources-title': 'Recursos de IA',
             'resources-subtitle': 'Guías prácticas de implementación de IA, herramientas y casos de estudio para líderes de PYMES',
             
             // Process Section
@@ -745,13 +745,13 @@ function applyTranslations(lang) {
             'resources-issue10-title': 'Número #10',
             'resources-issue10-desc': 'Calculadora ROI IA: Mide tu Éxito',
             'resources-view-all': 'Ver Todos los Números →',
-            'resources-guides-title': 'Guías de Implementación',
-            'resources-guides-desc': 'Guías paso a paso para implementar soluciones IA en tus operaciones comerciales.',
+            'resources-guides-title': 'Perspectivas y Análisis',
+            'resources-guides-desc': 'Artículos y perspectivas sobre la implementación de IA para PyMEs.',
             'resources-guide1': 'Evaluación de Preparación IA',
             'resources-guide2': 'Automatización Servicio al Cliente',
             'resources-guide3': 'Marco de Optimización de Procesos',
             'resources-guide4': 'Plantillas de Medición ROI',
-            'resources-access-guides': 'Acceder a Guías →',
+            'resources-access-guides': 'Ver artículos →',
             'resources-stories-title': 'Historias de Éxito',
             'resources-stories-desc': 'Casos de estudio reales de PyMEs con métricas ROI detalladas y cronogramas de implementación.',
             'resources-case1-title': 'IA Manufacturera',
@@ -777,7 +777,7 @@ function applyTranslations(lang) {
             'loading-services': 'Cargando servicios...',
             'no-services': 'No hay servicios disponibles.',
             // Education Section
-            'education-title': 'Educación',
+            'education-title': 'Perspectivas y Análisis',
             'education-subtitle': 'Aprende implementación de IA paso a paso',
             'loading-education': 'Cargando recursos...',
             'no-education-items': 'No hay recursos disponibles.',
@@ -1624,15 +1624,23 @@ async function loadResourcesOverview(lang = 'en') {
         }
     }
 
-    // GUIDES TOPICS (Education) - first 4 titles
+    // GUIDES TOPICS (Education + Blog) - first 4 titles
     if (guidesEl) {
         try {
-            let slugs = [];
+            let eduSlugs = [];
+            let blogSlugs = [];
             try {
-                const res = await fetch('/content/education/manifest.json', { cache: 'no-cache' });
-                if (res.ok) {
-                    const data = await res.json();
-                    if (Array.isArray(data.slugs)) slugs = data.slugs;
+                const resEdu = await fetch('/content/education/manifest.json', { cache: 'no-cache' });
+                if (resEdu.ok) {
+                    const data = await resEdu.json();
+                    if (Array.isArray(data.slugs)) eduSlugs = data.slugs;
+                }
+            } catch (e) { /* ignore */ }
+            try {
+                const resBlog = await fetch('/content/blog/manifest.json', { cache: 'no-cache' });
+                if (resBlog.ok) {
+                    const data = await resBlog.json();
+                    if (Array.isArray(data.slugs)) blogSlugs = data.slugs;
                 }
             } catch (e) { /* ignore */ }
 
@@ -1655,27 +1663,44 @@ async function loadResourcesOverview(lang = 'en') {
                 return null;
             };
 
-            if (!slugs.length) {
+            const fetchBlog = async (slug) => {
+                const urls = [
+                    `/content/blog/${slug}/index.${lang}.md`,
+                    `/content/blog/${slug}/index.en.md`
+                ];
+                for (const url of urls) {
+                    try {
+                        const r = await fetch(url, { cache: 'no-cache' });
+                        if (!r.ok) continue;
+                        const text = await r.text();
+                        const { frontmatter } = parseFrontmatter(text);
+                        if (!frontmatter || !frontmatter.title) continue;
+                        const order = parseInt(frontmatter.order, 10);
+                        return { title: frontmatter.title, order: Number.isFinite(order) ? order : 999 };
+                    } catch (e) { /* continue */ }
+                }
+                return null;
+            };
+
+            const eduItems = await Promise.all(eduSlugs.map(fetchEdu));
+            const blogItems = await Promise.all(blogSlugs.map(fetchBlog));
+            const merged = [...eduItems, ...blogItems].filter(Boolean)
+                .sort((a, b) => (a.order || 999) - (b.order || 999))
+                .slice(0, 4);
+
+            guidesEl.innerHTML = '';
+            if (!merged.length) {
                 setEmpty(guidesEl, 'no-education-items', 'No education items available.');
             } else {
-                const items = (await Promise.all(slugs.map(fetchEdu))).filter(Boolean)
-                    .sort((a, b) => (a.order || 999) - (b.order || 999))
-                    .slice(0, 4);
-
-                guidesEl.innerHTML = '';
-                if (!items.length) {
-                    setEmpty(guidesEl, 'no-education-items', 'No education items available.');
-                } else {
-                    items.forEach(it => {
-                        const row = document.createElement('div');
-                        row.className = 'flex items-center';
-                        row.innerHTML = `
-                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
-                            <span class="text-gray-700">${it.title}</span>
-                        `;
-                        guidesEl.appendChild(row);
-                    });
-                }
+                merged.forEach(it => {
+                    const row = document.createElement('div');
+                    row.className = 'flex items-center';
+                    row.innerHTML = `
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span class="text-gray-700">${it.title}</span>
+                    `;
+                    guidesEl.appendChild(row);
+                });
             }
         } catch (e) {
             setEmpty(guidesEl, 'no-education-items', 'No education items available.');
