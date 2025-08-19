@@ -65,7 +65,6 @@ async function setLanguage(lang) { // <-- 1. Added 'async' here
     // Load dynamic content from CMS before applying static translations
     await Promise.all([
         loadServicesContent(lang),
-        loadBlogContent(lang),
         loadEducationContent(lang),
         loadNewsContent(lang),
         loadSuccessStoriesContent(lang),
@@ -203,7 +202,7 @@ function applyTranslations(lang) {
             'footer-custom-ai': 'Custom AI Solutions',
             'footer-implementation': 'Implementation',
             'footer-resources': 'Resources',
-            'footer-blog': 'Blog',
+            'footer-blog': 'Education',
             'footer-case-studies': 'Case Studies',
             'footer-insights': 'AI Insights',
             'footer-consultation': 'Consultation',
@@ -303,11 +302,6 @@ function applyTranslations(lang) {
             // Services dynamic states
             'loading-services': 'Loading services...',
             'no-services': 'No services available.',
-            // Blog Section
-            'blog-title': 'Latest Blog Posts',
-            'blog-subtitle': 'Insights, guides, and updates from RapidAI',
-            'loading-blog': 'Loading blog...',
-            'no-blog-posts': 'No blog posts available.',
             // Education Section
             'education-title': 'Education',
             'education-subtitle': 'Learn AI implementation step by step',
@@ -445,7 +439,7 @@ function applyTranslations(lang) {
             'footer-custom-ai': 'Solutions IA personnalisées',
             'footer-implementation': 'Implémentation',
             'footer-resources': 'Ressources',
-            'footer-blog': 'Blog',
+            'footer-blog': 'Éducation',
             'footer-case-studies': 'Études de cas',
             'footer-insights': 'Insights IA',
             'footer-consultation': 'Consultation',
@@ -545,11 +539,6 @@ function applyTranslations(lang) {
             // Services dynamic states
             'loading-services': 'Chargement des services...',
             'no-services': 'Aucun service disponible.',
-            // Blog Section
-            'blog-title': 'Derniers Articles',
-            'blog-subtitle': 'Analyses, guides et actualités RapidAI',
-            'loading-blog': 'Chargement du blog...',
-            'no-blog-posts': 'Aucun article disponible.',
             // Education Section
             'education-title': 'Éducation',
             'education-subtitle': "Apprenez l'implémentation IA étape par étape",
@@ -687,7 +676,7 @@ function applyTranslations(lang) {
             'footer-custom-ai': 'Soluciones de IA personalizadas',
             'footer-implementation': 'Implementación',
             'footer-resources': 'Recursos',
-            'footer-blog': 'Blog',
+            'footer-blog': 'Educación',
             'footer-case-studies': 'Casos de estudio',
             'footer-insights': 'Insights de IA',
             'footer-consultation': 'Consulta',
@@ -787,11 +776,6 @@ function applyTranslations(lang) {
             // Services dynamic states
             'loading-services': 'Cargando servicios...',
             'no-services': 'No hay servicios disponibles.',
-            // Blog Section
-            'blog-title': 'Últimas Publicaciones',
-            'blog-subtitle': 'Ideas, guías y novedades de RapidAI',
-            'loading-blog': 'Cargando blog...',
-            'no-blog-posts': 'No hay publicaciones disponibles.',
             // Education Section
             'education-title': 'Educación',
             'education-subtitle': 'Aprende implementación de IA paso a paso',
@@ -1162,86 +1146,7 @@ async function loadServicesContent(lang = 'en') {
     });
 }
 
-async function loadBlogContent(lang = 'en') {
-    const blogContainer = document.getElementById('blog-container');
-    if (!blogContainer) return;
-    blogContainer.innerHTML = `
-        <div class="col-span-3 text-center py-8">
-            <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
-            <p class="mt-4 text-gray-600" data-translate="loading-blog">Loading blog...</p>
-        </div>`;
-
-    let slugs = [];
-    try {
-        const res = await fetch('/content/blog/manifest.json', { cache: 'no-cache' });
-        if (res.ok) {
-            const data = await res.json();
-            if (Array.isArray(data.slugs)) slugs = data.slugs;
-        }
-    } catch (e) {
-        // ignore; will show empty state
-    }
-
-    async function fetchPost(slug) {
-        const urls = [
-            `/content/blog/${slug}/index.${lang}.md`,
-            `/content/blog/${slug}/index.en.md`
-        ];
-        for (const url of urls) {
-            try {
-                const res = await fetch(url, { cache: 'no-cache' });
-                if (!res.ok) continue;
-                const text = await res.text();
-                const { frontmatter } = parseFrontmatter(text);
-                if (!frontmatter || !frontmatter.title) continue;
-                const order = parseInt(frontmatter.order, 10);
-                return {
-                    slug,
-                    title: frontmatter.title,
-                    description: frontmatter.description || '',
-                    cover: frontmatter.cover || '',
-                    order: Number.isFinite(order) ? order : 999
-                };
-            } catch (e) { /* continue */ }
-        }
-        return null;
-    }
-
-    if (!slugs.length) {
-        blogContainer.innerHTML = `
-            <div class="col-span-3 text-center py-8">
-                <p class="text-gray-600" data-translate="no-blog-posts">No blog posts available.</p>
-            </div>`;
-        return;
-    }
-
-    const posts = (await Promise.all(slugs.map(fetchPost))).filter(Boolean)
-        .sort((a, b) => (a.order || 999) - (b.order || 999));
-
-    blogContainer.innerHTML = '';
-    if (!posts.length) {
-        blogContainer.innerHTML = `
-            <div class="col-span-3 text-center py-8">
-                <p class="text-gray-600" data-translate="no-blog-posts">No blog posts available.</p>
-            </div>`;
-        return;
-    }
-
-    posts.forEach(post => {
-        const card = document.createElement('div');
-        card.className = 'bg-white p-8 rounded-2xl shadow-lg card-hover fade-in';
-        card.innerHTML = `
-            ${post.cover ? `<img src="${post.cover}" alt="${post.title}" class="rounded-xl mb-4">` : ''}
-            <h3 class="text-2xl font-semibold text-gray-800 mb-3">${post.title}</h3>
-            <p class="text-gray-600 mb-4">${post.description || ''}</p>
-        `;
-        blogContainer.appendChild(card);
-        if (typeof observer !== 'undefined' && observer instanceof IntersectionObserver) {
-            observer.observe(card);
-            card.classList.add('visible');
-        }
-    });
-}
+/* Blog loader removed — blog posts are merged into Education via loadEducationContent() */
 
 async function loadEducationContent(lang = 'en') {
     const eduContainer = document.getElementById('education-container');
@@ -1252,6 +1157,7 @@ async function loadEducationContent(lang = 'en') {
             <p class="mt-4 text-gray-600" data-translate="loading-education">Loading education...</p>
         </div>`;
 
+    // Load Education items
     let slugs = [];
     try {
         const res = await fetch('/content/education/manifest.json', { cache: 'no-cache' });
@@ -1287,20 +1193,48 @@ async function loadEducationContent(lang = 'en') {
         }
         return null;
     }
+    // Load Blog posts to merge into Education
+    let blogSlugs = [];
+    try {
+        const res = await fetch('/content/blog/manifest.json', { cache: 'no-cache' });
+        if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data.slugs)) blogSlugs = data.slugs;
+        }
+    } catch (e) { /* ignore */ }
 
-    if (!slugs.length) {
-        eduContainer.innerHTML = `
-            <div class="col-span-3 text-center py-8">
-                <p class="text-gray-600" data-translate="no-education-items">No education items available.</p>
-            </div>`;
-        return;
+    async function fetchBlogPost(slug) {
+        const urls = [
+            `/content/blog/${slug}/index.${lang}.md`,
+            `/content/blog/${slug}/index.en.md`
+        ];
+        for (const url of urls) {
+            try {
+                const res = await fetch(url, { cache: 'no-cache' });
+                if (!res.ok) continue;
+                const text = await res.text();
+                const { frontmatter, content } = parseFrontmatter(text);
+                if (!frontmatter || !frontmatter.title) continue;
+                const order = parseInt(frontmatter.order, 10);
+                return {
+                    slug,
+                    title: frontmatter.title,
+                    description: frontmatter.description || frontmatter.excerpt || (content ? (content.slice(0, 160) + '...') : ''),
+                    icon: 'fas fa-pen',
+                    order: Number.isFinite(order) ? order : 999
+                };
+            } catch (e) { /* continue */ }
+        }
+        return null;
     }
 
-    const items = (await Promise.all(slugs.map(fetchItem))).filter(Boolean)
-        .sort((a, b) => (a.order || 999) - (b.order || 999));
+    // Fetch education and blog items
+    const eduItems = (await Promise.all(slugs.map(fetchItem))).filter(Boolean);
+    const blogItems = (await Promise.all(blogSlugs.map(fetchBlogPost))).filter(Boolean);
+    const combined = [...eduItems, ...blogItems].sort((a, b) => (a.order || 999) - (b.order || 999));
 
     eduContainer.innerHTML = '';
-    if (!items.length) {
+    if (!combined.length) {
         eduContainer.innerHTML = `
             <div class="col-span-3 text-center py-8">
                 <p class="text-gray-600" data-translate="no-education-items">No education items available.</p>
@@ -1308,7 +1242,7 @@ async function loadEducationContent(lang = 'en') {
         return;
     }
 
-    items.forEach(item => {
+    combined.forEach(item => {
         const card = document.createElement('div');
         card.className = 'bg-white p-8 rounded-2xl shadow-lg card-hover fade-in';
         card.innerHTML = `
