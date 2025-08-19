@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Education | RapidAI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50">
+  <nav class="fixed w-full bg-white shadow-sm z-50 transition-all duration-300" id="navbar">
+    <div class="container mx-auto px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-rocket text-3xl gradient-text"></i>
+          <a href="/index.html" class="text-xl font-bold text-gray-800">RapidAI</a>
+        </div>
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="/index.html#resources" class="text-gray-600 hover:text-blue-600 transition-colors" data-translate="nav-resources">Resources</a>
+          <a href="/index.html#services" class="text-gray-600 hover:text-blue-600 transition-colors" data-translate="nav-services">Services</a>
+          <a href="/index.html#about" class="text-gray-600 hover:text-blue-600 transition-colors" data-translate="nav-about">About</a>
+          <a href="/index.html#process" class="text-gray-600 hover:text-blue-600 transition-colors" data-translate="nav-process">Process</a>
+          <div class="relative" id="languageSwitcher">
+            <button onclick="toggleLanguageMenu()" class="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors">
+              <i class="fas fa-globe text-lg"></i>
+              <span id="currentLang">EN</span>
+              <i class="fas fa-chevron-down text-sm"></i>
+            </button>
+            <div id="languageMenu" class="hidden absolute right-0 mt-2 bg-white rounded-lg shadow-lg border py-2 z-50 min-w-[120px]">
+              <a href="#" onclick="setLanguage('en')" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                <span class="fi fi-us mr-3"></span>
+                <span>English</span>
+              </a>
+              <a href="#" onclick="setLanguage('fr')" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                <span class="fi fi-fr mr-3"></span>
+                <span>Français</span>
+              </a>
+              <a href="#" onclick="setLanguage('es')" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                <span class="fi fi-es mr-3"></span>
+                <span>Español</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="pt-28 pb-16">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4" data-translate="education-title">Education</h1>
+        <p class="text-xl text-gray-600" data-translate="education-subtitle">Practical AI learning content</p>
+      </div>
+
+      <div id="education-container" class="grid md:grid-cols-3 gap-8">
+        <div class="col-span-3 text-center py-8">
+          <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+          <p class="mt-4 text-gray-600" data-translate="loading-education">Loading education...</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
