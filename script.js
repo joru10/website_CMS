@@ -75,6 +75,9 @@ async function setLanguage(lang) { // <-- 1. Added 'async' here
     // Apply translations
     applyTranslations(lang);
     
+    // Load Intro/Hero content from CMS (overrides static translations)
+    await loadIntroContent(lang);
+    
     // Override hero claims with CMS/JSON content
     await loadClaimsAndStats();
     
@@ -1776,6 +1779,40 @@ async function loadClaimsAndStats() {
         if (labelEl && map.get('stat-speed-label')) labelEl.textContent = map.get('stat-speed-label');
     } catch (e) {
         // ignore
+    }
+}
+
+// Load Intro/Hero content from /content/intro with i18n fallback
+async function loadIntroContent(lang = 'en') {
+    try {
+        const urls = [
+            `/content/intro/index.${lang}.json`,
+            `/content/intro/index.en.json`
+        ];
+        let data = null;
+        for (const url of urls) {
+            try {
+                const res = await fetch(url, { cache: 'no-cache' });
+                if (!res.ok) continue;
+                data = await res.json();
+                break;
+            } catch (e) { /* continue */ }
+        }
+        if (!data) return;
+
+        const titleEl = document.getElementById('hero-title');
+        const subtitleEl = document.getElementById('hero-subtitle');
+        const quoteEl = document.getElementById('hero-quote');
+        const signatureEl = document.getElementById('hero-signature');
+        const ctaEl = document.getElementById('hero-cta');
+
+        if (titleEl && typeof data.title === 'string') titleEl.innerHTML = data.title;
+        if (subtitleEl && typeof data.subtitle === 'string') subtitleEl.innerHTML = data.subtitle;
+        if (quoteEl && typeof data.quote === 'string') quoteEl.innerHTML = data.quote;
+        if (signatureEl && typeof data.signature === 'string') signatureEl.innerHTML = data.signature;
+        if (ctaEl && typeof data.cta === 'string') ctaEl.textContent = data.cta;
+    } catch (e) {
+        // leave static translations
     }
 }
 
