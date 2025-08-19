@@ -77,6 +77,8 @@ async function setLanguage(lang) { // <-- 1. Added 'async' here
     
     // Load Intro/Hero content from CMS (overrides static translations)
     await loadIntroContent(lang);
+    // Load About content from CMS (overrides static translations)
+    await loadAboutContent(lang);
     
     // Override hero claims with CMS/JSON content
     await loadClaimsAndStats();
@@ -1814,6 +1816,53 @@ async function loadIntroContent(lang = 'en') {
         if (ctaEl && typeof data.cta === 'string') ctaEl.textContent = data.cta;
         if (imageEl && typeof data.image === 'string' && data.image.trim()) imageEl.src = data.image;
         if (imageEl && typeof data.image_alt === 'string') imageEl.alt = data.image_alt;
+    } catch (e) {
+        // leave static translations
+    }
+}
+
+// Load About/Meet Jose content from /content/about with i18n fallback
+async function loadAboutContent(lang = 'en') {
+    try {
+        const urls = [
+            `/content/about/index.${lang}.json`,
+            `/content/about/index.en.json`
+        ];
+        let data = null;
+        for (const url of urls) {
+            try {
+                const res = await fetch(url, { cache: 'no-cache' });
+                if (!res.ok) continue;
+                data = await res.json();
+                break;
+            } catch (e) { /* continue */ }
+        }
+        if (!data) return;
+
+        const titleEl = document.getElementById('about-title');
+        const descEl = document.getElementById('about-description');
+        const imageEl = document.getElementById('about-image');
+        const bulletsEl = document.getElementById('about-bullets');
+
+        if (titleEl && typeof data.title === 'string') titleEl.innerHTML = data.title;
+        if (descEl && typeof data.description === 'string') descEl.innerHTML = data.description;
+        if (imageEl && typeof data.image === 'string' && data.image.trim()) imageEl.src = data.image;
+        if (imageEl && typeof data.image_alt === 'string') imageEl.alt = data.image_alt;
+
+        if (bulletsEl && Array.isArray(data.bullets)) {
+            bulletsEl.innerHTML = '';
+            data.bullets.forEach(item => {
+                if (!item || typeof item.text !== 'string') return;
+                const row = document.createElement('div');
+                row.className = 'flex items-center space-x-3';
+                const iconClass = typeof item.icon === 'string' && item.icon.trim() ? item.icon : 'fas fa-check-circle text-green-500';
+                row.innerHTML = `
+                    <i class="${iconClass}"></i>
+                    <span class="text-gray-700">${item.text}</span>
+                `;
+                bulletsEl.appendChild(row);
+            });
+        }
     } catch (e) {
         // leave static translations
     }
