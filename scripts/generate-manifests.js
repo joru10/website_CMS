@@ -90,9 +90,45 @@ function generateTestimonialsManifest() {
   writeJSON(outPath, { slugs });
 }
 
+function generateSectionManifestMd(section) {
+  const root = path.join(process.cwd(), 'content', section);
+  ensureDir(root);
+
+  const dirs = listDirs(root);
+  const items = dirs.map((slug) => {
+    const dirPath = path.join(root, slug);
+    let hasAnyIndex = false;
+    try {
+      const files = fs.readdirSync(dirPath);
+      hasAnyIndex = files.some((f) => /^index\.[a-z]{2}\.md$/i.test(f));
+    } catch (_) {
+      hasAnyIndex = false;
+    }
+    return {
+      slug,
+      mtime: getMTime(dirPath),
+      valid: hasAnyIndex,
+    };
+  });
+
+  const valid = items.filter((x) => x.valid);
+  valid.sort((a, b) => {
+    if (b.mtime !== a.mtime) return b.mtime - a.mtime; // newest first
+    return a.slug.localeCompare(b.slug);
+  });
+
+  const slugs = valid.map((x) => x.slug);
+  const outPath = path.join(root, 'manifest.json');
+  writeJSON(outPath, { slugs });
+}
+
 function main() {
   generateCasesManifest();
   generateTestimonialsManifest();
+  // Markdown-based sections
+  generateSectionManifestMd('blog');
+  generateSectionManifestMd('news');
+  generateSectionManifestMd('education');
 }
 
 main();

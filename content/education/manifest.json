@@ -1,3 +1,6 @@
 {
-  "slugs": ["intro-to-ai"]
+  "slugs": [
+    "prompt-engineering-basics",
+    "intro-to-ai"
+  ]
 }

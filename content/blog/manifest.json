@@ -1,3 +1,6 @@
 {
-  "slugs": ["hello-world"]
+  "slugs": [
+    "getting-started-with-ai",
+    "hello-world"
+  ]
 }
