@@ -225,6 +225,23 @@
             ]
           },
           {
+            name: 'intro',
+            label: 'Homepage Hero',
+            folder: 'content/intro',
+            create: false,
+            slug: 'index',
+            path: 'index',
+            format: 'json',
+            i18n: true,
+            fields: [
+              { label: 'Title (HTML allowed)', name: 'title', widget: 'text', i18n: true },
+              { label: 'Subtitle', name: 'subtitle', widget: 'text', i18n: true },
+              { label: 'Quote (HTML allowed)', name: 'quote', widget: 'text', i18n: true },
+              { label: 'Signature (HTML allowed)', name: 'signature', widget: 'text', i18n: true },
+              { label: 'CTA Label', name: 'cta', widget: 'string', i18n: true }
+            ]
+          },
+          {
             name: 'services',
             label: 'Services',
             label_singular: 'Service',
