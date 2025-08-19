@@ -227,18 +227,26 @@
           {
             name: 'intro',
             label: 'Homepage Hero',
-            folder: 'content/intro',
+            delete: false,
             create: false,
-            slug: 'index',
-            path: 'index',
-            format: 'json',
             i18n: true,
-            fields: [
-              { label: 'Title (HTML allowed)', name: 'title', widget: 'text', i18n: true },
-              { label: 'Subtitle', name: 'subtitle', widget: 'text', i18n: true },
-              { label: 'Quote (HTML allowed)', name: 'quote', widget: 'text', i18n: true },
-              { label: 'Signature (HTML allowed)', name: 'signature', widget: 'text', i18n: true },
-              { label: 'CTA Label', name: 'cta', widget: 'string', i18n: true }
+            files: [
+              {
+                file: 'content/intro/index.json',
+                label: 'Homepage Hero',
+                name: 'index',
+                format: 'json',
+                i18n: true,
+                fields: [
+                  { label: 'Title (HTML allowed)', name: 'title', widget: 'text', i18n: true },
+                  { label: 'Subtitle', name: 'subtitle', widget: 'text', i18n: true },
+                  { label: 'Quote (HTML allowed)', name: 'quote', widget: 'text', i18n: true },
+                  { label: 'Signature (HTML allowed)', name: 'signature', widget: 'text', i18n: true },
+                  { label: 'CTA Label', name: 'cta', widget: 'string', i18n: true },
+                  { label: 'Image', name: 'image', widget: 'image', required: false, i18n: 'duplicate', hint: 'Recommended ~1200x800' },
+                  { label: 'Image Alt', name: 'image_alt', widget: 'string', required: false, i18n: true }
+                ]
+              }
             ]
           },
           {

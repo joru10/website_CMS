@@ -1805,12 +1805,15 @@ async function loadIntroContent(lang = 'en') {
         const quoteEl = document.getElementById('hero-quote');
         const signatureEl = document.getElementById('hero-signature');
         const ctaEl = document.getElementById('hero-cta');
+        const imageEl = document.getElementById('hero-image');
 
         if (titleEl && typeof data.title === 'string') titleEl.innerHTML = data.title;
         if (subtitleEl && typeof data.subtitle === 'string') subtitleEl.innerHTML = data.subtitle;
         if (quoteEl && typeof data.quote === 'string') quoteEl.innerHTML = data.quote;
         if (signatureEl && typeof data.signature === 'string') signatureEl.innerHTML = data.signature;
         if (ctaEl && typeof data.cta === 'string') ctaEl.textContent = data.cta;
+        if (imageEl && typeof data.image === 'string' && data.image.trim()) imageEl.src = data.image;
+        if (imageEl && typeof data.image_alt === 'string') imageEl.alt = data.image_alt;
     } catch (e) {
         // leave static translations
     }
