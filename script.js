@@ -69,7 +69,8 @@ async function setLanguage(lang) { // <-- 1. Added 'async' here
         loadEducationContent(lang),
         loadNewsContent(lang),
         loadSuccessStoriesContent(lang),
-        loadTestimonialsContent(lang)
+        loadTestimonialsContent(lang),
+        loadResourcesOverview(lang)
     ]);
     
     // Apply translations
@@ -1248,7 +1249,7 @@ async function loadEducationContent(lang = 'en') {
     eduContainer.innerHTML = `
         <div class="col-span-3 text-center py-8">
             <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
-            <p class="mt-4 text-gray-600">Loading education...</p>
+            <p class="mt-4 text-gray-600" data-translate="loading-education">Loading education...</p>
         </div>`;
 
     let slugs = [];
@@ -1607,6 +1608,200 @@ async function loadTestimonialsContent(lang = 'en') {
             card.classList.add('visible');
         }
     });
+}
+
+// Populate the Resources overview section with live CMS previews
+async function loadResourcesOverview(lang = 'en') {
+    const newsEl = document.getElementById('resources-news-previews');
+    const guidesEl = document.getElementById('resources-guides-topics');
+    const casesEl = document.getElementById('resources-cases-examples');
+
+    // Helper to set an empty state with a translated message
+    const setEmpty = (el, key, defaultText) => {
+        if (!el) return;
+        el.innerHTML = `
+            <div class="${el.id === 'resources-news-previews' ? 'border-l-4 border-gray-300 pl-4 py-2' : 'border border-gray-200 rounded-lg p-3'}">
+                <p class="text-gray-600 text-sm" data-translate="${key}">${defaultText}</p>
+            </div>
+        `;
+    };
+
+    // NEWS PREVIEWS (latest 3)
+    if (newsEl) {
+        try {
+            let slugs = [];
+            try {
+                const res = await fetch('/content/news/manifest.json', { cache: 'no-cache' });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data.slugs)) slugs = data.slugs;
+                }
+            } catch (e) { /* ignore */ }
+
+            const fetchNewsPreview = async (slug) => {
+                const urls = [
+                    `/content/news/${slug}/index.${lang}.md`,
+                    `/content/news/${slug}/index.en.md`
+                ];
+                for (const url of urls) {
+                    try {
+                        const r = await fetch(url, { cache: 'no-cache' });
+                        if (!r.ok) continue;
+                        const text = await r.text();
+                        const { frontmatter, content } = parseFrontmatter(text);
+                        if (!frontmatter || !frontmatter.title) continue;
+                        const d = frontmatter.date ? new Date(frontmatter.date) : null;
+                        return {
+                            title: frontmatter.title,
+                            summary: frontmatter.summary || frontmatter.description || (content ? (content.slice(0, 120) + '...') : ''),
+                            date: d && !isNaN(d) ? d.getTime() : 0
+                        };
+                    } catch (e) { /* continue */ }
+                }
+                return null;
+            };
+
+            if (!slugs.length) {
+                setEmpty(newsEl, 'no-news-items', 'No news items available.');
+            } else {
+                const items = (await Promise.all(slugs.map(fetchNewsPreview))).filter(Boolean)
+                    .sort((a, b) => (b.date || 0) - (a.date || 0))
+                    .slice(0, 3);
+
+                newsEl.innerHTML = '';
+                if (!items.length) {
+                    setEmpty(newsEl, 'no-news-items', 'No news items available.');
+                } else {
+                    items.forEach((it, idx) => {
+                        const block = document.createElement('div');
+                        block.className = idx === 0
+                            ? 'border-l-4 border-blue-600 pl-4 py-2 bg-blue-50 rounded-r'
+                            : 'border-l-4 border-gray-300 pl-4 py-2';
+                        block.innerHTML = `
+                            <h4 class="font-semibold text-gray-800 text-sm">${it.title}</h4>
+                            <p class="text-gray-600 text-sm">${it.summary || ''}</p>
+                        `;
+                        newsEl.appendChild(block);
+                    });
+                }
+            }
+        } catch (e) {
+            setEmpty(newsEl, 'no-news-items', 'No news items available.');
+        }
+    }
+
+    // GUIDES TOPICS (Education) - first 4 titles
+    if (guidesEl) {
+        try {
+            let slugs = [];
+            try {
+                const res = await fetch('/content/education/manifest.json', { cache: 'no-cache' });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data.slugs)) slugs = data.slugs;
+                }
+            } catch (e) { /* ignore */ }
+
+            const fetchEdu = async (slug) => {
+                const urls = [
+                    `/content/education/${slug}/index.${lang}.md`,
+                    `/content/education/${slug}/index.en.md`
+                ];
+                for (const url of urls) {
+                    try {
+                        const r = await fetch(url, { cache: 'no-cache' });
+                        if (!r.ok) continue;
+                        const text = await r.text();
+                        const { frontmatter } = parseFrontmatter(text);
+                        if (!frontmatter || !frontmatter.title) continue;
+                        const order = parseInt(frontmatter.order, 10);
+                        return { title: frontmatter.title, order: Number.isFinite(order) ? order : 999 };
+                    } catch (e) { /* continue */ }
+                }
+                return null;
+            };
+
+            if (!slugs.length) {
+                setEmpty(guidesEl, 'no-education-items', 'No education items available.');
+            } else {
+                const items = (await Promise.all(slugs.map(fetchEdu))).filter(Boolean)
+                    .sort((a, b) => (a.order || 999) - (b.order || 999))
+                    .slice(0, 4);
+
+                guidesEl.innerHTML = '';
+                if (!items.length) {
+                    setEmpty(guidesEl, 'no-education-items', 'No education items available.');
+                } else {
+                    items.forEach(it => {
+                        const row = document.createElement('div');
+                        row.className = 'flex items-center';
+                        row.innerHTML = `
+                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                            <span class="text-gray-700">${it.title}</span>
+                        `;
+                        guidesEl.appendChild(row);
+                    });
+                }
+            }
+        } catch (e) {
+            setEmpty(guidesEl, 'no-education-items', 'No education items available.');
+        }
+    }
+
+    // CASES EXAMPLES - show 3 with title + brief outcome/summary
+    if (casesEl) {
+        try {
+            let slugs = [];
+            try {
+                const res = await fetch('/content/cases/manifest.json', { cache: 'no-cache' });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data.slugs)) slugs = data.slugs;
+                }
+            } catch (e) { /* ignore */ }
+
+            const fetchCase = async (slug) => {
+                const urls = [
+                    `/content/cases/${slug}/index.${lang}.json`,
+                    `/content/cases/${slug}/index.en.json`
+                ];
+                for (const url of urls) {
+                    try {
+                        const r = await fetch(url, { cache: 'no-cache' });
+                        if (!r.ok) continue;
+                        const json = await r.json();
+                        if (!json || !json.title) continue;
+                        const excerpt = (s) => (typeof s === 'string' && s.length > 0) ? (s.replace(/[#$*>_`\-]/g, '').slice(0, 120) + '...') : '';
+                        const short = excerpt(json.outcome || json.solution || json.challenge || '');
+                        return { title: json.title, short };
+                    } catch (e) { /* continue */ }
+                }
+                return null;
+            };
+
+            if (!slugs.length) {
+                setEmpty(casesEl, 'no-cases', 'No case studies available.');
+            } else {
+                const items = (await Promise.all(slugs.map(fetchCase))).filter(Boolean).slice(0, 3);
+                casesEl.innerHTML = '';
+                if (!items.length) {
+                    setEmpty(casesEl, 'no-cases', 'No case studies available.');
+                } else {
+                    items.forEach(it => {
+                        const box = document.createElement('div');
+                        box.className = 'border border-gray-200 rounded-lg p-3';
+                        box.innerHTML = `
+                            <h4 class="font-semibold text-gray-800 text-sm">${it.title}</h4>
+                            ${it.short ? `<p class=\"text-gray-600 text-sm\">${it.short}</p>` : ''}
+                        `;
+                        casesEl.appendChild(box);
+                    });
+                }
+            }
+        } catch (e) {
+            setEmpty(casesEl, 'no-cases', 'No case studies available.');
+        }
+    }
 }
 
 async function loadClaimsAndStats() {
