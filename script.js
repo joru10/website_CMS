@@ -299,6 +299,9 @@ function applyTranslations(lang) {
             'assessment-preview-title': 'Assessment Preview',
             'assessment-preview-quote': '"Takes 5 minutes, saves months of planning"',
             'assessment-completed': '500+ completed',
+            // Services dynamic states
+            'loading-services': 'Loading services...',
+            'no-services': 'No services available.',
             // Blog Section
             'blog-title': 'Latest Blog Posts',
             'blog-subtitle': 'Insights, guides, and updates from RapidAI',
@@ -538,6 +541,9 @@ function applyTranslations(lang) {
             'assessment-preview-title': 'Aperçu de l\'Évaluation',
             'assessment-preview-quote': '"Prend 5 minutes, économise des mois de planification"',
             'assessment-completed': '500+ complétées',
+            // Services dynamic states
+            'loading-services': 'Chargement des services...',
+            'no-services': 'Aucun service disponible.',
             // Blog Section
             'blog-title': 'Derniers Articles',
             'blog-subtitle': 'Analyses, guides et actualités RapidAI',
@@ -777,6 +783,9 @@ function applyTranslations(lang) {
             'assessment-preview-title': 'Vista previa de Evaluación',
             'assessment-preview-quote': '"Toma 5 minutos, ahorra meses de planificación"',
             'assessment-completed': '500+ completadas',
+            // Services dynamic states
+            'loading-services': 'Cargando servicios...',
+            'no-services': 'No hay servicios disponibles.',
             // Blog Section
             'blog-title': 'Últimas Publicaciones',
             'blog-subtitle': 'Ideas, guías y novedades de RapidAI',
@@ -1067,7 +1076,7 @@ async function loadServicesContent(lang = 'en') {
     servicesContainer.innerHTML = `
         <div class="col-span-3 text-center py-8">
             <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
-            <p class="mt-4 text-gray-600">Loading services...</p>
+            <p class="mt-4 text-gray-600" data-translate="loading-services">Loading services...</p>
         </div>`;
 
     // Load list of service slugs from manifest with safe fallback
@@ -1123,7 +1132,7 @@ async function loadServicesContent(lang = 'en') {
     if (!servicesData.length) {
         servicesContainer.innerHTML = `
             <div class="col-span-3 text-center py-8">
-                <p class="text-gray-600">No services available.</p>
+                <p class="text-gray-600" data-translate="no-services">No services available.</p>
             </div>`;
         return;
     }
