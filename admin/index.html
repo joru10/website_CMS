@@ -61,12 +61,27 @@
             if (collName !== 'sitecontent' || !entry) return;
             // For files collection ensure slug is the file name
             var forced = 'claims';
-            if (current !== forced && entry.set) {
-              console.log('[SlugGuard] Forcing slug for sitecontent =>', forced, '(was:', current, ')');
-              return entry.set('slug', forced);
+            var newEntry = entry;
+            if (entry && entry.get && entry.set) {
+              // Immutable.js Map
+              if (current !== forced) {
+                console.log('[SlugGuard] Forcing slug for sitecontent (Immutable) =>', forced, '(was:', current, ')');
+                newEntry = entry.set('slug', forced);
+              } else {
+                console.log('[SlugGuard] Slug already set (Immutable) =>', current);
+              }
             } else {
-              console.log('[SlugGuard] Slug already set =>', current);
+              // Plain JS object fallback
+              if (current !== forced) {
+                console.log('[SlugGuard] Forcing slug for sitecontent (plain) =>', forced, '(was:', current, ')');
+                try { newEntry = Object.assign({}, entry, { slug: forced }); }
+                catch(_e) { newEntry = entry; }
+              } else {
+                console.log('[SlugGuard] Slug already set (plain) =>', current);
+              }
             }
+            // Event handlers must return an object like { entry }
+            return { entry: newEntry };
           } catch (e) { console.warn('[SlugGuard] handler error', e); }
         };
         // Also log slug on hash changes for visibility
