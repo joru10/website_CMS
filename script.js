@@ -6,6 +6,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         if (target) {
             target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
+
     });
 });
 
@@ -79,6 +80,8 @@ async function setLanguage(lang) { // <-- 1. Added 'async' here
     await loadIntroContent(lang);
     // Load About content from CMS (overrides static translations)
     await loadAboutContent(lang);
+    // Load Resources Intro content from CMS (overrides static translations)
+    await loadResourcesIntro(lang);
     
     // Override hero claims with CMS/JSON content
     await loadClaimsAndStats();
@@ -1863,6 +1866,34 @@ async function loadAboutContent(lang = 'en') {
                 bulletsEl.appendChild(row);
             });
         }
+    } catch (e) {
+        // leave static translations
+    }
+}
+
+// Load Resources Intro content from /content/resources_intro with i18n fallback
+async function loadResourcesIntro(lang = 'en') {
+    try {
+        const urls = [
+            `/content/resources_intro/index.${lang}.json`,
+            `/content/resources_intro/index.en.json`
+        ];
+        let data = null;
+        for (const url of urls) {
+            try {
+                const res = await fetch(url, { cache: 'no-cache' });
+                if (!res.ok) continue;
+                data = await res.json();
+                break;
+            } catch (e) { /* continue */ }
+        }
+        if (!data) return;
+
+        const titleEl = document.getElementById('resources-intro-title');
+        const subtitleEl = document.getElementById('resources-intro-subtitle');
+
+        if (titleEl && typeof data.title === 'string') titleEl.innerHTML = data.title;
+        if (subtitleEl && typeof data.subtitle === 'string') subtitleEl.innerHTML = data.subtitle;
     } catch (e) {
         // leave static translations
     }
