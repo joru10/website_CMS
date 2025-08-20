@@ -17,6 +17,25 @@
     { "key": "stat-efficiency", "value": "Gain d'Efficacité Moyen" },
     { "key": "newsletter-placeholder", "value": "Entrez votre email professionnel" },
     { "key": "newsletter-join", "value": "Rejoindre Gratuitement" },
-    { "key": "newsletter-note", "value": "Gratuit pour toujours. Pas de spam. Désabonnement à tout moment. Plus de 2 000 dirigeants de PME nous font confiance." }
+    { "key": "newsletter-note", "value": "Gratuit pour toujours. Pas de spam. Désabonnement à tout moment. Plus de 2 000 dirigeants de PME nous font confiance." },
+    { "key": "process-title", "value": "Implémentez l'IA avec Vitesse, Précision et Confiance" },
+    { "key": "process-subtitle", "value": "Un processus clair en 4 étapes qui vous mène de l'incertitude aux résultats" },
+    { "key": "process-step1-title", "value": "Planifiez une Consultation de Préparation IA" },
+    { "key": "process-step1-desc", "value": "Nous analysons vos besoins commerciaux et identifions les opportunités IA à fort impact. Évaluation claire, sans accablement." },
+    { "key": "process-step2-title", "value": "Évaluez vos Opportunités IA" },
+    { "key": "process-step2-desc", "value": "Nous comprenons vos besoins commerciaux et voyons exactement comment l'IA peut aider. Feuille de route sur mesure, prochaines étapes claires." },
+    { "key": "process-step3-title", "value": "Examinez le Plan d'Implémentation" },
+    { "key": "process-step3-desc", "value": "Nous examinons notre feuille de route détaillée et nous accordons sur les prochaines étapes. Calendrier clair, processus transparent, aucune surprise." },
+    { "key": "process-step4-title", "value": "Implémentez avec Vitesse, Précision et Confiance" },
+    { "key": "process-step4-desc", "value": "Transformez vos opérations commerciales avec des solutions IA qui offrent des résultats mesurables dès le premier jour." },
+    { "key": "assessment-title", "value": "🚀 Évaluation Gratuite de Préparation IA" },
+    { "key": "assessment-desc", "value": "Découvrez votre potentiel d'implémentation IA en 5 minutes. Obtenez une feuille de route personnalisée avec recommandations spécifiques et projections ROI." },
+    { "key": "assessment-feature1", "value": "✓ Insights spécifiques à l'industrie" },
+    { "key": "assessment-feature2", "value": "✓ Analyse coût-bénéfice" },
+    { "key": "assessment-feature3", "value": "✓ Calendrier d'implémentation" },
+    { "key": "assessment-button", "value": "Commencer l'Évaluation" },
+    { "key": "assessment-preview-title", "value": "Aperçu de l'Évaluation" },
+    { "key": "assessment-preview-quote", "value": "\"Prend 5 minutes, économise des mois de planification\"" },
+    { "key": "assessment-completed", "value": "500+ complétées" }
   ]
 }

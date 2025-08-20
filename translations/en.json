@@ -71,6 +71,25 @@
     {
       "key": "newsletter-note",
       "value": "Free forever. No spam. Unsubscribe anytime. 2,000+ SME leaders trust us."
-    }
+    },
+    { "key": "process-title", "value": "Implement AI with Speed, Precision, and Confidence" },
+    { "key": "process-subtitle", "value": "A clear 4-step process that takes you from uncertainty to results" },
+    { "key": "process-step1-title", "value": "Schedule AI Readiness Consultation" },
+    { "key": "process-step1-desc", "value": "We analyze your business needs and identify the highest-impact AI opportunities. Clear assessment, no overwhelm." },
+    { "key": "process-step2-title", "value": "Assess Your AI Opportunities" },
+    { "key": "process-step2-desc", "value": "We understand your business needs and see exactly how AI can help. Tailored roadmap, clear next steps." },
+    { "key": "process-step3-title", "value": "Review Implementation Plan" },
+    { "key": "process-step3-desc", "value": "We review our detailed roadmap and agree on next steps. Clear timeline, transparent process, no surprises." },
+    { "key": "process-step4-title", "value": "Implement with Speed, Precision, and Confidence" },
+    { "key": "process-step4-desc", "value": "Transform your business operations with AI solutions that deliver measurable results from day one." },
+    { "key": "assessment-title", "value": "🚀 Free AI Readiness Assessment" },
+    { "key": "assessment-desc", "value": "Discover your AI implementation potential in 5 minutes. Get a personalized roadmap with specific recommendations and ROI projections." },
+    { "key": "assessment-feature1", "value": "✓ Industry-specific insights" },
+    { "key": "assessment-feature2", "value": "✓ Cost-benefit analysis" },
+    { "key": "assessment-feature3", "value": "✓ Implementation timeline" },
+    { "key": "assessment-button", "value": "Start Assessment" },
+    { "key": "assessment-preview-title", "value": "Assessment Preview" },
+    { "key": "assessment-preview-quote", "value": "\"Takes 5 minutes, saves months of planning\"" },
+    { "key": "assessment-completed", "value": "500+ completed" }
   ]
 }
