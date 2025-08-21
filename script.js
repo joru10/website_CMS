@@ -1929,17 +1929,21 @@ async function loadValuesContent(lang = 'en') {
             gridEl.innerHTML = '';
             const defaultBg = ['bg-blue-100','bg-green-100','bg-purple-100','bg-indigo-100','bg-red-100','bg-orange-100'];
             const defaultIcon = [
-                'fas fa-bullseye text-blue-600 text-2xl',
-                'fas fa-shield-alt text-green-600 text-2xl',
-                'fas fa-comments text-purple-600 text-2xl',
-                'fas fa-handshake text-indigo-600 text-2xl',
-                'fas fa-rocket text-red-600 text-2xl',
-                'fas fa-chart-line text-orange-600 text-2xl'
+                'fa-solid fa-bullseye text-blue-600 text-2xl',
+                'fa-solid fa-shield-halved text-green-600 text-2xl',
+                'fa-solid fa-comments text-purple-600 text-2xl',
+                'fa-solid fa-handshake text-indigo-600 text-2xl',
+                'fa-solid fa-rocket text-red-600 text-2xl',
+                'fa-solid fa-chart-line text-orange-600 text-2xl'
             ];
             data.items.forEach((item, idx) => {
                 if (!item) return;
                 const iconBg = (typeof item.iconBgClass === 'string' && item.iconBgClass.trim()) ? item.iconBgClass : defaultBg[idx % defaultBg.length];
-                const iconClass = (typeof item.iconClass === 'string' && item.iconClass.trim()) ? item.iconClass : defaultIcon[idx % defaultIcon.length];
+                let iconClass = (typeof item.iconClass === 'string' && item.iconClass.trim()) ? item.iconClass : defaultIcon[idx % defaultIcon.length];
+                // Normalize FA5 -> FA6 where needed
+                iconClass = iconClass
+                    .replace(/\bfas\b/g, 'fa-solid')
+                    .replace('fa-shield-alt', 'fa-shield-halved');
                 const title = typeof item.title === 'string' ? item.title : '';
                 const description = typeof item.description === 'string' ? item.description : '';
 
