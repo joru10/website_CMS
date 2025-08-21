@@ -430,6 +430,25 @@
               { label: 'Social Note (e.g., Verified on LinkedIn)', name: 'social_note', widget: 'string', required: false, i18n: true },
               { label: 'LinkedIn URL', name: 'linkedin_url', widget: 'string', required: false, i18n: 'duplicate' }
             ]
+          },
+          {
+            name: 'partners',
+            label: 'Partners',
+            label_singular: 'Partner',
+            folder: 'content/partners',
+            create: true,
+            slug: '{{slug}}',
+            format: 'json',
+            path: '{{slug}}/index',
+            i18n: true,
+            fields: [
+              { label: 'Name', name: 'name', widget: 'string', i18n: 'duplicate' },
+              { label: 'Tagline', name: 'tagline', widget: 'string', required: false, i18n: true },
+              { label: 'Description', name: 'description', widget: 'text', i18n: true },
+              { label: 'Badge (e.g., Category • Region)', name: 'badge', widget: 'string', required: false, i18n: true },
+              { label: 'Website URL', name: 'website_url', widget: 'string', required: false, i18n: 'duplicate' },
+              { label: 'Icon (CSS class, optional)', name: 'icon', widget: 'string', required: false, i18n: 'duplicate' }
+            ]
           }
         ]
       };

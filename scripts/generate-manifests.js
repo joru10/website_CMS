@@ -11,6 +11,38 @@ function ensureDir(p) {
   if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
 }
 
+function generatePartnersManifest() {
+  const partnersRoot = path.join(process.cwd(), 'content', 'partners');
+  ensureDir(partnersRoot);
+
+  const dirs = listDirs(partnersRoot);
+  const items = dirs.map((slug) => {
+    const dirPath = path.join(partnersRoot, slug);
+    let hasAnyIndex = false;
+    try {
+      const files = fs.readdirSync(dirPath);
+      hasAnyIndex = files.some((f) => /^index\.[a-z]{2}\.json$/i.test(f));
+    } catch (_) {
+      hasAnyIndex = false;
+    }
+    return {
+      slug,
+      mtime: getMTime(dirPath),
+      valid: hasAnyIndex,
+    };
+  });
+
+  const valid = items.filter((x) => x.valid);
+  valid.sort((a, b) => {
+    if (b.mtime !== a.mtime) return b.mtime - a.mtime; // newest first
+    return a.slug.localeCompare(b.slug);
+  });
+
+  const slugs = valid.map((x) => x.slug);
+  const outPath = path.join(partnersRoot, 'manifest.json');
+  writeJSON(outPath, { slugs });
+}
+
 function writeJSON(filePath, data) {
   const content = JSON.stringify(data, null, 2) + '\n';
   fs.writeFileSync(filePath, content, 'utf8');
@@ -125,6 +157,7 @@ function generateSectionManifestMd(section) {
 function main() {
   generateCasesManifest();
   generateTestimonialsManifest();
+  generatePartnersManifest();
   // Markdown-based sections
   generateSectionManifestMd('blog');
   generateSectionManifestMd('news');

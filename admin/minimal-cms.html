@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minimal CMS</title>
+  <style>
+    body { margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    #cms { margin-top: 20px; border: 1px solid #e1e1e1; border-radius: 4px; min-height: 80vh; }
+  </style>
+</head>
+<body>
+  <h1>Minimal CMS</h1>
+  <div id="cms"></div>
+  
+  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  
+  <script>
+  // Verify CMS is loaded
+  if (typeof CMS === 'undefined') {
+    document.getElementById('cms').innerHTML = 
+      '<div style="color: red; padding: 20px;">Error: CMS script failed to load. Check browser console for details.</div>';
+    throw new Error('CMS script failed to load');
+  }
+
+  // Initialize CMS with configuration
+  CMS.init({
+    config: {
+      backend: {
+        name: 'github',
+        repo: 'joru10/website_CMS',
+        branch: 'main',
+        base_url: 'https://joru10-cms-oauth.onrender.com',
+        auth_endpoint: 'auth',
+        token_endpoint: 'callback',
+        auth_type: 'pkce',
+        app_id: 'Ov23lilcBd8JkV3HWZbE',
+        auth_scope: 'repo',
+        // This tells the OAuth proxy where to redirect after successful auth
+        redirect_uri: window.location.origin + window.location.pathname
+      },
+      media_folder: 'static/uploads',
+      public_folder: '/uploads',
+      site_url: 'https://comfy-panda-0d488a.netlify.app',
+      display_url: 'https://comfy-panda-0d488a.netlify.app',
+      collections: [
+        {
+          name: 'blog',
+          label: 'Blog Posts',
+          folder: 'content/blog',
+          create: true,
+          fields: [
+            { label: 'Title', name: 'title', widget: 'string' },
+            { label: 'Publish Date', name: 'date', widget: 'datetime' },
+            { label: 'Body', name: 'body', widget: 'markdown' }
+          ]
+        }
+      ]
+    }
+  });
+  </script>
+</body>
+</html>

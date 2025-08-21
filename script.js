@@ -70,6 +70,7 @@ async function setLanguage(lang) { // <-- 1. Added 'async' here
         loadNewsContent(lang),
         loadSuccessStoriesContent(lang),
         loadTestimonialsContent(lang),
+        loadPartnersContent(lang),
         loadResourcesOverview(lang)
     ]);
     
@@ -226,6 +227,12 @@ function applyTranslations(lang) {
             // SME Trust/Clients Section
             'clients-title': 'Trusted by Forward-Thinking SMEs',
             'clients-subtitle': 'Join innovative technology companies that have transformed their operations with AI',
+            // Partners Section (dynamic)
+            'partners-title': 'Our Partners',
+            'partners-subtitle': 'Collaborations that enhance our solutions and client outcomes',
+            'loading-partners': 'Loading partners...',
+            'no-partners': 'No partners available.',
+            'partners-visit': 'Visit website',
             
             // Newsletter Section
             'newsletter-name': 'RapidAI Weekly',
@@ -463,6 +470,12 @@ function applyTranslations(lang) {
             // SME Trust/Clients Section
             'clients-title': 'Approuvé par les PME Avant-Gardistes',
             'clients-subtitle': 'Rejoignez les entreprises technologiques innovantes qui ont transformé leurs opérations avec l\'IA',
+            // Partenaires (dynamique)
+            'partners-title': 'Nos Partenaires',
+            'partners-subtitle': 'Des collaborations qui renforcent nos solutions et les résultats clients',
+            'loading-partners': 'Chargement des partenaires...',
+            'no-partners': 'Aucun partenaire disponible.',
+            'partners-visit': 'Visiter le site',
             
             // Newsletter Section
             'newsletter-name': 'RapidAI Hebdo',
@@ -700,6 +713,12 @@ function applyTranslations(lang) {
             // SME Trust/Clients Section
             'clients-title': 'Confiado por PyMEs Visionarias',
             'clients-subtitle': 'Únete a empresas tecnológicas innovadoras que han transformado sus operaciones con IA',
+            // Socios (dinámico)
+            'partners-title': 'Nuestros Socios',
+            'partners-subtitle': 'Colaboraciones que mejoran nuestras soluciones y los resultados de los clientes',
+            'loading-partners': 'Cargando socios...',
+            'no-partners': 'No hay socios disponibles.',
+            'partners-visit': 'Visitar sitio',
             
             // Newsletter Section
             'newsletter-name': 'RapidAI Semanal',
@@ -1546,6 +1565,95 @@ async function loadTestimonialsContent(lang = 'en') {
             ${(metric1 || metric2) ? `<div class="border-t pt-4 grid grid-cols-2 gap-4 text-center">${metric1}${metric2}</div>` : ''}
         `;
 
+        container.appendChild(card);
+        if (typeof observer !== 'undefined' && observer instanceof IntersectionObserver) {
+            observer.observe(card);
+            card.classList.add('visible');
+        }
+    });
+}
+
+// Load Partners from /content/partners using manifest.json and i18n fallback
+async function loadPartnersContent(lang = 'en') {
+    const container = document.getElementById('partners-container');
+    if (!container) return;
+    container.innerHTML = `
+        <div class="col-span-3 text-center py-8">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+            <p class="mt-4 text-gray-600" data-translate="loading-partners">Loading partners...</p>
+        </div>`;
+
+    let slugs = [];
+    try {
+        const res = await fetch('/content/partners/manifest.json', { cache: 'no-cache' });
+        if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data.slugs)) slugs = data.slugs;
+        }
+    } catch (e) { /* ignore */ }
+
+    async function fetchPartner(slug) {
+        const urls = [
+            `/content/partners/${slug}/index.${lang}.json`,
+            `/content/partners/${slug}/index.en.json`
+        ];
+        for (const url of urls) {
+            try {
+                const res = await fetch(url, { cache: 'no-cache' });
+                if (!res.ok) continue;
+                const json = await res.json();
+                if (!json || !json.name) continue;
+                return {
+                    slug,
+                    name: json.name || '',
+                    tagline: json.tagline || '',
+                    description: json.description || '',
+                    badge: json.badge || '',
+                    website_url: json.website_url || '',
+                    icon: json.icon || ''
+                };
+            } catch (e) { /* continue */ }
+        }
+        return null;
+    }
+
+    if (!slugs.length) {
+        container.innerHTML = `
+            <div class="col-span-3 text-center py-8">
+                <p class="text-gray-600" data-translate="no-partners">No partners available.</p>
+            </div>`;
+        return;
+    }
+
+    const items = (await Promise.all(slugs.map(fetchPartner))).filter(Boolean);
+
+    container.innerHTML = '';
+    if (!items.length) {
+        container.innerHTML = `
+            <div class="col-span-3 text-center py-8">
+                <p class="text-gray-600" data-translate="no-partners">No partners available.</p>
+            </div>`;
+        return;
+    }
+
+    items.forEach((p) => {
+        const card = document.createElement('div');
+        card.className = 'bg-white p-6 rounded-2xl shadow-lg card-hover fade-in';
+        const badgeHtml = p.badge ? `<div class="bg-purple-100 text-purple-800 text-xs font-semibold px-3 py-1 rounded-full inline-block mb-3">${p.badge}</div>` : '';
+        const iconHtml = p.icon ? `<div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mr-3"><i class="${p.icon.replace(/\bfas\b/g,'fa-solid')}"></i></div>` : '';
+        const visitHtml = p.website_url ? `<a href="${p.website_url}" target="_blank" rel="noopener" class="text-blue-600 text-sm font-semibold hover:underline" data-translate="partners-visit">Visit website</a>` : '';
+        card.innerHTML = `
+            ${badgeHtml}
+            <div class="flex items-start mb-2">
+                ${iconHtml}
+                <div>
+                    <h4 class="text-lg font-semibold text-gray-800">${p.name}</h4>
+                    ${p.tagline ? `<p class="text-sm text-gray-500">${p.tagline}</p>` : ''}
+                </div>
+            </div>
+            ${p.description ? `<p class="text-gray-600 mb-3">${p.description}</p>` : ''}
+            ${visitHtml}
+        `;
         container.appendChild(card);
         if (typeof observer !== 'undefined' && observer instanceof IntersectionObserver) {
             observer.observe(card);
