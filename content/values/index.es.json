@@ -1,0 +1,46 @@
+{
+  "title": "Nuestros Valores de Implementación IA",
+  "subtitle": "Los principios que guían cada proyecto de RapidAI",
+  "items": [
+    {
+      "iconBgClass": "bg-blue-100",
+      "iconClass": "fas fa-bullseye text-blue-600 text-2xl",
+      "title": "Enfoque PyME",
+      "description": "Priorizamos las necesidades únicas de pequeñas y medianas empresas. Entendemos tus desafíos, limitaciones de recursos y ambiciones de crecimiento. Cada solución está diseñada específicamente para el éxito de PyMEs."
+    },
+    {
+      "iconBgClass": "bg-green-100",
+      "iconClass": "fas fa-shield-alt text-green-600 text-2xl",
+      "title": "Excelencia Técnica",
+      "description": "Mantenemos los más altos estándares de implementación técnica y mejores prácticas de IA. Nos mantenemos al día con las tendencias de la industria y entregamos soluciones robustas, escalables y preparadas para el futuro."
+    },
+    {
+      "iconBgClass": "bg-purple-100",
+      "iconClass": "fas fa-comments text-purple-600 text-2xl",
+      "title": "Comunicación Clara",
+      "description": "Creemos en una comunicación transparente y sin jerga. Explicamos conceptos complejos de IA en términos de negocio que entiendes, manteniéndote informado en cada paso."
+    },
+    {
+      "iconBgClass": "bg-indigo-100",
+      "iconClass": "fas fa-handshake text-indigo-600 text-2xl",
+      "title": "Alianza a Largo Plazo",
+      "description": "Buscamos ser tu asesor de IA de confianza a largo plazo. Brindamos guía y soporte a lo largo de tu camino en IA, fomentando relaciones duraderas basadas en el éxito mutuo."
+    },
+    {
+      "iconBgClass": "bg-red-100",
+      "iconClass": "fas fa-rocket text-red-600 text-2xl",
+      "title": "Resultados Rápidos",
+      "description": "Nos comprometemos a entregar valor rápidamente. Nos enfocamos en implementaciones que muestran ROI medible en semanas, no meses, asegurando que tu inversión en IA se recupere rápido."
+    },
+    {
+      "iconBgClass": "bg-orange-100",
+      "iconClass": "fas fa-chart-line text-orange-600 text-2xl",
+      "title": "Impacto Medible",
+      "description": "Asumimos la responsabilidad de entregar resultados cuantificables. Seguimos métricas, medimos el ROI y aseguramos que tus soluciones de IA creen un valor real de negocio que puedas ver y medir."
+    }
+  ],
+  "cta": {
+    "title": "¿Listo para Poner Estos Valores en Acción?",
+    "subtitle": "Hablemos de cómo nuestro enfoque puede transformar tus operaciones con IA."
+  }
+}

@@ -297,6 +297,28 @@
             ]
           },
           {
+            name: 'values',
+            label: 'Implementation Values',
+            delete: false,
+            create: false,
+            i18n: true,
+            folder: 'content/values',
+            format: 'json',
+            slug: 'index',
+            path: 'index',
+            fields: [
+              { label: 'Title', name: 'title', widget: 'string', i18n: true },
+              { label: 'Subtitle', name: 'subtitle', widget: 'text', i18n: true },
+              { label: 'Items', name: 'items', widget: 'list', i18n: true, fields: [
+                { label: 'Icon (CSS class)', name: 'icon', widget: 'string', i18n: 'duplicate', hint: 'e.g., fas fa-rocket' },
+                { label: 'Title', name: 'title', widget: 'string', i18n: true },
+                { label: 'Description', name: 'description', widget: 'text', i18n: true }
+              ]},
+              { label: 'CTA Title', name: 'cta_title', widget: 'string', required: false, i18n: true },
+              { label: 'CTA Subtitle', name: 'cta_subtitle', widget: 'text', required: false, i18n: true }
+            ]
+          },
+          {
             name: 'services',
             label: 'Services',
             label_singular: 'Service',

@@ -1,0 +1,46 @@
+{
+  "title": "Nos Valeurs d'Implémentation IA",
+  "subtitle": "Les principes qui guident chaque projet RapidAI",
+  "items": [
+    {
+      "iconBgClass": "bg-blue-100",
+      "iconClass": "fas fa-bullseye text-blue-600 text-2xl",
+      "title": "Focus PME",
+      "description": "Nous priorisons les besoins uniques des petites et moyennes entreprises. Nous comprenons vos défis, contraintes de ressources et ambitions de croissance. Chaque solution est conçue spécifiquement pour le succès des PME."
+    },
+    {
+      "iconBgClass": "bg-green-100",
+      "iconClass": "fas fa-shield-alt text-green-600 text-2xl",
+      "title": "Excellence Technique",
+      "description": "Nous respectons les plus hauts standards d'implémentation technique et les meilleures pratiques IA. Nous restons à jour avec les tendances de l'industrie et livrons des solutions robustes, évolutives et prêtes pour l'avenir."
+    },
+    {
+      "iconBgClass": "bg-purple-100",
+      "iconClass": "fas fa-comments text-purple-600 text-2xl",
+      "title": "Communication Claire",
+      "description": "Nous croyons en une communication transparente, sans jargon. Nous expliquons les concepts IA complexes en termes commerciaux que vous comprenez, vous tenant informé à chaque étape."
+    },
+    {
+      "iconBgClass": "bg-indigo-100",
+      "iconClass": "fas fa-handshake text-indigo-600 text-2xl",
+      "title": "Partenariat à Long Terme",
+      "description": "Nous visons à être votre conseiller IA de confiance à long terme. Nous fournissons guidance et support tout au long de votre parcours IA, favorisant des relations durables basées sur le succès mutuel."
+    },
+    {
+      "iconBgClass": "bg-red-100",
+      "iconClass": "fas fa-rocket text-red-600 text-2xl",
+      "title": "Résultats Rapides",
+      "description": "Nous nous engageons à livrer de la valeur rapidement. Nous nous concentrons sur des implémentations qui montrent un ROI mesurable en semaines, pas en mois, assurant que votre investissement IA soit rentable rapidement."
+    },
+    {
+      "iconBgClass": "bg-orange-100",
+      "iconClass": "fas fa-chart-line text-orange-600 text-2xl",
+      "title": "Impact Mesurable",
+      "description": "Nous prenons la responsabilité de livrer des résultats quantifiables. Nous suivons les métriques, mesurons le ROI, et assurons que vos solutions IA créent une vraie valeur commerciale que vous pouvez voir et mesurer."
+    }
+  ],
+  "cta": {
+    "title": "Prêt à Mettre Ces Valeurs en Action ?",
+    "subtitle": "Discutons de la façon dont notre approche peut transformer vos opérations avec l’IA."
+  }
+}

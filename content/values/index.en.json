@@ -1,0 +1,46 @@
+{
+  "title": "Our AI Implementation Values",
+  "subtitle": "The principles that guide every RapidAI project",
+  "items": [
+    {
+      "iconBgClass": "bg-blue-100",
+      "iconClass": "fas fa-bullseye text-blue-600 text-2xl",
+      "title": "SME Focus",
+      "description": "We prioritize the unique needs of small and medium enterprises. We understand your challenges, resource constraints, and growth ambitions. Every solution is designed specifically for SME success."
+    },
+    {
+      "iconBgClass": "bg-green-100",
+      "iconClass": "fas fa-shield-alt text-green-600 text-2xl",
+      "title": "Technical Excellence",
+      "description": "We uphold the highest standards of technical implementation and AI best practices. We stay current with industry trends and deliver solutions that are robust, scalable, and future-ready."
+    },
+    {
+      "iconBgClass": "bg-purple-100",
+      "iconClass": "fas fa-comments text-purple-600 text-2xl",
+      "title": "Clear Communication",
+      "description": "We believe in transparent, jargon-free communication. We explain complex AI concepts in business terms you understand, keeping you informed every step of the way."
+    },
+    {
+      "iconBgClass": "bg-indigo-100",
+      "iconClass": "fas fa-handshake text-indigo-600 text-2xl",
+      "title": "Long-Term Partnership",
+      "description": "We aim to be your trusted AI advisor for the long term. We provide guidance and support throughout your AI journey, fostering lasting relationships based on mutual success."
+    },
+    {
+      "iconBgClass": "bg-red-100",
+      "iconClass": "fas fa-rocket text-red-600 text-2xl",
+      "title": "Rapid Results",
+      "description": "We are committed to delivering value quickly. We focus on implementations that show measurable ROI in weeks, not months, ensuring your AI investment pays off fast."
+    },
+    {
+      "iconBgClass": "bg-orange-100",
+      "iconClass": "fas fa-chart-line text-orange-600 text-2xl",
+      "title": "Measurable Impact",
+      "description": "We take responsibility for delivering quantifiable results. We track metrics, measure ROI, and ensure your AI solutions create real business value you can see and measure."
+    }
+  ],
+  "cta": {
+    "title": "Ready to Experience These Values in Action?",
+    "subtitle": "Let's discuss how our approach can transform your business operations with AI."
+  }
+}

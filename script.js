@@ -82,6 +82,8 @@ async function setLanguage(lang) { // <-- 1. Added 'async' here
     await loadAboutContent(lang);
     // Load Resources Intro content from CMS (overrides static translations)
     await loadResourcesIntro(lang);
+    // Load Values content from CMS (overrides static translations)
+    await loadValuesContent(lang);
     
     // Override hero claims with CMS/JSON content
     await loadClaimsAndStats();
@@ -1895,6 +1897,70 @@ async function loadResourcesIntro(lang = 'en') {
         if (titleEl && typeof data.title === 'string') titleEl.innerHTML = data.title;
         if (subtitleEl && typeof data.subtitle === 'string') subtitleEl.innerHTML = data.subtitle;
     } catch (e) {
+        // leave static translations
+    }
+}
+
+// Load Values content from /content/values with i18n fallback
+async function loadValuesContent(lang = 'en') {
+    try {
+        const urls = [
+            `/content/values/index.${lang}.json`,
+            `/content/values/index.en.json`
+        ];
+        let data = null;
+        for (const url of urls) {
+            try {
+                const res = await fetch(url, { cache: 'no-cache' });
+                if (!res.ok) continue;
+                data = await res.json();
+                break;
+            } catch (_e) { /* continue */ }
+        }
+        if (!data) return;
+
+        const titleEl = document.getElementById('values-title');
+        const subtitleEl = document.getElementById('values-subtitle');
+        if (titleEl && typeof data.title === 'string') titleEl.innerHTML = data.title;
+        if (subtitleEl && typeof data.subtitle === 'string') subtitleEl.innerHTML = data.subtitle;
+
+        const gridEl = document.getElementById('values-grid');
+        if (gridEl && Array.isArray(data.items)) {
+            gridEl.innerHTML = '';
+            const defaultBg = ['bg-blue-100','bg-green-100','bg-purple-100','bg-indigo-100','bg-red-100','bg-orange-100'];
+            const defaultIcon = [
+                'fas fa-bullseye text-blue-600 text-2xl',
+                'fas fa-shield-alt text-green-600 text-2xl',
+                'fas fa-comments text-purple-600 text-2xl',
+                'fas fa-handshake text-indigo-600 text-2xl',
+                'fas fa-rocket text-red-600 text-2xl',
+                'fas fa-chart-line text-orange-600 text-2xl'
+            ];
+            data.items.forEach((item, idx) => {
+                if (!item) return;
+                const iconBg = (typeof item.iconBgClass === 'string' && item.iconBgClass.trim()) ? item.iconBgClass : defaultBg[idx % defaultBg.length];
+                const iconClass = (typeof item.iconClass === 'string' && item.iconClass.trim()) ? item.iconClass : defaultIcon[idx % defaultIcon.length];
+                const title = typeof item.title === 'string' ? item.title : '';
+                const description = typeof item.description === 'string' ? item.description : '';
+
+                const card = document.createElement('div');
+                card.className = 'bg-white p-8 rounded-2xl shadow-lg card-hover fade-in';
+                card.innerHTML = `
+                    <div class="w-16 h-16 ${iconBg} rounded-full flex items-center justify-center mb-6">
+                        <i class="${iconClass}"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">${title}</h3>
+                    <p class="text-gray-600">${description}</p>
+                `;
+                gridEl.appendChild(card);
+            });
+        }
+
+        const ctaTitleEl = document.getElementById('values-cta-title');
+        const ctaSubtitleEl = document.getElementById('values-cta-subtitle');
+        if (ctaTitleEl && data.cta && typeof data.cta.title === 'string') ctaTitleEl.innerHTML = data.cta.title;
+        if (ctaSubtitleEl && data.cta && typeof data.cta.subtitle === 'string') ctaSubtitleEl.innerHTML = data.cta.subtitle;
+    } catch (_e) {
         // leave static translations
     }
 }
