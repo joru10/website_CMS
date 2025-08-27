@@ -954,36 +954,69 @@ document.addEventListener('DOMContentLoaded', function() {
             button.textContent = 'Joining...';
             button.disabled = true;
             emailInput.disabled = true;
-            
-            // Simulate newsletter signup
-            setTimeout(() => {
-                button.textContent = 'Welcome Aboard! ';
-                button.style.backgroundColor = '#10B981';
-                
+
+            const form = this;
+            const formData = new FormData(form);
+            // Ensure form-name exists for Netlify Forms capture
+            if (!formData.get('form-name')) {
+                formData.append('form-name', form.getAttribute('name') || 'newsletter');
+            }
+
+            const body = new URLSearchParams(formData).toString();
+
+            fetch('/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body
+            }).then((res) => {
+                // Treat any 2xx/3xx as success for Netlify Forms
+                if (!res.ok && (res.status < 200 || res.status >= 400)) {
+                    throw new Error('Network response was not ok');
+                }
                 // Show success message
                 const successMessage = document.createElement('div');
                 successMessage.className = 'mt-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800 text-sm';
                 successMessage.innerHTML = `
                     <div class="flex items-center">
                         <i class="fas fa-check-circle mr-2"></i>
-                        <span><strong>Success!</strong> You're now subscribed to RapidAI Weekly. Check your email for issue #13.</span>
+                        <span><strong>Success!</strong> You're now subscribed to RapidAI Weekly. Check your email for a welcome message.</span>
                     </div>
                 `;
-                
-                this.appendChild(successMessage);
-                
+                form.appendChild(successMessage);
+                button.textContent = 'Welcome Aboard! ';
+                button.style.backgroundColor = '#10B981';
+
                 setTimeout(() => {
                     button.textContent = originalText;
                     button.disabled = false;
                     emailInput.disabled = false;
                     button.style.backgroundColor = '';
                     emailInput.style.borderColor = '';
-                    this.reset();
-                    if (successMessage.parentNode) {
-                        successMessage.remove();
-                    }
+                    form.reset();
+                    if (successMessage.parentNode) successMessage.remove();
                 }, 4000);
-            }, 1500);
+            }).catch((err) => {
+                // Show error message
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm';
+                errorMessage.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <span><strong>Oops!</strong> Something went wrong. Please try again.</span>
+                    </div>
+                `;
+                form.appendChild(errorMessage);
+
+                button.textContent = originalText;
+                button.disabled = false;
+                emailInput.disabled = false;
+                emailInput.style.borderColor = '#EF4444';
+
+                setTimeout(() => {
+                    if (errorMessage.parentNode) errorMessage.remove();
+                    emailInput.style.borderColor = '';
+                }, 4000);
+            });
         });
     }
 });
