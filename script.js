@@ -964,14 +964,50 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const body = new URLSearchParams(formData).toString();
 
-            fetch('/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body
-            }).then((res) => {
-                // Treat any 2xx/3xx as success for Netlify Forms
-                if (!res.ok && (res.status < 200 || res.status >= 400)) {
-                    throw new Error('Network response was not ok');
+            // Local dev behavior:
+            // - If using Netlify Dev (localhost:8888) or a netlify.live tunnel, POST to '/'
+            //   so Netlify Dev handles the form. No production fallback in this case.
+            // - If on plain localhost (e.g., static server) and a production origin is configured,
+            //   post to the production site with no-cors and treat opaque as success.
+            const isLocalHost = /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname);
+            const isNetlifyDev = (window.location.port === '8888') || (/\.netlify\.live$/.test(window.location.hostname));
+            const prodMeta = document.querySelector('meta[name="netlify-prod-origin"]');
+            const prodOrigin = (prodMeta && prodMeta.content ? prodMeta.content.trim() : '');
+
+            if (isLocalHost && !isNetlifyDev && !prodOrigin) {
+                // Helpful message for local dev when origin isn't set and not using Netlify Dev
+                const warn = document.createElement('div');
+                warn.className = 'mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800 text-sm';
+                warn.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <span><strong>Local note:</strong> Set <code>&lt;meta name=\"netlify-prod-origin\" content=\"https://your-site.netlify.app\"&gt;</code> in index.html
+                        or run <code>netlify dev --live</code> to test Netlify Forms locally.</span>
+                    </div>
+                `;
+                form.appendChild(warn);
+                button.textContent = originalText;
+                button.disabled = false;
+                emailInput.disabled = false;
+                emailInput.style.borderColor = '';
+                return;
+            }
+
+            const useProdFallback = isLocalHost && !isNetlifyDev && !!prodOrigin;
+            const endpoint = useProdFallback ? (prodOrigin.replace(/\/+$/, '') + '/') : '/';
+
+            const fetchOptions = useProdFallback
+                ? { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body }
+                : { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body };
+
+            fetch(endpoint, fetchOptions).then((res) => {
+                // If using no-cors, we get an opaque response we treat as success
+                const isOpaque = (res && res.type === 'opaque');
+                if (!isOpaque) {
+                    // Treat any 2xx/3xx as success for Netlify Forms
+                    if (!res.ok && (res.status < 200 || res.status >= 400)) {
+                        throw new Error('Network response was not ok');
+                    }
                 }
                 // Show success message
                 const successMessage = document.createElement('div');

@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css">
     <link rel="stylesheet" href="styles.css">
+    <!-- Local newsletter testing: set your deployed origin (e.g., https://your-site.netlify.app) -->
+    <meta name="netlify-prod-origin" content="https://comfy-panda-0d488a.netlify.app/">
 </head>
 <body class="bg-gray-50">
     <!-- Navigation -->
@@ -531,6 +533,13 @@
                                 <p class="text-xs text-gray-500">
                                     <span data-translate="newsletter-note">Free forever. No spam. Unsubscribe anytime. 2,000+ SME leaders trust us.</span>
                                 </p>
+                            </form>
+
+                            <!-- Netlify Forms detection helper: hidden duplicate ensures detection at build time -->
+                            <form name="newsletter" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
+                                <input type="hidden" name="form-name" value="newsletter">
+                                <input type="email" name="email">
+                                <p><label>Don’t fill this out: <input name="bot-field"></label></p>
                             </form>
                         </div>
                         
