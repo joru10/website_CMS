@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Netlify Forms Detection</title>
+</head>
+<body>
+  <!-- This minimal page exists solely to ensure Netlify detects the newsletter form at build time -->
+  <form name="newsletter" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+    <input type="hidden" name="form-name" value="newsletter" />
+    <p class="hidden"><label>Don’t fill this out: <input name="bot-field" /></label></p>
+    <label>Email <input type="email" name="email" /></label>
+    <button type="submit">Submit</button>
+  </form>
+</body>
+</html>
