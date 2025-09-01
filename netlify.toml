@@ -3,6 +3,15 @@
   command = "npm run build"
   functions = "netlify/functions"
 
+  # Ensure Netlify Post Processing runs so HTML Forms detection can register forms
+  # If your project UI has post processing disabled, this config re-enables it at build time
+  [build.processing]
+    skip_processing = false
+
+  # Optional: keep Pretty URLs enabled via config (mirrors UI setting)
+  [build.processing.html]
+    pretty_urls = true
+
 # OAuth: specific routes first (before SPA catch-all)
 [[redirects]]
   from = "/oauth/*"
@@ -38,6 +47,11 @@
 [[redirects]]
   from = "/admin/callback.html"
   to = "/admin/callback.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin/minimal-cms.html"
+  to = "/admin/minimal-cms.html"
   status = 200
 
 [[redirects]]
