@@ -252,6 +252,10 @@
                     <form name="newsletter" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
                         <input type="hidden" name="form-name" value="newsletter">
                         <input type="email" name="email">
+                        <!-- Ensure Netlify captures preferences fields -->
+                        <input type="checkbox" name="topics" value="newsletter">
+                        <input type="checkbox" name="topics" value="insights">
+                        <input type="checkbox" name="topics" value="cases">
                         <p><label>Don’t fill this out: <input name="bot-field"></label></p>
                     </form>
 
