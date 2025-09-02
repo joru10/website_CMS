@@ -207,57 +207,6 @@
                         </div>
                     </div>
                     
-                    <!-- Inline Resources Signup (newsletter + more) -->
-                    <form id="newsletterForm" name="newsletter" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="space-y-3 mt-6">
-                        <input type="hidden" name="form-name" value="newsletter">
-                        <p class="hidden"><label>Don’t fill this out: <input name="bot-field"></label></p>
-                        <!-- Preferences -->
-                        <div class="text-sm text-gray-700">
-                            <span class="font-medium">Choose updates:</span>
-                            <div class="mt-2 flex flex-wrap gap-3">
-                                <label class="inline-flex items-center gap-2">
-                                    <input type="checkbox" name="topics" value="newsletter" checked class="h-4 w-4 border-gray-300 rounded">
-                                    <span>Newsletter</span>
-                                </label>
-                                <label class="inline-flex items-center gap-2">
-                                    <input type="checkbox" name="topics" value="insights" class="h-4 w-4 border-gray-300 rounded">
-                                    <span>Insights & Guides</span>
-                                </label>
-                                <label class="inline-flex items-center gap-2">
-                                    <input type="checkbox" name="topics" value="cases" class="h-4 w-4 border-gray-300 rounded">
-                                    <span>Case Studies</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3">
-                            <input 
-                                type="email" name="email"
-                                placeholder="Enter your business email" data-translate-placeholder="newsletter-placeholder" 
-                                class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200" 
-                                required
-                            >
-                            <button 
-                                type="submit" 
-                                class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors transform hover:scale-105"
-                            >
-                                <span data-translate="newsletter-join">Join Free</span>
-                            </button>
-                        </div>
-                        <p class="text-xs text-gray-500">
-                            <span data-translate="newsletter-note">Free forever. No spam. Unsubscribe anytime. 2,000+ SME leaders trust us.</span>
-                        </p>
-                    </form>
-
-                    <!-- Netlify Forms detection helper: hidden duplicate ensures detection at build time -->
-                    <form name="newsletter" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
-                        <input type="hidden" name="form-name" value="newsletter">
-                        <input type="email" name="email">
-                        <!-- Ensure Netlify captures preferences fields -->
-                        <input type="checkbox" name="topics" value="newsletter">
-                        <input type="checkbox" name="topics" value="insights">
-                        <input type="checkbox" name="topics" value="cases">
-                        <p><label>Don’t fill this out: <input name="bot-field"></label></p>
-                    </form>
 
                     <a href="news.html" class="text-blue-600 font-semibold hover:text-blue-700 transition-colors" data-translate="resources-view-all">View All Issues →</a>
                 </div>
@@ -301,6 +250,71 @@
                 </div>
             </div>
             
+            <!-- Full-width resources signup row -->
+            <div class="bg-white p-8 md:p-10 rounded-2xl shadow-lg fade-in mb-16">
+                <div class="md:flex md:items-center md:gap-8">
+                    <div class="flex items-start gap-4 md:w-1/3">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-bolt text-blue-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-1">Get AI Resources & Updates</h3>
+                            <p class="text-gray-600 text-sm">Select the updates you want, then enter your email to subscribe.</p>
+                        </div>
+                    </div>
+                    <div class="mt-6 md:mt-0 md:flex-1">
+                        <form id="newsletterForm" name="newsletter" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="space-y-3">
+                            <input type="hidden" name="form-name" value="newsletter">
+                            <p class="hidden"><label>Don’t fill this out: <input name="bot-field"></label></p>
+                            <!-- Preferences -->
+                            <div class="text-sm text-gray-700">
+                                <span class="font-medium">Choose updates:</span>
+                                <div class="mt-2 flex flex-wrap gap-3">
+                                    <label class="inline-flex items-center gap-2">
+                                        <input type="checkbox" name="topics" value="newsletter" checked class="h-4 w-4 border-gray-300 rounded">
+                                        <span>Newsletter</span>
+                                    </label>
+                                    <label class="inline-flex items-center gap-2">
+                                        <input type="checkbox" name="topics" value="insights" class="h-4 w-4 border-gray-300 rounded">
+                                        <span>Insights & Guides</span>
+                                    </label>
+                                    <label class="inline-flex items-center gap-2">
+                                        <input type="checkbox" name="topics" value="cases" class="h-4 w-4 border-gray-300 rounded">
+                                        <span>Case Studies</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3">
+                                <input 
+                                    type="email" name="email"
+                                    placeholder="Enter your business email" data-translate-placeholder="newsletter-placeholder" 
+                                    class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200" 
+                                    required
+                                >
+                                <button 
+                                    type="submit" 
+                                    class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors transform hover:scale-105"
+                                >
+                                    <span data-translate="newsletter-join">Join Free</span>
+                                </button>
+                            </div>
+                            <p class="text-xs text-gray-500">
+                                <span data-translate="newsletter-note">Free forever. No spam. Unsubscribe anytime. 2,000+ SME leaders trust us.</span>
+                            </p>
+                        </form>
+                        <!-- Netlify Forms detection helper: hidden duplicate ensures detection at build time -->
+                        <form name="newsletter" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
+                            <input type="hidden" name="form-name" value="newsletter">
+                            <input type="email" name="email">
+                            <input type="checkbox" name="topics" value="newsletter">
+                            <input type="checkbox" name="topics" value="insights">
+                            <input type="checkbox" name="topics" value="cases">
+                            <p><label>Don’t fill this out: <input name="bot-field"></label></p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             <!-- Featured Content -->
             <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-8 md:p-12 text-white fade-in">
                 <div class="grid md:grid-cols-2 gap-8 items-center">
