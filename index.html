@@ -207,6 +207,36 @@
                         </div>
                     </div>
                     
+                    <!-- Inline Newsletter Signup (moved from separate section) -->
+                    <form id="newsletterForm" name="newsletter" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="space-y-3 mt-6">
+                        <input type="hidden" name="form-name" value="newsletter">
+                        <p class="hidden"><label>Don’t fill this out: <input name="bot-field"></label></p>
+                        <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3">
+                            <input 
+                                type="email" name="email"
+                                placeholder="Enter your business email" data-translate-placeholder="newsletter-placeholder" 
+                                class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200" 
+                                required
+                            >
+                            <button 
+                                type="submit" 
+                                class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors transform hover:scale-105"
+                            >
+                                <span data-translate="newsletter-join">Join Free</span>
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500">
+                            <span data-translate="newsletter-note">Free forever. No spam. Unsubscribe anytime. 2,000+ SME leaders trust us.</span>
+                        </p>
+                    </form>
+
+                    <!-- Netlify Forms detection helper: hidden duplicate ensures detection at build time -->
+                    <form name="newsletter" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
+                        <input type="hidden" name="form-name" value="newsletter">
+                        <input type="email" name="email">
+                        <p><label>Don’t fill this out: <input name="bot-field"></label></p>
+                    </form>
+
                     <a href="news.html" class="text-blue-600 font-semibold hover:text-blue-700 transition-colors" data-translate="resources-view-all">View All Issues →</a>
                 </div>
                 
@@ -467,114 +497,7 @@
         </div>
     </section>
 
-    <!-- Newsletter Section -->
-    <section class="py-20 bg-gray-50">
-        <div class="container mx-auto px-6">
-            <div class="max-w-4xl mx-auto">
-                <div class="bg-white rounded-3xl shadow-xl overflow-hidden">
-                    <div class="grid md:grid-cols-2 items-center">
-                        <!-- Newsletter Content -->
-                        <div class="p-8 md:p-12">
-                            <div class="flex items-center mb-6">
-                                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-                                    <i class="fas fa-envelope text-blue-600 text-xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-2xl font-bold text-gray-800" data-translate="newsletter-name">RapidAI Weekly</h3>
-                                    <p class="text-sm text-gray-600" data-translate="newsletter-tagline">#1 AI Newsletter for SMEs</p>
-                                </div>
-                            </div>
-                            
-                            <h2 class="text-3xl font-bold text-gray-800 mb-4" data-translate="newsletter-title">
-                                Get Weekly AI Insights That Actually Work
-                            </h2>
-                            
-                            <p class="text-gray-600 mb-6" data-translate="newsletter-description">
-                                Join <strong>500+ tech SME leaders</strong> who get practical AI implementation strategies, tools, and case studies delivered every Tuesday. No fluff, just actionable insights.
-                            </p>
-                            
-                            <div class="space-y-3 mb-8">
-                                <div class="flex items-center text-gray-700">
-                                    <i class="fas fa-check-circle text-green-500 mr-3"></i>
-                                    <span data-translate="newsletter-feature1">Weekly AI tool reviews and comparisons</span>
-                                </div>
-                                <div class="flex items-center text-gray-700">
-                                    <i class="fas fa-check-circle text-green-500 mr-3"></i>
-                                    <span data-translate="newsletter-feature2">Real SME implementation case studies</span>
-                                </div>
-                                <div class="flex items-center text-gray-700">
-                                    <i class="fas fa-check-circle text-green-500 mr-3"></i>
-                                    <span data-translate="newsletter-feature3">ROI calculators and assessment frameworks</span>
-                                </div>
-                                <div class="flex items-center text-gray-700">
-                                    <i class="fas fa-check-circle text-green-500 mr-3"></i>
-                                    <span data-translate="newsletter-feature4">Exclusive early access to resources</span>
-                                </div>
-                            </div>
-                            
-                            <!-- Newsletter Signup Form -->
-                            <form id="newsletterForm" name="newsletter" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="space-y-4">
-                                <input type="hidden" name="form-name" value="newsletter">
-                                <p class="hidden"><label>Don’t fill this out: <input name="bot-field"></label></p>
-                                <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3">
-                                    <input 
-                                        type="email" name="email"
-                                        placeholder="Enter your business email" data-translate-placeholder="newsletter-placeholder" 
-                                        class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200" 
-                                        required
-                                    >
-                                    <button 
-                                        type="submit" 
-                                        class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors transform hover:scale-105"
-                                    >
-                                        <span data-translate="newsletter-join">Join Free</span>
-                                    </button>
-                                </div>
-                                <p class="text-xs text-gray-500">
-                                    <span data-translate="newsletter-note">Free forever. No spam. Unsubscribe anytime. 2,000+ SME leaders trust us.</span>
-                                </p>
-                            </form>
-
-                            <!-- Netlify Forms detection helper: hidden duplicate ensures detection at build time -->
-                            <form name="newsletter" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
-                                <input type="hidden" name="form-name" value="newsletter">
-                                <input type="email" name="email">
-                                <p><label>Don’t fill this out: <input name="bot-field"></label></p>
-                            </form>
-                        </div>
-                        
-                        <!-- Newsletter Preview -->
-                        <div class="bg-gradient-to-br from-blue-50 to-indigo-100 p-8 md:p-12 h-full">
-                            <div class="bg-white rounded-2xl shadow-lg p-6 transform rotate-3 hover:rotate-0 transition-transform duration-300">
-                                <div class="border-l-4 border-blue-600 pl-4 mb-4">
-                                    <h4 class="font-bold text-gray-800" data-translate="newsletter-issue-number">RapidAI Weekly #12</h4>
-                                    <p class="text-sm text-gray-600" data-translate="newsletter-latest-issue">Latest Issue</p>
-                                </div>
-                                
-                                <h5 class="text-lg font-semibold text-gray-800 mb-3" data-translate="newsletter-issue-title">
-                                    "5 AI Tools That Save SMEs 20+ Hours Weekly"
-                                </h5>
-                                
-                                <div class="space-y-2 text-sm text-gray-600">
-                                    <p data-translate="newsletter-content1">📊 Tool Comparison: Claude vs ChatGPT for Business</p>
-                                    <p data-translate="newsletter-content2">🏭 Case Study: Manufacturing AI ROI in 30 Days</p>
-                                    <p data-translate="newsletter-content3">🛠️ Free Template: AI Implementation Checklist</p>
-                                    <p data-translate="newsletter-content4">💡 Quick Win: Automate Customer Support</p>
-                                </div>
-                                
-                                <div class="mt-4 pt-4 border-t border-gray-200">
-                                    <div class="flex justify-between text-xs text-gray-500">
-                                        <span data-translate="newsletter-read-time">5 min read</span>
-                                        <span data-translate="newsletter-open-rate">98% open rate</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- Newsletter integrated into Resources; standalone section removed -->
 
     <!-- CTA Section -->
     <section class="py-20 bg-gradient-to-r from-blue-600 to-indigo-600">
