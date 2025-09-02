@@ -2103,38 +2103,62 @@ async function loadValuesContent(lang = 'en') {
 
         const gridEl = document.getElementById('values-grid');
         if (gridEl && Array.isArray(data.items)) {
-            gridEl.innerHTML = '';
-            const defaultBg = ['bg-blue-100','bg-green-100','bg-purple-100','bg-indigo-100','bg-red-100','bg-orange-100'];
-            const defaultIcon = [
-                'fa-solid fa-bullseye text-blue-600 text-2xl',
-                'fa-solid fa-shield-halved text-green-600 text-2xl',
-                'fa-solid fa-comments text-purple-600 text-2xl',
-                'fa-solid fa-handshake text-indigo-600 text-2xl',
-                'fa-solid fa-rocket text-red-600 text-2xl',
-                'fa-solid fa-chart-line text-orange-600 text-2xl'
-            ];
-            data.items.forEach((item, idx) => {
-                if (!item) return;
-                const iconBg = (typeof item.iconBgClass === 'string' && item.iconBgClass.trim()) ? item.iconBgClass : defaultBg[idx % defaultBg.length];
-                let iconClass = (typeof item.iconClass === 'string' && item.iconClass.trim()) ? item.iconClass : defaultIcon[idx % defaultIcon.length];
-                // Normalize FA5 -> FA6 where needed
-                iconClass = iconClass
-                    .replace(/\bfas\b/g, 'fa-solid')
-                    .replace('fa-shield-alt', 'fa-shield-halved');
-                const title = typeof item.title === 'string' ? item.title : '';
-                const description = typeof item.description === 'string' ? item.description : '';
+            const safeItems = data.items.filter(Boolean);
+            if (safeItems.length === 0) {
+                console.warn('[Values] No items found in CMS data; keeping static fallback.');
+            } else {
+                const fragment = document.createDocumentFragment();
+                const defaultBg = ['bg-blue-100','bg-green-100','bg-purple-100','bg-indigo-100','bg-red-100','bg-orange-100'];
+                const defaultIcon = [
+                    'fa-solid fa-bullseye text-blue-600 text-2xl',
+                    'fa-solid fa-shield-halved text-green-600 text-2xl',
+                    'fa-solid fa-comments text-purple-600 text-2xl',
+                    'fa-solid fa-handshake text-indigo-600 text-2xl',
+                    'fa-solid fa-rocket text-red-600 text-2xl',
+                    'fa-solid fa-chart-line text-orange-600 text-2xl'
+                ];
+                try {
+                    safeItems.forEach((item, idx) => {
+                        const iconBg = (typeof item.iconBgClass === 'string' && item.iconBgClass.trim()) ? item.iconBgClass : defaultBg[idx % defaultBg.length];
+                        let iconClass = (typeof item.iconClass === 'string' && item.iconClass.trim()) ? item.iconClass : defaultIcon[idx % defaultIcon.length];
+                        // Normalize FA5 -> FA6 where needed
+                        iconClass = iconClass
+                            .replace(/\bfas\b/g, 'fa-solid')
+                            .replace('fa-shield-alt', 'fa-shield-halved');
+                        const title = typeof item.title === 'string' ? item.title : '';
+                        const description = typeof item.description === 'string' ? item.description : '';
 
-                const card = document.createElement('div');
-                card.className = 'bg-white p-8 rounded-2xl shadow-lg card-hover fade-in';
-                card.innerHTML = `
-                    <div class="w-16 h-16 ${iconBg} rounded-full flex items-center justify-center mb-6">
-                        <i class="${iconClass}"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-4">${title}</h3>
-                    <p class="text-gray-600">${description}</p>
-                `;
-                gridEl.appendChild(card);
-            });
+                        const card = document.createElement('div');
+                        card.className = 'bg-white p-8 rounded-2xl shadow-lg card-hover fade-in';
+                        card.innerHTML = `
+                            <div class="w-16 h-16 ${iconBg} rounded-full flex items-center justify-center mb-6">
+                                <i class="${iconClass}"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">${title}</h3>
+                            <p class="text-gray-600">${description}</p>
+                        `;
+                        fragment.appendChild(card);
+                    });
+                    // Only clear and replace after successful build
+                    gridEl.innerHTML = '';
+                    gridEl.appendChild(fragment);
+                    // Ensure newly injected cards are observed for fade-in and made visible
+                    if (typeof observer !== 'undefined' && observer instanceof IntersectionObserver) {
+                        gridEl.querySelectorAll('.fade-in').forEach(el => {
+                            observer.observe(el);
+                            el.classList.add('visible');
+                        });
+                    } else {
+                        // Fallback: make them visible without observer
+                        gridEl.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
+                    }
+                } catch (e) {
+                    console.error('[Values] Failed to render items; keeping static fallback.', e);
+                }
+            }
+        }
+ else if (gridEl) {
+            console.warn('[Values] Invalid items format in CMS data; keeping static fallback.');
         }
 
         const ctaTitleEl = document.getElementById('values-cta-title');
