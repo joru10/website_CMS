@@ -1015,7 +1015,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 successMessage.innerHTML = `
                     <div class="flex items-center">
                         <i class="fas fa-check-circle mr-2"></i>
-                        <span><strong>Success!</strong> You're now subscribed to RapidAI Weekly. Check your email for a welcome message.</span>
+                        <span><strong>Success!</strong> You're now subscribed to RapidAI resources. Check your email for a welcome message.</span>
                     </div>
                 `;
                 form.appendChild(successMessage);
