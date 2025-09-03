@@ -11,3 +11,6 @@ static/uploads/
 # Env files
 .env
 oauth-provider/.env
+
+# Local Netlify folder
+.netlify

@@ -6,58 +6,341 @@
   <title>Minimal CMS</title>
   <style>
     body { margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    #cms { margin-top: 20px; border: 1px solid #e1e1e1; border-radius: 4px; min-height: 80vh; }
+    #nc-root { margin-top: 20px; border: 1px solid #e1e1e1; border-radius: 4px; min-height: 80vh; }
   </style>
 </head>
 <body>
   <h1>Minimal CMS</h1>
-  <div id="cms"></div>
+  <div id="diagnostics" style="margin-top:10px;font-size:14px;">
+    <strong>Diagnostics:</strong>
+    <a href="/oauth/version" target="_blank" rel="noopener">/oauth/version</a> ·
+    <a href="/oauth/client_id" target="_blank" rel="noopener">/oauth/client_id</a>
+  </div>
+  <div id="nc-root"></div>
   
+  <script>
+    // Prevent Decap from auto-loading config.yml; support both legacy and new flags
+    window.CMS_MANUAL_INIT = true;
+    window.DecapCMS_MANUAL_INIT = true;
+  </script>
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
   
   <script>
-  // Verify CMS is loaded
-  if (typeof CMS === 'undefined') {
-    document.getElementById('cms').innerHTML = 
-      '<div style="color: red; padding: 20px;">Error: CMS script failed to load. Check browser console for details.</div>';
-    throw new Error('CMS script failed to load');
-  }
+  // Minimal inline CMS config using the same OAuth function as /admin
+  (function() {
+    if (typeof CMS === 'undefined') {
+      var root = document.getElementById('nc-root');
+      if (root) root.innerHTML = '<div style="color: red; padding: 20px;">Error: CMS script failed to load.</div>';
+      return;
+    }
 
-  // Initialize CMS with configuration
-  CMS.init({
-    config: {
+    const cmsConfig = {
       backend: {
         name: 'github',
         repo: 'joru10/website_CMS',
         branch: 'main',
-        base_url: 'https://joru10-cms-oauth.onrender.com',
+        base_url: '/oauth',
         auth_endpoint: 'auth',
-        token_endpoint: 'callback',
         auth_type: 'pkce',
-        app_id: 'Ov23lilcBd8JkV3HWZbE',
-        auth_scope: 'repo',
-        // This tells the OAuth proxy where to redirect after successful auth
-        redirect_uri: window.location.origin + window.location.pathname
+        token_endpoint: 'access_token'
       },
       media_folder: 'static/uploads',
-      public_folder: '/uploads',
-      site_url: 'https://comfy-panda-0d488a.netlify.app',
-      display_url: 'https://comfy-panda-0d488a.netlify.app',
+      public_folder: '/static/uploads',
+      i18n: {
+        structure: 'multiple_files',
+        locales: ['en', 'es', 'fr'],
+        default_locale: 'en'
+      },
+      publish_mode: 'simple',
       collections: [
+        {
+          name: 'sitecontent',
+          label: 'Site Content (claims, stats)',
+          delete: false,
+          create: false,
+          i18n: false,
+          files: [
+            {
+              file: 'content.json',
+              label: 'Claims & Stats',
+              name: 'claims',
+              i18n: false,
+              format: 'json',
+              fields: [
+                { label: 'Items', name: 'items', widget: 'list', summary: '{{fields.key}}: {{fields.value}}', fields: [
+                  { label: 'Key', name: 'key', widget: 'string' },
+                  { label: 'Value', name: 'value', widget: 'string' }
+                ]}
+              ]
+            }
+          ]
+        },
+        {
+          name: 'translations',
+          label: 'Translations',
+          label_singular: 'Translation file',
+          delete: false,
+          create: false,
+          files: [
+            { file: 'translations/en.json', name: 'en', label: 'English', format: 'json', fields: [
+              { label: 'Strings', name: 'strings', widget: 'list', summary: '{{fields.key}}', fields: [
+                { label: 'Key', name: 'key', widget: 'string' },
+                { label: 'Value', name: 'value', widget: 'string' }
+              ]}
+            ]},
+            { file: 'translations/es.json', name: 'es', label: 'Español (EU)', format: 'json', fields: [
+              { label: 'Strings', name: 'strings', widget: 'list', summary: '{{fields.key}}', fields: [
+                { label: 'Key', name: 'key', widget: 'string' },
+                { label: 'Value', name: 'value', widget: 'string' }
+              ]}
+            ]},
+            { file: 'translations/fr.json', name: 'fr', label: 'Français (EU)', format: 'json', fields: [
+              { label: 'Strings', name: 'strings', widget: 'list', summary: '{{fields.key}}', fields: [
+                { label: 'Key', name: 'key', widget: 'string' },
+                { label: 'Value', name: 'value', widget: 'string' }
+              ]}
+            ]}
+          ]
+        },
+        {
+          name: 'intro',
+          label: 'Homepage Hero',
+          i18n: true,
+          delete: false,
+          create: false,
+          files: [
+            {
+              file: 'content/intro/index.json',
+              label: 'Hero',
+              name: 'index',
+              format: 'json',
+              fields: [
+                { label: 'Title (HTML allowed)', name: 'title', widget: 'text', i18n: true },
+                { label: 'Subtitle', name: 'subtitle', widget: 'text', i18n: true },
+                { label: 'Quote (HTML allowed)', name: 'quote', widget: 'text', i18n: true },
+                { label: 'Signature (HTML allowed)', name: 'signature', widget: 'text', i18n: true },
+                { label: 'CTA Label', name: 'cta', widget: 'string', i18n: true },
+                { label: 'Image', name: 'image', widget: 'image', required: false, i18n: 'duplicate', hint: 'Recommended ~1200x800' },
+                { label: 'Image Alt', name: 'image_alt', widget: 'string', required: false, i18n: true }
+              ]
+            }
+          ]
+        },
+        {
+          name: 'about',
+          label: 'About (Meet Jose)',
+          i18n: true,
+          delete: false,
+          create: false,
+          files: [
+            {
+              file: 'content/about/index.json',
+              label: 'About',
+              name: 'index',
+              format: 'json',
+              fields: [
+                { label: 'Title (HTML allowed)', name: 'title', widget: 'text', i18n: true },
+                { label: 'Description (HTML allowed)', name: 'description', widget: 'text', i18n: true },
+                { label: 'Image', name: 'image', widget: 'image', required: false, i18n: 'duplicate', hint: 'Recommended ~800x600' },
+                { label: 'Image Alt', name: 'image_alt', widget: 'string', required: false, i18n: true },
+                { label: 'Bullets', name: 'bullets', widget: 'list', i18n: true, fields: [
+                  { label: 'Icon (CSS class)', name: 'icon', widget: 'string', required: false, i18n: 'duplicate', hint: 'e.g., fas fa-rocket' },
+                  { label: 'Text', name: 'text', widget: 'string', i18n: true }
+                ]}
+              ]
+            }
+          ]
+        },
+        {
+          name: 'resources_intro',
+          label: 'Resources Intro',
+          i18n: true,
+          delete: false,
+          create: false,
+          files: [
+            {
+              file: 'content/resources_intro/index.json',
+              label: 'Intro',
+              name: 'index',
+              format: 'json',
+              fields: [
+                { label: 'Title (HTML allowed)', name: 'title', widget: 'text', i18n: true },
+                { label: 'Subtitle', name: 'subtitle', widget: 'text', i18n: true }
+              ]
+            }
+          ]
+        },
+        {
+          name: 'values',
+          label: 'Implementation Values',
+          i18n: true,
+          delete: false,
+          create: false,
+          files: [
+            {
+              file: 'content/values/index.json',
+              label: 'Values',
+              name: 'index',
+              format: 'json',
+              fields: [
+                { label: 'Title', name: 'title', widget: 'string', i18n: true },
+                { label: 'Subtitle', name: 'subtitle', widget: 'text', i18n: true },
+                { label: 'Items', name: 'items', widget: 'list', i18n: true, fields: [
+                  { label: 'Icon (CSS class)', name: 'icon', widget: 'string', i18n: 'duplicate', hint: 'e.g., fas fa-rocket' },
+                  { label: 'Title', name: 'title', widget: 'string', i18n: true },
+                  { label: 'Description', name: 'description', widget: 'text', i18n: true }
+                ]},
+                { label: 'CTA Title', name: 'cta_title', widget: 'string', required: false, i18n: true },
+                { label: 'CTA Subtitle', name: 'cta_subtitle', widget: 'text', required: false, i18n: true }
+              ]
+            }
+          ]
+        },
+        {
+          name: 'services',
+          label: 'Services',
+          label_singular: 'Service',
+          folder: 'content/services',
+          create: true,
+          slug: '{{slug}}',
+          format: 'frontmatter',
+          path: '{{slug}}/index',
+          i18n: true,
+          fields: [
+            { label: 'Title', name: 'title', widget: 'string', i18n: true },
+            { label: 'Description', name: 'description', widget: 'text', i18n: true },
+            { label: 'Features', name: 'features', widget: 'list', i18n: true, hint: 'One feature per item' },
+            { label: 'Icon (CSS class)', name: 'icon', widget: 'string', required: false, hint: 'e.g., fas fa-brain', i18n: 'duplicate' },
+            { label: 'Order', name: 'order', widget: 'number', value_type: 'int', min: 1, i18n: 'duplicate' },
+            { label: 'Featured', name: 'featured', widget: 'boolean', default: false, i18n: 'duplicate' }
+          ]
+        },
         {
           name: 'blog',
           label: 'Blog Posts',
           folder: 'content/blog',
           create: true,
+          slug: '{{slug}}',
+          format: 'frontmatter',
+          path: '{{slug}}/index',
+          i18n: true,
           fields: [
-            { label: 'Title', name: 'title', widget: 'string' },
-            { label: 'Publish Date', name: 'date', widget: 'datetime' },
-            { label: 'Body', name: 'body', widget: 'markdown' }
+            { label: 'Title', name: 'title', widget: 'string', i18n: true },
+            { label: 'Date', name: 'date', widget: 'datetime', i18n: 'duplicate' },
+            { label: 'Description', name: 'description', widget: 'text', i18n: true },
+            { label: 'Cover (URL)', name: 'cover', widget: 'string', required: false, i18n: 'duplicate' },
+            { label: 'Body', name: 'body', widget: 'markdown', i18n: true }
+          ]
+        },
+        {
+          name: 'education',
+          label: 'Education Articles',
+          folder: 'content/education',
+          create: true,
+          slug: '{{slug}}',
+          format: 'frontmatter',
+          path: '{{slug}}/index',
+          i18n: true,
+          fields: [
+            { label: 'Title', name: 'title', widget: 'string', i18n: true },
+            { label: 'Date', name: 'date', widget: 'datetime', i18n: 'duplicate' },
+            { label: 'Description', name: 'description', widget: 'text', i18n: true },
+            { label: 'Icon (CSS class)', name: 'icon', widget: 'string', required: false, i18n: 'duplicate' },
+            { label: 'Body', name: 'body', widget: 'markdown', i18n: true }
+          ]
+        },
+        {
+          name: 'news',
+          label: 'News',
+          folder: 'content/news',
+          create: true,
+          slug: '{{slug}}',
+          format: 'frontmatter',
+          path: '{{slug}}/index',
+          i18n: true,
+          fields: [
+            { label: 'Title', name: 'title', widget: 'string', i18n: true },
+            { label: 'Date', name: 'date', widget: 'datetime', i18n: 'duplicate' },
+            { label: 'Summary', name: 'summary', widget: 'text', i18n: true },
+            { label: 'Body', name: 'body', widget: 'markdown', i18n: true }
+          ]
+        },
+        {
+          name: 'cases',
+          label: 'Case Studies',
+          folder: 'content/cases',
+          create: true,
+          slug: '{{slug}}',
+          format: 'json',
+          path: '{{slug}}/index',
+          i18n: true,
+          fields: [
+            { label: 'Title', name: 'title', widget: 'string', i18n: true },
+            { label: 'Industry', name: 'industry', widget: 'string', i18n: true },
+            { label: 'Challenge', name: 'challenge', widget: 'markdown', i18n: true },
+            { label: 'Solution', name: 'solution', widget: 'markdown', i18n: true },
+            { label: 'Outcome', name: 'outcome', widget: 'markdown', i18n: true }
+          ]
+        },
+        {
+          name: 'testimonials',
+          label: 'Testimonials',
+          label_singular: 'Testimonial',
+          folder: 'content/testimonials',
+          create: true,
+          slug: '{{slug}}',
+          format: 'json',
+          path: '{{slug}}/index',
+          i18n: true,
+          fields: [
+            { label: 'Name', name: 'name', widget: 'string', i18n: 'duplicate' },
+            { label: 'Title/Role', name: 'role', widget: 'string', required: false, i18n: true },
+            { label: 'Company', name: 'company', widget: 'string', required: false, i18n: 'duplicate' },
+            { label: 'Avatar', name: 'avatar', widget: 'image', required: false, i18n: 'duplicate' },
+            { label: 'Badge (e.g., sector • size)', name: 'badge', widget: 'string', required: false, i18n: true },
+            { label: 'Delivery (e.g., 2 weeks delivery)', name: 'delivery', widget: 'string', required: false, i18n: true },
+            { label: 'Stars (1-5)', name: 'stars', widget: 'number', min: 1, max: 5, default: 5, i18n: 'duplicate' },
+            { label: 'Quote', name: 'quote', widget: 'text', i18n: true },
+            { label: 'Metric 1 Label', name: 'metric1_label', widget: 'string', required: false, i18n: true },
+            { label: 'Metric 1 Value', name: 'metric1_value', widget: 'string', required: false, i18n: true },
+            { label: 'Metric 2 Label', name: 'metric2_label', widget: 'string', required: false, i18n: true },
+            { label: 'Metric 2 Value', name: 'metric2_value', widget: 'string', required: false, i18n: true },
+            { label: 'Social Note (e.g., Verified on LinkedIn)', name: 'social_note', widget: 'string', required: false, i18n: true },
+            { label: 'LinkedIn URL', name: 'linkedin_url', widget: 'string', required: false, i18n: 'duplicate' }
+          ]
+        },
+        {
+          name: 'partners',
+          label: 'Partners',
+          label_singular: 'Partner',
+          folder: 'content/partners',
+          create: true,
+          slug: '{{slug}}',
+          format: 'json',
+          path: '{{slug}}/index',
+          i18n: true,
+          fields: [
+            { label: 'Name', name: 'name', widget: 'string', i18n: 'duplicate' },
+            { label: 'Tagline', name: 'tagline', widget: 'string', required: false, i18n: true },
+            { label: 'Description', name: 'description', widget: 'text', i18n: true },
+            { label: 'Badge (e.g., Category • Region)', name: 'badge', widget: 'string', required: false, i18n: true },
+            { label: 'Website URL', name: 'website_url', widget: 'string', required: false, i18n: 'duplicate' },
+            { label: 'Icon (CSS class, optional)', name: 'icon', widget: 'string', required: false, i18n: 'duplicate' }
           ]
         }
       ]
+    };
+
+    try { console.log('[Minimal CMS] Initializing Decap with inline config'); } catch(e){}
+    if (typeof window.initCMS === 'function') {
+      window.initCMS({ config: cmsConfig, load_config_file: false });
+    } else if (typeof window.CMS !== 'undefined' && typeof window.CMS.init === 'function') {
+      window.CMS.init({ config: cmsConfig, load_config_file: false });
+    } else {
+      var root2 = document.getElementById('nc-root');
+      if (root2) root2.innerHTML = '<div style="color:red;padding:20px;">Error: Decap CMS not initialized.</div>';
     }
-  });
+  })();
   </script>
 </body>
 </html>
