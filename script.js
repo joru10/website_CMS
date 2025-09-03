@@ -47,8 +47,9 @@ document.addEventListener('click', function(event) {
     }
 });
 async function setLanguage(lang) { // <-- 1. Added 'async' here
-    // Hide the language menu
-    document.getElementById('languageMenu').classList.add('hidden');
+    // Hide the language menu (guard if missing on some pages)
+    const langMenuEl = document.getElementById('languageMenu');
+    if (langMenuEl) langMenuEl.classList.add('hidden');
     
     // Update current language display
     const currentLangDisplay = document.getElementById('currentLang');
@@ -58,13 +59,13 @@ async function setLanguage(lang) { // <-- 1. Added 'async' here
         'es': 'ES'
     };
     
-    currentLangDisplay.textContent = langNames[lang];
+    if (currentLangDisplay) currentLangDisplay.textContent = langNames[lang];
     
     // Store language preference
     localStorage.setItem('rapidai-language', lang);
     
-    // Load dynamic content from CMS before applying static translations
-    await Promise.all([
+    // Start dynamic content loads
+    const loaders = [
         loadServicesContent(lang),
         loadEducationContent(lang),
         loadNewsContent(lang),
@@ -72,10 +73,13 @@ async function setLanguage(lang) { // <-- 1. Added 'async' here
         loadTestimonialsContent(lang),
         loadPartnersContent(lang),
         loadResourcesOverview(lang)
-    ]);
-    
-    // Apply translations
+    ];
+
+    // Apply translations early so loading states and static text are localized
     applyTranslations(lang);
+
+    // Wait for dynamic content to finish
+    await Promise.all(loaders);
     
     // Load Intro/Hero content from CMS (overrides static translations)
     await loadIntroContent(lang);
@@ -845,13 +849,7 @@ function applyTranslations(lang) {
         }
     });
 
-    // Apply placeholder translations (e.g., inputs)
-    document.querySelectorAll('[data-translate-placeholder]').forEach(el => {
-        const pKey = el.getAttribute('data-translate-placeholder');
-        if (currentTranslations[pKey]) {
-            el.setAttribute('placeholder', currentTranslations[pKey]);
-        }
-    });
+    // Note: placeholder translations already applied above
 }
 
 function showLanguageChangeNotification(lang) {
@@ -891,13 +889,12 @@ function showLanguageChangeNotification(lang) {
 
 // Initialize language on page load
 function initializeLanguage() {
-    const savedLang = localStorage.getItem('rapidai-language') || 'en';
-    const browserLang = navigator.language.split('-')[0];
+    const storedLang = localStorage.getItem('rapidai-language');
+    const browserLang = (navigator.language || 'en').split('-')[0];
     const supportedLangs = ['en', 'fr', 'es'];
-    
-    // Use saved language, or browser language if supported, otherwise default to English
-    const defaultLang = savedLang !== 'en' ? savedLang : 
-                       (supportedLangs.includes(browserLang) ? browserLang : 'en');
+
+    // Prefer saved language if present; otherwise use supported browser language or default to English
+    const defaultLang = storedLang ? storedLang : (supportedLangs.includes(browserLang) ? browserLang : 'en');
 
     // Initialize all dynamic content and translations for default language
     setLanguage(defaultLang);
@@ -1958,9 +1955,7 @@ async function loadClaimsAndStats() {
         const items = Array.isArray(data.items) ? data.items : [];
         const map = new Map(items.map(i => [i.key, i.value]));
         const statEl = document.querySelector('[data-translate="stat-speed"]');
-        const labelEl = document.querySelector('[data-translate="stat-speed-label"]');
         if (statEl && map.get('stat-speed')) statEl.textContent = map.get('stat-speed');
-        if (labelEl && map.get('stat-speed-label')) labelEl.textContent = map.get('stat-speed-label');
     } catch (e) {
         // ignore
     }
