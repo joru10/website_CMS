@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Minimal CMS</title>
+  <!-- Netlify Identity for parity with main admin page -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <style>
     body { margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     #nc-root { margin-top: 20px; border: 1px solid #e1e1e1; border-radius: 4px; min-height: 80vh; }
@@ -25,6 +27,203 @@
   </script>
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
   
+  <!-- OAuth + SlugGuard helpers (ported from admin/index.html) -->
+  <script>
+    // Utility to call a callback once CMS APIs are ready
+    function whenCMSReady(cb) {
+      if (window.CMS && typeof window.CMS.init === 'function') return cb();
+      setTimeout(() => whenCMSReady(cb), 50);
+    }
+
+    // Slug guard to keep files-collection slug stable and provide visibility
+    function defineSlugGuard() {
+      try {
+        if (window.__slugGuardDefined) return;
+        window.__slugGuardDefined = true;
+        window.__ensureSlugFromRoute = function({ entry, collection }) {
+          try {
+            var collName = collection && (collection.get ? collection.get('name') : collection.name);
+            var current = entry ? (entry.get ? entry.get('slug') : entry.slug) : undefined;
+            console.log('[SlugGuard] event fired', { coll: collName, slug: current });
+            if (collName !== 'sitecontent' || !entry) return;
+            var forced = 'claims';
+            var newEntry = entry;
+            if (entry && entry.get && entry.set) {
+              if (current !== forced) {
+                console.log('[SlugGuard] Forcing slug for sitecontent (Immutable) =>', forced, '(was:', current, ')');
+                newEntry = entry.set('slug', forced);
+              } else {
+                console.log('[SlugGuard] Slug already set (Immutable) =>', current);
+              }
+            } else {
+              if (current !== forced) {
+                console.log('[SlugGuard] Forcing slug for sitecontent (plain) =>', forced, '(was:', current, ')');
+                try { newEntry = Object.assign({}, entry, { slug: forced }); }
+                catch(_e) { newEntry = entry; }
+              } else {
+                console.log('[SlugGuard] Slug already set (plain) =>', current);
+              }
+            }
+            return { entry: newEntry };
+          } catch (e) { console.warn('[SlugGuard] handler error', e); }
+        };
+        window.addEventListener('hashchange', function(){
+          try {
+            var h = (window.location.hash || '').replace(/^#!/, '#');
+            var m = h.match(/#\/collections\/[^/]+\/entries\/([^/?#]+)/);
+            var routeSlug = (m && m[1]) ? decodeURIComponent(m[1]) : undefined;
+            console.log('[SlugGuard] hashchange route slug =', routeSlug);
+          } catch(e){}
+        });
+      } catch(e) { console.warn('Failed to define slug guard', e); }
+    }
+
+    // OAuth postMessage handler and helpers
+    window.authSuccess = false;
+    window._exchangeInProgress = false;
+    window._oauthProcessed = false;
+    window._processedStates = new Set();
+    window._fallbackTimers = new Map();
+
+    window.addEventListener('message', function(event) {
+      try { console.log('OAuth postMessage received:', { origin: event.origin, data: event.data }); } catch (e) {}
+      if (event.origin !== window.location.origin) return;
+      const message = event.data || {};
+      if (message.state && window._processedStates.has(message.state)) {
+        try { console.log('State already processed; ignoring message'); } catch (e) {}
+        return;
+      }
+      if (message.type === 'authorization:github:success' && message.response) {
+        return handleAuthSuccess(message.response);
+      }
+      if (message.type === 'authorization:github:error') {
+        console.error('GitHub OAuth error:', message.error, message.error_description);
+        alert(`Authentication failed: ${message.error_description || 'Unknown error'}`);
+        return;
+      }
+      if (message.source === 'decap-cms' && message.code && message.state) {
+        if (window._exchangeInProgress) { try { console.log('Exchange in progress; ignoring duplicate'); } catch(e){} return; }
+        window._processedStates.add(message.state);
+        try { console.log('Decap-style message detected; waiting briefly for legacy success before fallback exchange'); } catch(e){}
+        if (window._fallbackTimers.has(message.state)) return;
+        const t = setTimeout(function() {
+          if (window._oauthProcessed || window.authSuccess) {
+            try { console.log('Legacy success detected during wait; skipping fallback exchange'); } catch(e){}
+            window._fallbackTimers.delete(message.state);
+            return;
+          }
+          window._exchangeInProgress = true;
+          try { console.log('Proceeding with fallback token exchange via /oauth/access_token'); } catch(e){}
+          fetch('/oauth/access_token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ code: message.code, state: message.state })
+          })
+          .then(r => r.ok ? r.json() : r.text().then(t => { throw new Error(`HTTP ${r.status}: ${t}`); }))
+          .then(json => {
+            if (json && json.access_token) {
+              handleAuthSuccess(json);
+            } else {
+              console.error('Token response missing access_token:', json);
+              alert('Authentication failed: missing access token in response');
+            }
+          })
+          .catch(err => {
+            console.error('Token exchange failed:', err);
+            alert('Authentication failed during token exchange');
+          })
+          .finally(() => { window._exchangeInProgress = false; window._fallbackTimers.delete(message.state); });
+        }, 800);
+        window._fallbackTimers.set(message.state, t);
+      }
+    });
+
+    function handleAuthSuccess(response) {
+      if (window.authSuccess) return;
+      window.authSuccess = true;
+      console.log('GitHub OAuth successful:', response);
+      if (response && response.access_token) {
+        window._oauthProcessed = true;
+        const cmsUser = {
+          token: response.access_token,
+          login: 'github',
+          provider: 'github',
+          backendName: 'github',
+          user: { login: 'github', name: 'GitHub User' },
+          token_type: response.token_type || 'bearer'
+        };
+        localStorage.setItem('netlify-cms-user', JSON.stringify(cmsUser));
+        localStorage.setItem('decap-cms-user', JSON.stringify(cmsUser));
+        sessionStorage.setItem('netlify-cms-user', JSON.stringify(cmsUser));
+        document.dispatchEvent(new CustomEvent('cms:auth:success', { detail: { token: response.access_token, provider: 'github', user: cmsUser } }));
+        if (window.opener) {
+          window.close();
+        } else {
+          console.log('Token stored; reloading once to let Decap restore session');
+          try { sessionStorage.setItem('_cms_reload_after_auth', '1'); } catch(e){}
+          try {
+            const h = (window.location.hash || '').replace(/^#!/, '#');
+            const target = (!h || h === '#/' || h === '#') ? '#/collections/sitecontent/entries/claims' : h;
+            window.location.replace(window.location.pathname + target);
+          } catch(e) { window.location.reload(); }
+        }
+      } else {
+        console.error('No access token in response:', response);
+      }
+    }
+
+    // Handle direct access_token URL parameter
+    (function(){
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const accessToken = urlParams.get('access_token');
+        if (accessToken) {
+          const cleanUrl = window.location.origin + window.location.pathname;
+          window.history.replaceState({}, document.title, cleanUrl);
+          handleAuthSuccess({ access_token: accessToken, token_type: urlParams.get('token_type') || 'bearer', scope: urlParams.get('scope') || 'repo,user' });
+        } else if (urlParams.get('auth') === 'success') {
+          window._oauthProcessed = true;
+          window.authSuccess = true;
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      } catch(e){}
+    })();
+
+    // Mirror legacy user key to Decap key and handle post-auth reload
+    document.addEventListener('DOMContentLoaded', function() {
+      let afterAuthReload = false;
+      try {
+        if (sessionStorage.getItem('_cms_reload_after_auth') === '1') {
+          afterAuthReload = true;
+          sessionStorage.removeItem('_cms_reload_after_auth');
+          window._skipOAuthPopup = true;
+          console.log('Post-auth reload detected; skipping popup open');
+        }
+      } catch(e){}
+      try {
+        const u1 = localStorage.getItem('netlify-cms-user');
+        const u2 = localStorage.getItem('decap-cms-user');
+        if (u1 && !u2) {
+          localStorage.setItem('decap-cms-user', u1);
+          console.log('Mirrored netlify-cms-user -> decap-cms-user at load');
+        }
+      } catch(e){}
+    });
+
+    // Early register slug guard
+    whenCMSReady(function(){
+      try {
+        defineSlugGuard();
+        if (window.CMS && window.CMS.registerEventListener && window.__ensureSlugFromRoute) {
+          window.CMS.registerEventListener({ name: 'preSave', handler: window.__ensureSlugFromRoute });
+          window.CMS.registerEventListener({ name: 'prePublish', handler: window.__ensureSlugFromRoute });
+          console.log('[SlugGuard] Registered preSave/prePublish listeners');
+        }
+      } catch(e) { console.warn('Failed to register slug guard early', e); }
+    });
+  </script>
+  
   <script>
   // Minimal inline CMS config using the same OAuth function as /admin
   (function() {
@@ -42,7 +241,16 @@
         base_url: '/oauth',
         auth_endpoint: 'auth',
         auth_type: 'pkce',
-        token_endpoint: 'access_token'
+        token_endpoint: 'access_token',
+        cms_label_prefix: 'CMS',
+        commit_messages: {
+          create: 'Create {{collection}} “{{slug}}”',
+          update: 'Update {{collection}} “{{slug}}”',
+          delete: 'Delete {{collection}} “{{slug}}”',
+          uploadMedia: 'Upload “{{path}}”',
+          deleteMedia: 'Delete “{{path}}”',
+          openAuthoring: '{{message}}'
+        }
       },
       media_folder: 'static/uploads',
       public_folder: '/static/uploads',
@@ -348,6 +556,31 @@
       var root2 = document.getElementById('nc-root');
       if (root2) root2.innerHTML = '<div style="color:red;padding:20px;">Error: Decap CMS not initialized.</div>';
     }
+    // Post-init: re-register slug guard and normalize default route
+    try {
+      setTimeout(function(){
+        try {
+          if (window.CMS && window.CMS.registerEventListener && window.__ensureSlugFromRoute) {
+            window.CMS.registerEventListener({ name: 'preSave', handler: window.__ensureSlugFromRoute });
+            window.CMS.registerEventListener({ name: 'prePublish', handler: window.__ensureSlugFromRoute });
+            console.log('[SlugGuard] Re-registered listeners after CMS.init');
+          }
+        } catch(e) { console.warn('[SlugGuard] Post-init registration error', e); }
+        try {
+          var h = (window.location.hash || '').replace(/^#!/, '#');
+          if (!h || h === '#/' || h === '#') {
+            console.log('Routing to sitecontent single entry: claims');
+            window.location.hash = '#/collections/sitecontent/entries/claims';
+          }
+        } catch(e) { console.warn('Route normalizer failed', e); }
+        try {
+          if (window.CMS && window.CMS.getConfig) {
+            var cfg = window.CMS.getConfig();
+            console.log('Effective CMS config:', (cfg && cfg.toJS) ? cfg.toJS() : cfg);
+          }
+        } catch (e) { console.warn('Could not log effective CMS config', e); }
+      }, 150);
+    } catch(e){}
   })();
   </script>
 </body>
