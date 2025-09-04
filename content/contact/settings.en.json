@@ -1,0 +1,8 @@
+{
+  "email": "jose@rapidai.com",
+  "phone": "+1 (555) 123-RAPID",
+  "schedule_url": "https://cal.com/rapidai/intro",
+  "show_email": true,
+  "show_phone": true,
+  "show_schedule": true
+}

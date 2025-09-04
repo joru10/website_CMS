@@ -519,6 +519,25 @@
             { label: 'Website URL', name: 'website_url', widget: 'string', required: false, i18n: 'duplicate' },
             { label: 'Icon (CSS class, optional)', name: 'icon', widget: 'string', required: false, i18n: 'duplicate' }
           ]
+        },
+        {
+          name: 'contact_settings',
+          label: 'Contact Settings',
+          delete: false,
+          create: false,
+          i18n: true,
+          folder: 'content/contact',
+          format: 'json',
+          slug: 'settings',
+          path: 'settings',
+          fields: [
+            { label: 'Email', name: 'email', widget: 'string', i18n: 'duplicate', hint: 'Public contact email' },
+            { label: 'Phone', name: 'phone', widget: 'string', i18n: 'duplicate', hint: 'Public contact phone number' },
+            { label: 'Schedule URL', name: 'schedule_url', widget: 'string', i18n: 'duplicate', hint: 'Calendar booking link' },
+            { label: 'Show Email', name: 'show_email', widget: 'boolean', default: true, i18n: 'duplicate' },
+            { label: 'Show Phone', name: 'show_phone', widget: 'boolean', default: true, i18n: 'duplicate' },
+            { label: 'Show Schedule', name: 'show_schedule', widget: 'boolean', default: true, i18n: 'duplicate' }
+          ]
         }
       ]
     };

@@ -93,6 +93,8 @@ async function setLanguage(lang) { // <-- 1. Added 'async' here
     
     // Override hero claims with CMS/JSON content
     await loadClaimsAndStats();
+    // Load and apply contact settings (email, phone, schedule)
+    await loadContactSettings(lang);
     
     // Show language change confirmation
     showLanguageChangeNotification(lang);
@@ -2185,6 +2187,95 @@ async function loadValuesContent(lang = 'en') {
         if (ctaSubtitleEl && data.cta && typeof data.cta.subtitle === 'string') ctaSubtitleEl.innerHTML = data.cta.subtitle;
     } catch (_e) {
         // leave static translations
+    }
+}
+
+// Load Contact Settings from /content/contact with i18n fallback
+async function loadContactSettings(lang = 'en') {
+    try {
+        const urls = [
+            `/content/contact/settings.${lang}.json`,
+            `/content/contact/settings.en.json`
+        ];
+        let data = null;
+        for (const url of urls) {
+            try {
+                const res = await fetch(url, { cache: 'no-cache' });
+                if (!res.ok) continue;
+                data = await res.json();
+                break;
+            } catch (_e) { /* continue */ }
+        }
+        if (!data) return;
+
+        const email = (typeof data.email === 'string') ? data.email.trim() : '';
+        const phone = (typeof data.phone === 'string') ? data.phone.trim() : '';
+        const scheduleUrl = (typeof data.schedule_url === 'string') ? data.schedule_url.trim() : '';
+        const showEmail = (typeof data.show_email === 'boolean') ? data.show_email : true;
+        const showPhone = (typeof data.show_phone === 'boolean') ? data.show_phone : true;
+        const showSchedule = (typeof data.show_schedule === 'boolean') ? data.show_schedule : true;
+
+        const setVisible = (el, visible) => { if (el) el.classList.toggle('hidden', !visible); };
+        const normTel = (raw) => raw ? `tel:${raw.replace(/[^+\d]/g, '')}` : '';
+
+        // Contact section elements
+        const contactEmailBlock = document.getElementById('contact-email-block');
+        const contactEmailLink = document.getElementById('contact-email-link');
+        const contactPhoneBlock = document.getElementById('contact-phone-block');
+        const contactPhoneLink = document.getElementById('contact-phone-link');
+        const contactScheduleBlock = document.getElementById('contact-schedule-block');
+        const contactScheduleLink = document.getElementById('contact-schedule-link');
+
+        // Footer elements
+        const footerEmailBlock = document.getElementById('footer-email-block');
+        const footerEmailLink = document.getElementById('footer-email-link');
+        const footerPhoneBlock = document.getElementById('footer-phone-block');
+        const footerPhoneLink = document.getElementById('footer-phone-link');
+        const footerScheduleBlock = document.getElementById('footer-schedule-block');
+        const footerScheduleLink = document.getElementById('footer-schedule-link');
+
+        const emailValid = !!email;
+        const phoneValid = !!phone;
+        const scheduleValid = !!scheduleUrl;
+
+        // Apply to contact section
+        setVisible(contactEmailBlock, showEmail && emailValid);
+        if (contactEmailLink && emailValid) {
+            contactEmailLink.textContent = email;
+            contactEmailLink.href = `mailto:${email}`;
+        }
+
+        setVisible(contactPhoneBlock, showPhone && phoneValid);
+        if (contactPhoneLink && phoneValid) {
+            contactPhoneLink.textContent = phone;
+            contactPhoneLink.href = normTel(phone);
+        }
+
+        setVisible(contactScheduleBlock, showSchedule && scheduleValid);
+        if (contactScheduleLink && scheduleValid) {
+            contactScheduleLink.href = scheduleUrl;
+        }
+
+        // Apply to footer
+        setVisible(footerEmailBlock, showEmail && emailValid);
+        if (footerEmailLink && emailValid) {
+            footerEmailLink.textContent = email;
+            footerEmailLink.href = `mailto:${email}`;
+        }
+
+        setVisible(footerPhoneBlock, showPhone && phoneValid);
+        if (footerPhoneLink && phoneValid) {
+            footerPhoneLink.textContent = phone;
+            footerPhoneLink.href = normTel(phone);
+        }
+
+        setVisible(footerScheduleBlock, showSchedule && scheduleValid);
+        if (footerScheduleLink && scheduleValid) {
+            footerScheduleLink.textContent = (footerScheduleLink.textContent || 'Schedule a Call');
+            footerScheduleLink.href = scheduleUrl;
+        }
+    } catch (e) {
+        console.warn('[ContactSettings] Failed to load/apply contact settings', e);
     }
 }
 

@@ -614,19 +614,26 @@
                 </form>
                 
                 <div class="mt-12 grid md:grid-cols-3 gap-8 text-center fade-in">
-                    <div>
+                    <div id="contact-email-block">
                         <i class="fas fa-envelope text-blue-600 text-3xl mb-4"></i>
                         <h4 class="font-semibold text-gray-800 mb-2" data-translate="contact-email-me">Email Me</h4>
-                        <p class="text-gray-600">jose@rapidai.com</p>
+                        <p class="text-gray-600">
+                            <a id="contact-email-link" href="mailto:jose@rapidai.com" class="hover:text-blue-600 transition-colors">jose@rapidai.com</a>
+                        </p>
                     </div>
-                    <div>
+                    <div id="contact-phone-block">
                         <i class="fas fa-phone text-blue-600 text-3xl mb-4"></i>
                         <h4 class="font-semibold text-gray-800 mb-2" data-translate="contact-call-me">Call Me</h4>
-                        <p class="text-gray-600">+1 (555) 123-RAPID</p>
+                        <p class="text-gray-600">
+                            <a id="contact-phone-link" href="tel:+1555123RAPID" class="hover:text-blue-600 transition-colors">+1 (555) 123-RAPID</a>
+                        </p>
                     </div>
-                    <div>
+                    <div id="contact-schedule-block">
                         <i class="fas fa-calendar text-blue-600 text-3xl mb-4"></i>
                         <h4 class="font-semibold text-gray-800 mb-2" data-translate="contact-schedule-call">Schedule a Call</h4>
+                        <p class="text-gray-600">
+                            <a id="contact-schedule-link" href="#" class="hover:text-blue-600 transition-colors" data-translate="cta-consultation">Schedule a Free Consultation</a>
+                        </p>
                         <p class="text-gray-600" data-translate="contact-availability">Available Mon-Fri 9AM-6PM EST</p>
                     </div>
                 </div>
@@ -645,6 +652,17 @@
                     </div>
                     <p class="text-gray-400" data-translate="footer-tagline">Rapid AI implementation for business transformation.</p>
                     <p class="text-gray-400 mt-2" data-translate="footer-author">By Jose Ruiz</p>
+                    <div class="mt-4 space-y-1">
+                        <div id="footer-email-block">
+                            <a id="footer-email-link" href="mailto:jose@rapidai.com" class="text-gray-400 hover:text-white transition-colors">jose@rapidai.com</a>
+                        </div>
+                        <div id="footer-phone-block">
+                            <a id="footer-phone-link" href="tel:+1555123RAPID" class="text-gray-400 hover:text-white transition-colors">+1 (555) 123-RAPID</a>
+                        </div>
+                        <div id="footer-schedule-block">
+                            <a id="footer-schedule-link" href="#" class="text-gray-400 hover:text-white transition-colors">Schedule a Call</a>
+                        </div>
+                    </div>
                 </div>
                 
                 <div>
