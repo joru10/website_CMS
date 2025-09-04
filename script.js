@@ -75,9 +75,10 @@ async function setLanguage(lang) { // <-- 1. Added 'async' here
         loadResourcesOverview(lang)
     ];
 
-    // Apply translations early so loading states and static text are localized
-    applyTranslations(lang);
-
+    // Prefetch dynamic translations and apply early so loading states and static text are localized
+    await fetchTranslations(lang);
+    await applyTranslations(lang);
+    
     // Wait for dynamic content to finish
     await Promise.all(loaders);
     
@@ -95,6 +96,27 @@ async function setLanguage(lang) { // <-- 1. Added 'async' here
     
     // Show language change confirmation
     showLanguageChangeNotification(lang);
+}
+
+async function fetchTranslations(lang) {
+    try {
+        window._i18nDynamic = window._i18nDynamic || {};
+        if (window._i18nDynamic[lang]) return window._i18nDynamic[lang];
+        const res = await fetch(`/translations/${lang}.json`, { cache: 'no-cache' });
+        if (!res.ok) throw new Error('No translations JSON');
+        const data = await res.json();
+        const items = Array.isArray(data.strings) ? data.strings : [];
+        const map = {};
+        for (const it of items) {
+            if (it && typeof it.key === 'string' && typeof it.value === 'string') {
+                map[it.key] = it.value;
+            }
+        }
+        window._i18nDynamic[lang] = map;
+        return map;
+    } catch (_e) {
+        return {};
+    }
 }
 
 function applyTranslations(lang) {
@@ -831,7 +853,8 @@ function applyTranslations(lang) {
         }
     };
     
-    const currentTranslations = translations[lang];
+    const dynamicMap = (window._i18nDynamic && window._i18nDynamic[lang]) || {};
+    const currentTranslations = Object.assign({}, translations[lang] || {}, dynamicMap);
     
     // Translate placeholders
     document.querySelectorAll('[data-translate-placeholder]').forEach(el => {
