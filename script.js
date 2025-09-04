@@ -2195,7 +2195,8 @@ async function loadContactSettings(lang = 'en') {
     try {
         const urls = [
             `/content/contact/settings.${lang}.json`,
-            `/content/contact/settings.en.json`
+            `/content/contact/settings.en.json`,
+            `/content/contact/settings.json`
         ];
         let data = null;
         for (const url of urls) {
@@ -2233,10 +2234,22 @@ async function loadContactSettings(lang = 'en') {
         const footerPhoneLink = document.getElementById('footer-phone-link');
         const footerScheduleBlock = document.getElementById('footer-schedule-block');
         const footerScheduleLink = document.getElementById('footer-schedule-link');
+        const footerLinkedinBlock = document.getElementById('footer-linkedin-block');
+        const footerLinkedinLink = document.getElementById('footer-linkedin-link');
+        const footerTwitterBlock = document.getElementById('footer-twitter-block');
+        const footerTwitterLink = document.getElementById('footer-twitter-link');
+        const footerGithubBlock = document.getElementById('footer-github-block');
+        const footerGithubLink = document.getElementById('footer-github-link');
 
         const emailValid = !!email;
         const phoneValid = !!phone;
         const scheduleValid = !!scheduleUrl;
+        const linkedinUrl = (typeof data.linkedin_url === 'string') ? data.linkedin_url.trim() : '';
+        const twitterUrl = (typeof data.twitter_url === 'string') ? data.twitter_url.trim() : '';
+        const githubUrl = (typeof data.github_url === 'string') ? data.github_url.trim() : '';
+        const showLinkedin = (typeof data.show_linkedin === 'boolean') ? data.show_linkedin : true;
+        const showTwitter = (typeof data.show_twitter === 'boolean') ? data.show_twitter : true;
+        const showGithub = (typeof data.show_github === 'boolean') ? data.show_github : true;
 
         // Apply to contact section
         setVisible(contactEmailBlock, showEmail && emailValid);
@@ -2274,6 +2287,16 @@ async function loadContactSettings(lang = 'en') {
             footerScheduleLink.textContent = (footerScheduleLink.textContent || 'Schedule a Call');
             footerScheduleLink.href = scheduleUrl;
         }
+        // Social links
+        const linkedinValid = !!linkedinUrl;
+        const twitterValid = !!twitterUrl;
+        const githubValid = !!githubUrl;
+        setVisible(footerLinkedinBlock, showLinkedin && linkedinValid);
+        if (footerLinkedinLink && linkedinValid) footerLinkedinLink.href = linkedinUrl;
+        setVisible(footerTwitterBlock, showTwitter && twitterValid);
+        if (footerTwitterLink && twitterValid) footerTwitterLink.href = twitterUrl;
+        setVisible(footerGithubBlock, showGithub && githubValid);
+        if (footerGithubLink && githubValid) footerGithubLink.href = githubUrl;
     } catch (e) {
         console.warn('[ContactSettings] Failed to load/apply contact settings', e);
     }
