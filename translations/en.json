@@ -148,29 +148,101 @@
       "key": "assessment-completed",
       "value": "500+ completed"
     },
-    { "key": "cta-consultation", "value": "Schedule a Free Consultation" },
-    { "key": "contact-submit", "value": "Request Free Consultation" },
-    { "key": "newsletter-title", "value": "Get AI Resources & Updates" },
-    { "key": "newsletter-desc", "value": "Select the updates you want, then enter your email to subscribe." },
-    { "key": "newsletter-choose-updates", "value": "Choose updates:" },
-    { "key": "newsletter-topic-newsletter", "value": "Newsletter" },
-    { "key": "newsletter-topic-insights", "value": "Insights & Guides" },
-    { "key": "newsletter-topic-cases", "value": "Case Studies" },
-    { "key": "footer-tagline", "value": "Rapid AI implementation for business transformation." },
-    { "key": "footer-author", "value": "By Jose Ruiz" },
-    { "key": "footer-services", "value": "Services" },
-    { "key": "footer-ai-strategy", "value": "AI Strategy" },
-    { "key": "footer-automation", "value": "Process Automation" },
-    { "key": "footer-custom-ai", "value": "Custom AI Solutions" },
-    { "key": "footer-implementation", "value": "Implementation" },
-    { "key": "footer-resources", "value": "Resources" },
-    { "key": "footer-blog", "value": "Insights & Perspectives" },
-    { "key": "footer-case-studies", "value": "Case Studies" },
-    { "key": "footer-insights", "value": "AI Insights" },
-    { "key": "footer-consultation", "value": "Consultation" },
-    { "key": "footer-connect", "value": "Connect" },
-    { "key": "resources-newsletter-title", "value": "AI Resources & Updates" },
-    { "key": "resources-newsletter-desc", "value": "Get the best of RapidAI: newsletter, insights, guides, and case studies. Choose what you want to receive." },
-    { "key": "footer-copyright", "value": "© 2024 RapidAI by Jose Ruiz. All rights reserved." }
+    {
+      "key": "cta-consultation",
+      "value": "-"
+    },
+    {
+      "key": "contact-submit",
+      "value": "Request Free Consultation"
+    },
+    {
+      "key": "newsletter-title",
+      "value": "Get AI Resources & Updates"
+    },
+    {
+      "key": "newsletter-desc",
+      "value": "Select the updates you want, then enter your email to subscribe."
+    },
+    {
+      "key": "newsletter-choose-updates",
+      "value": "Choose updates:"
+    },
+    {
+      "key": "newsletter-topic-newsletter",
+      "value": "Newsletter"
+    },
+    {
+      "key": "newsletter-topic-insights",
+      "value": "Insights & Guides"
+    },
+    {
+      "key": "newsletter-topic-cases",
+      "value": "Case Studies"
+    },
+    {
+      "key": "footer-tagline",
+      "value": "Rapid AI implementation for business transformation."
+    },
+    {
+      "key": "footer-author",
+      "value": "By Jose Ruiz"
+    },
+    {
+      "key": "footer-services",
+      "value": "Services"
+    },
+    {
+      "key": "footer-ai-strategy",
+      "value": "AI Strategy"
+    },
+    {
+      "key": "footer-automation",
+      "value": "Process Automation"
+    },
+    {
+      "key": "footer-custom-ai",
+      "value": "Custom AI Solutions"
+    },
+    {
+      "key": "footer-implementation",
+      "value": "Implementation"
+    },
+    {
+      "key": "footer-resources",
+      "value": "Resources"
+    },
+    {
+      "key": "footer-blog",
+      "value": "Insights & Perspectives"
+    },
+    {
+      "key": "footer-case-studies",
+      "value": "Case Studies"
+    },
+    {
+      "key": "footer-insights",
+      "value": "AI Insights"
+    },
+    {
+      "key": "footer-consultation",
+      "value": "Consultation"
+    },
+    {
+      "key": "footer-connect",
+      "value": "Connect"
+    },
+    {
+      "key": "resources-newsletter-title",
+      "value": "AI Resources & Updates"
+    },
+    {
+      "key": "resources-newsletter-desc",
+      "value": "Get the best of RapidAI: newsletter, insights, guides, and case studies. Choose what you want to receive."
+    },
+    {
+      "key": "footer-copyright",
+      "value": "© 2024 RapidAI by Jose Ruiz. All rights reserved."
+    }
   ]
 }
