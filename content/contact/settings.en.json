@@ -1,14 +1,14 @@
 {
-  "show_linkedin": true,
+  "show_linkedin": false,
   "twitter_url": "https://x.com/",
   "show_github": true,
   "schedule_url": "Not/Available",
   "show_phone": false,
-  "phone": "+1 (555) 123-RAPID",
+  "phone": "+33 685122842",
   "linkedin_url": "https://www.linkedin.com/in/joruiz/",
   "show_twitter": true,
   "github_url": "https://github.com/joru10",
-  "show_schedule": true,
+  "show_schedule": false,
   "show_email": true,
   "email": "jose@rapidai.com"
 }
