@@ -4,5 +4,11 @@
   "schedule_url": "https://cal.com/rapidai/intro?lang=es",
   "show_email": true,
   "show_phone": true,
-  "show_schedule": true
+  "show_schedule": true,
+  "linkedin_url": "https://www.linkedin.com/in/joruiz/",
+  "show_linkedin": true,
+  "twitter_url": "https://x.com/",
+  "show_twitter": true,
+  "github_url": "https://github.com/joru10",
+  "show_github": true
 }
