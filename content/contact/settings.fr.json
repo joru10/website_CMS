@@ -1,14 +1,14 @@
 {
-  "email": "jose@rapidai.com",
-  "phone": "+1 (555) 123-RAPID",
-  "schedule_url": "https://cal.com/rapidai/intro?lang=fr",
-  "show_email": true,
-  "show_phone": true,
-  "show_schedule": true,
-  "linkedin_url": "https://www.linkedin.com/in/joruiz/",
   "show_linkedin": true,
   "twitter_url": "https://x.com/",
+  "show_github": true,
+  "schedule_url": "Not/Available",
+  "show_phone": false,
+  "phone": "+1 (555) 123-RAPID",
+  "linkedin_url": "https://www.linkedin.com/in/joruiz/",
   "show_twitter": true,
   "github_url": "https://github.com/joru10",
-  "show_github": true
+  "show_schedule": true,
+  "show_email": true,
+  "email": "jose@rapidai.com"
 }
