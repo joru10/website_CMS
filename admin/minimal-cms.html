@@ -361,6 +361,8 @@
           format: 'json',
           slug: 'index',
           path: 'index',
+          identifier_field: 'title',
+          summary: '{{title}}',
           fields: [
             { label: 'Title (HTML allowed)', name: 'title', widget: 'text', i18n: true },
             { label: 'Subtitle', name: 'subtitle', widget: 'text', i18n: true }
@@ -525,13 +527,12 @@
           label: 'Contact Settings',
           delete: false,
           editor: { preview: false },
-          i18n: true,
+          i18n: { structure: 'single_file' },
           files: [
             {
               label: 'Contact Settings',
               name: 'settings',
               file: 'content/contact/settings.json',
-              i18n: true,
               fields: [
                 { label: 'Email', name: 'email', widget: 'string', i18n: 'duplicate', hint: 'Public contact email' },
                 { label: 'Phone', name: 'phone', widget: 'string', i18n: 'duplicate', hint: 'Public contact phone number' },
