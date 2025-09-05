@@ -64,7 +64,27 @@ async function setLanguage(lang) { // <-- 1. Added 'async' here
     // Store language preference
     localStorage.setItem('rapidai-language', lang);
     
-    // Start dynamic content loads
+    // Pre-hide contact and footer items to prevent flicker until settings load
+    [
+        'contact-email-block',
+        'contact-phone-block',
+        'contact-schedule-block',
+        'footer-email-block',
+        'footer-phone-block',
+        'footer-schedule-block',
+        'footer-linkedin-block',
+        'footer-twitter-block',
+        'footer-github-block'
+    ].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+    });
+    
+    // Prefetch dynamic translations and apply early so loading states and static text are localized
+    await fetchTranslations(lang);
+    await applyTranslations(lang);
+
+    // Start dynamic content loads AFTER translations are applied
     const loaders = [
         loadServicesContent(lang),
         loadEducationContent(lang),
@@ -72,13 +92,11 @@ async function setLanguage(lang) { // <-- 1. Added 'async' here
         loadSuccessStoriesContent(lang),
         loadTestimonialsContent(lang),
         loadPartnersContent(lang),
-        loadResourcesOverview(lang)
+        loadResourcesOverview(lang),
+        // Load and apply contact settings early in parallel to minimize hidden time
+        loadContactSettings(lang)
     ];
 
-    // Prefetch dynamic translations and apply early so loading states and static text are localized
-    await fetchTranslations(lang);
-    await applyTranslations(lang);
-    
     // Wait for dynamic content to finish
     await Promise.all(loaders);
     
@@ -93,8 +111,7 @@ async function setLanguage(lang) { // <-- 1. Added 'async' here
     
     // Override hero claims with CMS/JSON content
     await loadClaimsAndStats();
-    // Load and apply contact settings (email, phone, schedule)
-    await loadContactSettings(lang);
+    // Contact settings already loaded in parallel above
     
     // Show language change confirmation
     showLanguageChangeNotification(lang);
@@ -1109,6 +1126,22 @@ document.addEventListener('DOMContentLoaded', function() {
         observer.observe(el);
     });
     
+    // Pre-hide contact/footer items immediately on DOM ready to avoid any initial flash
+    [
+        'contact-email-block',
+        'contact-phone-block',
+        'contact-schedule-block',
+        'footer-email-block',
+        'footer-phone-block',
+        'footer-schedule-block',
+        'footer-linkedin-block',
+        'footer-twitter-block',
+        'footer-github-block'
+    ].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+    });
+
     // Initialize language support
     initializeLanguage();
 });
@@ -2199,11 +2232,13 @@ async function loadContactSettings(lang = 'en') {
             `/content/contact/settings.json`
         ];
         let data = null;
+        let loadedFrom = null;
         for (const url of urls) {
             try {
                 const res = await fetch(url, { cache: 'no-cache' });
                 if (!res.ok) continue;
                 data = await res.json();
+                loadedFrom = url;
                 break;
             } catch (_e) { /* continue */ }
         }
@@ -2215,6 +2250,10 @@ async function loadContactSettings(lang = 'en') {
         const showEmail = (typeof data.show_email === 'boolean') ? data.show_email : true;
         const showPhone = (typeof data.show_phone === 'boolean') ? data.show_phone : true;
         const showSchedule = (typeof data.show_schedule === 'boolean') ? data.show_schedule : true;
+
+        // Minimal validators
+        const isNonEmpty = (s) => typeof s === 'string' && s.trim().length > 0;
+        const isLikelyUrl = (s) => /^https?:\/\//i.test(s || '');
 
         const setVisible = (el, visible) => { if (el) el.classList.toggle('hidden', !visible); };
         const normTel = (raw) => raw ? `tel:${raw.replace(/[^+\d]/g, '')}` : '';
@@ -2240,6 +2279,15 @@ async function loadContactSettings(lang = 'en') {
         const footerTwitterLink = document.getElementById('footer-twitter-link');
         const footerGithubBlock = document.getElementById('footer-github-block');
         const footerGithubLink = document.getElementById('footer-github-link');
+        // New social elements (contact + footer)
+        const contactInstagramBlock = document.getElementById('contact-instagram-block');
+        const contactInstagramLink = document.getElementById('contact-instagram-link');
+        const contactYouTubeBlock = document.getElementById('contact-youtube-block');
+        const contactYouTubeLink = document.getElementById('contact-youtube-link');
+        const footerInstagramBlock = document.getElementById('footer-instagram-block');
+        const footerInstagramLink = document.getElementById('footer-instagram-link');
+        const footerYouTubeBlock = document.getElementById('footer-youtube-block');
+        const footerYouTubeLink = document.getElementById('footer-youtube-link');
 
         const emailValid = !!email;
         const phoneValid = !!phone;
@@ -2250,6 +2298,22 @@ async function loadContactSettings(lang = 'en') {
         const showLinkedin = (typeof data.show_linkedin === 'boolean') ? data.show_linkedin : true;
         const showTwitter = (typeof data.show_twitter === 'boolean') ? data.show_twitter : true;
         const showGithub = (typeof data.show_github === 'boolean') ? data.show_github : true;
+        const instagramUrl = (typeof data.instagram_url === 'string') ? data.instagram_url.trim() : '';
+        const showInstagram = (typeof data.show_instagram === 'boolean') ? data.show_instagram : false;
+        const youtubeUrl = (typeof data.youtube_url === 'string') ? data.youtube_url.trim() : '';
+        const showYouTube = (typeof data.show_youtube === 'boolean') ? data.show_youtube : false;
+
+        // Collect warnings for diagnostics without changing behavior
+        const warnings = [];
+        if (showEmail && !isNonEmpty(email)) warnings.push('show_email=true but email is empty');
+        if (showPhone && !isNonEmpty(phone)) warnings.push('show_phone=true but phone is empty');
+        if (showSchedule && !isNonEmpty(scheduleUrl)) warnings.push('show_schedule=true but schedule_url is empty');
+        if (isNonEmpty(scheduleUrl) && !isLikelyUrl(scheduleUrl)) warnings.push('schedule_url does not look like a valid http(s) URL');
+        if (showLinkedin && !isNonEmpty(linkedinUrl)) warnings.push('show_linkedin=true but linkedin_url is empty');
+        if (showTwitter && !isNonEmpty(twitterUrl)) warnings.push('show_twitter=true but twitter_url is empty');
+        if (showGithub && !isNonEmpty(githubUrl)) warnings.push('show_github=true but github_url is empty');
+        if (showInstagram && !isNonEmpty(instagramUrl)) warnings.push('show_instagram=true but instagram_url is empty');
+        if (showYouTube && !isNonEmpty(youtubeUrl)) warnings.push('show_youtube=true but youtube_url is empty');
 
         // Apply to contact section
         setVisible(contactEmailBlock, showEmail && emailValid);
@@ -2284,19 +2348,41 @@ async function loadContactSettings(lang = 'en') {
 
         setVisible(footerScheduleBlock, showSchedule && scheduleValid);
         if (footerScheduleLink && scheduleValid) {
-            footerScheduleLink.textContent = (footerScheduleLink.textContent || 'Schedule a Call');
+            // Do not override translation-controlled label; only set the URL
             footerScheduleLink.href = scheduleUrl;
         }
         // Social links
         const linkedinValid = !!linkedinUrl;
         const twitterValid = !!twitterUrl;
         const githubValid = !!githubUrl;
+        const instagramValid = !!instagramUrl;
+        const youtubeValid = !!youtubeUrl;
         setVisible(footerLinkedinBlock, showLinkedin && linkedinValid);
         if (footerLinkedinLink && linkedinValid) footerLinkedinLink.href = linkedinUrl;
         setVisible(footerTwitterBlock, showTwitter && twitterValid);
         if (footerTwitterLink && twitterValid) footerTwitterLink.href = twitterUrl;
         setVisible(footerGithubBlock, showGithub && githubValid);
         if (footerGithubLink && githubValid) footerGithubLink.href = githubUrl;
+        setVisible(footerInstagramBlock, showInstagram && instagramValid);
+        if (footerInstagramLink && instagramValid) footerInstagramLink.href = instagramUrl;
+        setVisible(footerYouTubeBlock, showYouTube && youtubeValid);
+        if (footerYouTubeLink && youtubeValid) footerYouTubeLink.href = youtubeUrl;
+
+        // Apply social links to contact section (if present)
+        setVisible(contactInstagramBlock, showInstagram && instagramValid);
+        if (contactInstagramLink && instagramValid) contactInstagramLink.href = instagramUrl;
+        setVisible(contactYouTubeBlock, showYouTube && youtubeValid);
+        if (contactYouTubeLink && youtubeValid) contactYouTubeLink.href = youtubeUrl;
+
+        if (warnings.length > 0) {
+            console.warn('[ContactSettings] Validation warnings', {
+                lang,
+                loadedFrom,
+                warnings
+            });
+        } else if (loadedFrom) {
+            console.debug('[ContactSettings] Loaded successfully', { lang, loadedFrom });
+        }
     } catch (e) {
         console.warn('[ContactSettings] Failed to load/apply contact settings', e);
     }

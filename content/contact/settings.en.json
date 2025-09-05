@@ -10,5 +10,9 @@
   "github_url": "https://github.com/joru10",
   "show_schedule": false,
   "show_email": true,
-  "email": "jose@rapidai.com"
+  "email": "jose@rapidai.com",
+  "instagram_url": "",
+  "show_instagram": false,
+  "youtube_url": "",
+  "show_youtube": false
 }

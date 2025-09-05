@@ -545,7 +545,11 @@
             { label: 'Twitter/X URL', name: 'twitter_url', widget: 'string', required: false, i18n: 'duplicate' },
             { label: 'Show Twitter/X', name: 'show_twitter', widget: 'boolean', default: true, i18n: 'duplicate' },
             { label: 'GitHub URL', name: 'github_url', widget: 'string', required: false, i18n: 'duplicate' },
-            { label: 'Show GitHub', name: 'show_github', widget: 'boolean', default: true, i18n: 'duplicate' }
+            { label: 'Show GitHub', name: 'show_github', widget: 'boolean', default: true, i18n: 'duplicate' },
+            { label: 'Instagram URL', name: 'instagram_url', widget: 'string', required: false, i18n: 'duplicate', hint: 'https://instagram.com/your-handle', pattern: ["https?://(www\\.)?instagram\\.com/[^\\s/]+/?$", "Must be a valid Instagram URL (e.g., https://instagram.com/your-handle)"] },
+            { label: 'Show Instagram', name: 'show_instagram', widget: 'boolean', default: true, i18n: 'duplicate' },
+            { label: 'YouTube URL', name: 'youtube_url', widget: 'string', required: false, i18n: 'duplicate', hint: 'https://youtube.com/@yourchannel', pattern: ["https?://(www\\.)?(youtube\\.com/(watch\\?v=[^\\s/]+|@[^\\s/]+|channel/[^\\s/]+|c/[^\\s/]+)|youtu\\.be/[^\\s/]+)", "Must be a valid YouTube URL (e.g., https://youtube.com/@yourchannel)"] },
+            { label: 'Show YouTube', name: 'show_youtube', widget: 'boolean', default: true, i18n: 'duplicate' }
           ]
         }
       ]
