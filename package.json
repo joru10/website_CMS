@@ -8,6 +8,7 @@
     "cms": "netlify-cms-proxy-server",
     "dev": "netlify dev",
     "generate:manifests": "node scripts/generate-manifests.js",
+    "generate:content": "node scripts/generate-content.js",
     "build": "node scripts/generate-manifests.js"
   },
   "dependencies": {
