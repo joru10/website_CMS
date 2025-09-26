@@ -14,11 +14,14 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const TRANSLATIONS_DIR = path.join(ROOT, 'translations');
 const LOCALES = ['en', 'es', 'fr'];
+const CONTENT_DIR = path.join(ROOT, 'content');
 
 const errors = [];
 const warnings = [];
 const localeKeySets = new Map();
 const localeKeyOrder = new Map();
+const missingContentLocales = [];
+const STRICT_CONTENT_I18N = process.env.STRICT_CONTENT_I18N === 'true';
 
 function addError(message) {
   errors.push(message);
@@ -148,10 +151,81 @@ function reportCoverage() {
   });
 }
 
+function readJson(filePath) {
+  try {
+    const raw = fs.readFileSync(filePath, 'utf8');
+    return JSON.parse(raw);
+  } catch (err) {
+    addError(`Unable to read or parse JSON file ${filePath}: ${err.message}`);
+    return null;
+  }
+}
+
+function ensureLocalizedFileExists(basePath, locale, extensions = ['.json', '.md', '.markdown']) {
+  const candidates = [];
+  extensions.forEach((ext) => {
+    candidates.push(`${basePath}.${locale}${ext}`);
+    candidates.push(`${basePath}.${locale}${ext.toUpperCase()}`);
+  });
+  candidates.push(`${basePath}.${locale}`);
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function flagMissingLocale(collection, slug, locale, basePath) {
+  const message = `[${collection}] Missing localized file for slug '${slug}' locale '${locale}' (looked for ${basePath}.${locale}.md|json)`;
+  if (STRICT_CONTENT_I18N) {
+    addError(message);
+  } else {
+    addWarning(message);
+  }
+  missingContentLocales.push({ collection, slug, locale });
+}
+
 function validateContentLocalization() {
-  // Placeholder for future enhancements: iterate content/ manifests to ensure each locale exists
-  // Example: load manifest.json files and ensure referenced localized files exist.
-  // Implementation to be completed in subsequent roadmap steps.
+  if (!fs.existsSync(CONTENT_DIR)) {
+    addWarning(`Content directory not found: ${CONTENT_DIR}`);
+    return;
+  }
+
+  const collections = ['blog', 'news', 'education', 'cases', 'testimonials', 'services'];
+  collections.forEach((collection) => {
+    const collectionDir = path.join(CONTENT_DIR, collection);
+    const manifestPath = path.join(collectionDir, 'manifest.json');
+    if (!fs.existsSync(collectionDir)) {
+      addWarning(`Collection directory missing: ${collectionDir}`);
+      return;
+    }
+    if (!fs.existsSync(manifestPath)) {
+      addWarning(`Manifest missing for ${collection}: ${manifestPath}`);
+      return;
+    }
+    const manifest = readJson(manifestPath);
+    if (!manifest || !Array.isArray(manifest.slugs)) {
+      addError(`Manifest for ${collection} must include a 'slugs' array: ${manifestPath}`);
+      return;
+    }
+
+    manifest.slugs.forEach((slug) => {
+      const slugDir = path.join(collectionDir, slug);
+      if (!fs.existsSync(slugDir)) {
+        addError(`[${collection}] Missing directory for slug '${slug}': ${slugDir}`);
+        return;
+      }
+
+      LOCALES.forEach((locale) => {
+        const basePath = path.join(slugDir, 'index');
+        const found = ensureLocalizedFileExists(basePath, locale);
+        if (!found) {
+          flagMissingLocale(collection, slug, locale, basePath);
+        }
+      });
+    });
+  });
 }
 
 function main() {

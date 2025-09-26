@@ -90,7 +90,6 @@ async function setLanguage(lang) { // <-- 1. Added 'async' here
         loadEducationContent(lang),
         loadNewsContent(lang),
         loadSuccessStoriesContent(lang),
-        loadTestimonialsContent(lang),
         loadPartnersContent(lang),
         loadResourcesOverview(lang),
         // Load and apply contact settings early in parallel to minimize hidden time
@@ -147,7 +146,6 @@ function applyTranslations(lang) {
             'nav-about': 'About',
             'nav-process': 'Process',
             'nav-resources': 'Resources',
-            'nav-testimonials': 'Success Stories',
             'nav-get-started': 'Get Started',
             'feature-rapid': 'Rapid AI Implementation',
             'feature-personalized': 'Personalized Solutions',
@@ -214,19 +212,6 @@ function applyTranslations(lang) {
             'process-step3-desc': 'We review our detailed roadmap and agree on next steps. Clear timeline, transparent process, no surprises.',
             'process-step4-title': 'Implement with Speed, Precision, and Confidence',
             'process-step4-desc': 'Transform your business operations with AI solutions that deliver measurable results from day one.',
-            
-            // Testimonials Section
-            'testimonials-title': 'Client Success Stories',
-            'testimonials-subtitle': 'See how businesses are thriving with RapidAI solutions',
-            'testimonial1-quote': '"Jose delivered our AI chatbot in just 2 weeks. Our customer response time improved by 80% and customer satisfaction scores are at an all-time high."',
-            'testimonial1-metric1': 'Faster Response',
-            'testimonial1-metric2': 'Satisfaction',
-            'testimonial2-quote': '"The inventory prediction system Jose built has reduced our waste by 45% and increased profits by 30%. The ROI was immediate and significant."',
-            'testimonial2-metric1': 'Waste Reduction',
-            'testimonial2-metric2': 'Profit Increase',
-            'testimonial3-quote': '"Jose\'s expertise in AI and rapid implementation approach saved us months of development time. Our predictive analytics platform is now our competitive advantage."',
-            'testimonial3-metric1': 'Time Saved',
-            'testimonial3-metric2': 'ROI Achieved',
             
             // Contact Section
             'contact-title': 'Let\'s Talk AI',
@@ -375,9 +360,6 @@ function applyTranslations(lang) {
             // Case Studies Section
             'loading-cases': 'Loading case studies...',
             'no-cases': 'No case studies available.',
-            // Testimonials Section (dynamic)
-            'loading-testimonials': 'Loading testimonials...',
-            'no-testimonials': 'No testimonials available.',
             'case-section-title': 'Case Studies',
             'case-section-subtitle': 'Real-world results from RapidAI implementations',
             'case-label-challenge': 'Challenge:',
@@ -390,7 +372,6 @@ function applyTranslations(lang) {
             'nav-about': 'À propos',
             'nav-process': 'Processus',
             'nav-resources': 'Ressources',
-            'nav-testimonials': 'Témoignages',
             'nav-get-started': 'Commencer',
             'feature-rapid': 'Implémentation IA Rapide',
             'feature-personalized': 'Solutions Personnalisées',
@@ -457,20 +438,6 @@ function applyTranslations(lang) {
             'process-step3-desc': 'Nous examinons notre feuille de route détaillée et nous accordons sur les prochaines étapes. Calendrier clair, processus transparent, aucune surprise.',
             'process-step4-title': 'Implémentez avec Vitesse, Précision et Confiance',
             'process-step4-desc': 'Transformez vos opérations commerciales avec des solutions IA qui offrent des résultats mesurables dès le premier jour.',
-            
-            // Testimonials Section
-            'testimonials-title': 'Témoignages de Succès Client',
-            'testimonials-subtitle': 'Découvrez comment les entreprises prospèrent avec les solutions RapidAI',
-            'testimonial1-quote': '"Jose a livré notre chatbot IA en seulement 2 semaines. Notre temps de réponse client s\'est amélioré de 80% et les scores de satisfaction sont à leur plus haut niveau."',
-            'testimonial1-metric1': 'Réponse Plus Rapide',
-            'testimonial1-metric2': 'Satisfaction',
-            'testimonial2-quote': '"Le système de prédiction d\'inventaire que Jose a construit a réduit nos déchets de 45% et augmenté nos profits de 30%. Le ROI a été immédiat et significatif."',
-            'testimonial2-metric1': 'Réduction des Déchets',
-            'testimonial2-metric2': 'Augmentation des Profits',
-            'testimonial3-quote': '"L\'expertise de Jose en IA et son approche d\'implémentation rapide nous ont fait économiser des mois de développement. Notre plateforme d\'analytique prédictive est maintenant notre avantage concurrentiel."',
-            'testimonial3-metric1': 'Temps Économisé',
-            'testimonial3-metric2': 'ROI Atteint',
-            
             // Contact Section
             'contact-title': 'Parlons IA',
             'contact-subtitle': 'Prêt à transformer votre entreprise avec une implémentation IA rapide ?',
@@ -618,9 +585,6 @@ function applyTranslations(lang) {
             // Case Studies Section
             'loading-cases': 'Chargement des études de cas...',
             'no-cases': 'Aucune étude de cas disponible.',
-            // Testimonials Section (dynamic)
-            'loading-testimonials': 'Chargement des témoignages...',
-            'no-testimonials': 'Aucun témoignage disponible.',
             'case-section-title': 'Études de cas',
             'case-section-subtitle': 'Résultats concrets des implémentations RapidAI',
             'case-label-challenge': 'Défi :',
@@ -633,7 +597,6 @@ function applyTranslations(lang) {
             'nav-about': 'Sobre mí',
             'nav-process': 'Proceso',
             'nav-resources': 'Recursos',
-            'nav-testimonials': 'Casos de éxito',
             'nav-get-started': 'Empieza aquí',
             'feature-rapid': 'Implementación rápida de IA',
             'feature-personalized': 'Soluciones personalizadas',
@@ -700,20 +663,6 @@ function applyTranslations(lang) {
             'process-step3-desc': 'Revisamos nuestra hoja de ruta detallada y acordamos los próximos pasos. Calendario claro, proceso transparente, sin sorpresas.',
             'process-step4-title': 'Implementa con Velocidad, Precisión y Confianza',
             'process-step4-desc': 'Transforma las operaciones de tu negocio con soluciones de IA que ofrecen resultados medibles desde el primer día.',
-            
-            // Testimonials Section
-            'testimonials-title': 'Casos de Éxito de Clientes',
-            'testimonials-subtitle': 'Descubre cómo las empresas están prosperando con las soluciones de RapidAI',
-            'testimonial1-quote': '"Jose entregó nuestro chatbot de IA en solo 2 semanas. Nuestro tiempo de respuesta al cliente mejoró un 80% y los puntajes de satisfacción están en su punto más alto."',
-            'testimonial1-metric1': 'Respuesta Más Rápida',
-            'testimonial1-metric2': 'Satisfacción',
-            'testimonial2-quote': '"El sistema de predicción de inventario que Jose construyó redujo nuestros desperdicios un 45% y aumentó las ganancias un 30%. El ROI fue inmediato y significativo."',
-            'testimonial2-metric1': 'Reducción de Desperdicios',
-            'testimonial2-metric2': 'Aumento de Ganancias',
-            'testimonial3-quote': '"La experiencia de Jose en IA y su enfoque de implementación rápida nos ahorró meses de desarrollo. Nuestra plataforma de analítica predictiva es ahora nuestra ventaja competitiva."',
-            'testimonial3-metric1': 'Tiempo Ahorrado',
-            'testimonial3-metric2': 'ROI Logrado',
-            
             // Contact Section
             'contact-title': 'Hablemos de IA',
             'contact-subtitle': '¿Listo para transformar tu negocio con implementación rápida de IA?',
@@ -861,9 +810,6 @@ function applyTranslations(lang) {
             // Case Studies Section
             'loading-cases': 'Cargando estudios de caso...',
             'no-cases': 'No hay estudios de caso disponibles.',
-            // Testimonials Section (dynamic)
-            'loading-testimonials': 'Cargando testimonios...',
-            'no-testimonials': 'No hay testimonios disponibles.',
             'case-section-title': 'Casos de Estudio',
             'case-section-subtitle': 'Resultados reales de implementaciones de RapidAI',
             'case-label-challenge': 'Desafío:',
@@ -1576,126 +1522,6 @@ async function loadSuccessStoriesContent(lang = 'en') {
     });
 }
 
-// Load Testimonials from /content/testimonials using manifest.json and i18n fallback
-async function loadTestimonialsContent(lang = 'en') {
-    const container = document.getElementById('testimonials-container');
-    if (!container) return;
-    container.innerHTML = `
-        <div class="col-span-3 text-center py-8">
-            <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
-            <p class="mt-4 text-gray-600" data-translate="loading-testimonials">Loading testimonials...</p>
-        </div>`;
-
-    let slugs = [];
-    try {
-        const res = await fetch('/content/testimonials/manifest.json', { cache: 'no-cache' });
-        if (res.ok) {
-            const data = await res.json();
-            if (Array.isArray(data.slugs)) slugs = data.slugs;
-        }
-    } catch (e) { /* ignore */ }
-
-    async function fetchTestimonial(slug) {
-        const urls = [
-            `/content/testimonials/${slug}/index.${lang}.json`,
-            `/content/testimonials/${slug}/index.en.json`
-        ];
-        for (const url of urls) {
-            try {
-                const res = await fetch(url, { cache: 'no-cache' });
-                if (!res.ok) continue;
-                const json = await res.json();
-                if (!json || !json.name || !json.quote) continue;
-                return {
-                    slug,
-                    name: json.name || '',
-                    role: json.role || '',
-                    company: json.company || '',
-                    avatar: json.avatar || '',
-                    badge: json.badge || '',
-                    delivery: json.delivery || '',
-                    stars: Math.min(5, Math.max(1, Number(json.stars || 5))) || 5,
-                    quote: json.quote || '',
-                    metric1_label: json.metric1_label || '',
-                    metric1_value: json.metric1_value || '',
-                    metric2_label: json.metric2_label || '',
-                    metric2_value: json.metric2_value || '',
-                    social_note: json.social_note || '',
-                    linkedin_url: json.linkedin_url || ''
-                };
-            } catch (e) { /* continue */ }
-        }
-        return null;
-    }
-
-    if (!slugs.length) {
-        container.innerHTML = `
-            <div class="col-span-3 text-center py-8">
-                <p class="text-gray-600" data-translate="no-testimonials">No testimonials available.</p>
-            </div>`;
-        return;
-    }
-
-    const items = (await Promise.all(slugs.map(fetchTestimonial))).filter(Boolean);
-
-    container.innerHTML = '';
-    if (!items.length) {
-        container.innerHTML = `
-            <div class="col-span-3 text-center py-8">
-                <p class="text-gray-600" data-translate="no-testimonials">No testimonials available.</p>
-            </div>`;
-        return;
-    }
-
-    items.forEach(t => {
-        const card = document.createElement('div');
-        card.className = 'bg-white p-8 rounded-2xl shadow-lg card-hover fade-in';
-
-        // Build stars
-        const starsHtml = Array.from({ length: t.stars }).map(() => '<i class="fas fa-star text-yellow-400"></i>').join('');
-
-        // Build header badge/delivery if present
-        const badgeHtml = t.badge ? `<div class="bg-blue-100 px-3 py-1 rounded-full"><span class="text-blue-800 text-xs font-semibold">${t.badge}</span></div>` : '';
-        const deliveryHtml = t.delivery ? `<div class="text-green-600 text-sm font-semibold">${t.delivery}</div>` : '';
-
-        // Build LinkedIn/social note
-        const linkedinHtml = t.linkedin_url ? `<a href="${t.linkedin_url}" target="_blank" rel="noopener" class="fab fa-linkedin text-blue-600 text-xs mr-1"></a>` : '<i class="fab fa-linkedin text-blue-600 text-xs mr-1"></i>';
-        const socialNoteHtml = t.social_note ? `<span class="text-xs text-gray-500">${t.social_note}</span>` : '';
-
-        // Metrics blocks
-        const metric1 = (t.metric1_value || t.metric1_label) ? `
-            <div>
-                <div class="text-2xl font-bold text-green-600">${t.metric1_value || ''}</div>
-                <div class="text-xs text-gray-500">${t.metric1_label || ''}</div>
-            </div>` : '';
-        const metric2 = (t.metric2_value || t.metric2_label) ? `
-            <div>
-                <div class="text-2xl font-bold text-blue-600">${t.metric2_value || ''}</div>
-                <div class="text-xs text-gray-500">${t.metric2_label || ''}</div>
-            </div>` : '';
-
-        card.innerHTML = `
-            ${(badgeHtml || deliveryHtml) ? `<div class="flex items-center justify-between mb-4">${badgeHtml}${deliveryHtml}</div>` : ''}
-            <div class="flex items-center mb-4">
-                ${t.avatar ? `<img src="${t.avatar}" alt="${t.name}" class="w-12 h-12 rounded-full mr-4">` : `<div class="w-12 h-12 rounded-full mr-4 bg-gray-200"></div>`}
-                <div>
-                    <h4 class="font-semibold text-gray-800">${t.name}</h4>
-                    <p class="text-sm text-gray-600">${[t.role, t.company].filter(Boolean).join(', ')}</p>
-                    ${(t.linkedin_url || t.social_note) ? `<div class="flex items-center mt-1">${linkedinHtml}${socialNoteHtml}</div>` : ''}
-                </div>
-            </div>
-            <div class="flex mb-4">${starsHtml}</div>
-            <p class="text-gray-600 mb-4">${t.quote}</p>
-            ${(metric1 || metric2) ? `<div class="border-t pt-4 grid grid-cols-2 gap-4 text-center">${metric1}${metric2}</div>` : ''}
-        `;
-
-        container.appendChild(card);
-        if (typeof observer !== 'undefined' && observer instanceof IntersectionObserver) {
-            observer.observe(card);
-            card.classList.add('visible');
-        }
-    });
-}
 
 // Load Partners from /content/partners using manifest.json and i18n fallback
 async function loadPartnersContent(lang = 'en') {
