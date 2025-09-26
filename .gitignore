@@ -5,8 +5,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 # Local CMS files
-static/uploads/
-!static/uploads/.gitkeep
+# Static uploads (keep tracked for public assets)
+# Commented to allow committed brand imagery. CMS uploads still go here.
+# static/uploads/
+# !static/uploads/.gitkeep
 
 # Env files
 .env
