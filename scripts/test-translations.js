@@ -5,6 +5,8 @@
  * - Detects duplicate keys per locale
  * - Confirms all locales expose the same set of keys
  * - Guards informal tone requirements for Spanish (no "su" / "sus" / "usted")
+ * - Reports missing translation keys per locale and optional coverage summary
+ * - (Stub) Validates that CMS content files provide localized variants
  */
 const fs = require('fs');
 const path = require('path');
@@ -16,6 +18,7 @@ const LOCALES = ['en', 'es', 'fr'];
 const errors = [];
 const warnings = [];
 const localeKeySets = new Map();
+const localeKeyOrder = new Map();
 
 function addError(message) {
   errors.push(message);
@@ -74,6 +77,7 @@ function loadLocale(locale) {
       addError(`${filePath} contains duplicated key "${item.key}"`);
     }
     keys.add(item.key);
+    localeKeyOrder.set(`${locale}:${item.key}`, index);
 
     if (locale === 'es' && typeof item.value === 'string') {
       checkSpanishTone(item.value, pointer, item.key);
@@ -116,13 +120,46 @@ function compareLocaleKeySets() {
     if (extras.length) {
       addWarning(`Locale '${locale}' has ${extras.length} extra key(s) not present in '${baseLocale}': ${extras.join(', ')}`);
     }
+
+    const outOfOrder = [...keySet].filter((key) => baseKeys.has(key)).filter((key) => {
+      const baseIndex = localeKeyOrder.get(`${baseLocale}:${key}`);
+      const localeIndex = localeKeyOrder.get(`${locale}:${key}`);
+      return typeof localeIndex === 'number' && typeof baseIndex === 'number' && localeIndex < baseIndex;
+    });
+    if (outOfOrder.length) {
+      addWarning(`Locale '${locale}' has ${outOfOrder.length} key(s) out of order compared to '${baseLocale}': ${outOfOrder.join(', ')}`);
+    }
   }
+}
+
+function reportCoverage() {
+  const baseLocale = LOCALES[0];
+  const baseKeys = localeKeySets.get(baseLocale) || new Set();
+  console.log('Translation coverage summary:');
+  LOCALES.forEach((locale) => {
+    const keys = localeKeySets.get(locale);
+    if (!keys) {
+      console.log(`  • ${locale}: 0 / ${baseKeys.size} keys`);
+      return;
+    }
+    const count = keys.size;
+    const pct = baseKeys.size ? Math.round((count / baseKeys.size) * 100) : 100;
+    console.log(`  • ${locale}: ${count} / ${baseKeys.size} keys (${pct}%)`);
+  });
+}
+
+function validateContentLocalization() {
+  // Placeholder for future enhancements: iterate content/ manifests to ensure each locale exists
+  // Example: load manifest.json files and ensure referenced localized files exist.
+  // Implementation to be completed in subsequent roadmap steps.
 }
 
 function main() {
   ensureTranslationDir();
   LOCALES.forEach(loadLocale);
   compareLocaleKeySets();
+  reportCoverage();
+  validateContentLocalization();
 
   if (warnings.length) {
     console.warn('Warnings:');
