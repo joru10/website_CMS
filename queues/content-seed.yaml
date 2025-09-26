@@ -1,0 +1,18 @@
+- section: blog
+  slug: accelerating-ai-delivery
+  title: Accelerating AI Delivery for SMEs
+  date: 2025-09-30
+  description: How RapidAI reduced AI delivery cycles for SMEs by 40%.
+  locales: [en, es, fr]
+- section: news
+  slug: rapidai-wins-eu-grant
+  title: RapidAI Secures EU Innovation Grant
+  date: 2025-10-10
+  description: Funding accelerates AI adoption support for European SMEs.
+  locales: [en, es, fr]
+- section: education
+  slug: ai-change-management
+  title: AI Change Management Toolkit
+  date: 2025-10-05
+  description: Framework for onboarding teams and reducing resistance to AI initiatives.
+  locales: [en, es, fr]
