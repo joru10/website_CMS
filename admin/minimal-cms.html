@@ -615,5 +615,49 @@
     } catch(e){}
   })();
   </script>
+  <script>
+    // Register simple preview templates for markdown-based collections
+    whenCMSReady(function(){
+      try {
+        var CMSRef = window.CMS || window.DecapCMS || window.NetlifyCms;
+        if (!CMSRef || !CMSRef.registerPreviewTemplate) return;
+
+        var createClass = window.createClass;
+        var h = window.h || (window.React && window.React.createElement);
+        if (!createClass || !h) {
+          console.warn('[CMS Preview] createClass/h not found; skipping preview templates');
+          return;
+        }
+
+        var CommonPreview = function(sectionName){
+          return createClass({
+            render: function(){
+              var entry = this.props.entry;
+              var title = entry.getIn(['data','title']);
+              var date = entry.getIn(['data','date']);
+              var description = entry.getIn(['data','description']);
+              var body = this.props.widgetFor('body');
+              return h('article', { style: { fontFamily: '-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif', lineHeight: '1.55', padding: '16px' } },
+                h('small', { style: { color: '#6b7280' } }, sectionName || ''),
+                h('h1', { style: { marginTop: '8px', marginBottom: '8px' } }, String(title || 'Untitled')),
+                date ? h('p', { style: { color: '#6b7280', margin: 0 } }, String(date)) : null,
+                description ? h('p', {}, String(description)) : null,
+                h('hr', {}),
+                h('div', { className: 'prose' }, body)
+              );
+            }
+          });
+        };
+
+        CMSRef.registerPreviewTemplate('blog', CommonPreview('Blog'));
+        CMSRef.registerPreviewTemplate('news', CommonPreview('News'));
+        CMSRef.registerPreviewTemplate('education', CommonPreview('Education'));
+        CMSRef.registerPreviewStyle('body { background:#fff; }', { raw: true });
+        console.log('[CMS Preview] Registered templates for blog/news/education');
+      } catch(e) {
+        console.warn('[CMS Preview] Failed to register templates', e);
+      }
+    });
+  </script>
 </body>
 </html>

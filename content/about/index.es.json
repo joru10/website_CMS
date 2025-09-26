@@ -1,8 +1,8 @@
 {
   "title": "Conoce a <span class=\"text-blue-600\">José Ruiz</span>",
   "description": "Con años de experiencia en inteligencia artificial y transformación empresarial, me especializo en ayudar a las empresas a implementar rápidamente soluciones de IA que generan resultados medibles.",
-  "image": "https://picsum.photos/seed/jose/500/400",
-  "image_alt": "José Ruiz - Experto en IA",
+  "image": "/static/uploads/about-jose.png",
+  "image_alt": "Retrato de Jose Ruiz, fundador de RapidAI",
   "bullets": [
     { "icon": "fas fa-graduation-cap text-blue-600", "text": "Experto en aprendizaje automático e implementación de IA" },
     { "icon": "fas fa-briefcase text-blue-600", "text": "Historial probado con empresas de todos los tamaños" },

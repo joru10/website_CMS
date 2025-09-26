@@ -17,8 +17,7 @@
     { "key": "stat-efficiency", "value": "Mejora media de eficiencia" },
     { "key": "newsletter-placeholder", "value": "Introduce tu correo de empresa" },
     { "key": "newsletter-join", "value": "Únete gratis" },
-    { "key": "newsletter-note", "value": "Gratis para siempre. Sin spam. Cancela tu suscripción en cualquier momento. Más de 2.000 líderes de pymes confían en nosotros." }
-  ,
+    { "key": "newsletter-note", "value": "Gratis para siempre. Sin spam. Cancela tu suscripción en cualquier momento. Más de 2.000 líderes de pymes confían en nosotros." },
   { "key": "process-title", "value": "Implementa IA con velocidad, precisión y confianza" },
   { "key": "process-subtitle", "value": "Un proceso claro de 4 pasos que te lleva de la incertidumbre a los resultados" },
   { "key": "process-step1-title", "value": "Programa una consulta de preparación para IA" },

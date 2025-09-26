@@ -1,8 +1,8 @@
 {
   "title": "Meet <span class=\"text-blue-600\">Jose Ruiz</span>",
   "description": "With years of experience in artificial intelligence and business transformation, I specialize in helping companies rapidly implement AI solutions that deliver measurable results.",
-  "image": "https://picsum.photos/seed/jose/500/400",
-  "image_alt": "Jose Ruiz - AI Expert",
+  "image": "/static/uploads/about-jose.png",
+  "image_alt": "Portrait of Jose Ruiz, founder of RapidAI",
   "bullets": [
     { "icon": "fas fa-graduation-cap text-blue-600", "text": "Expert in Machine Learning & AI Implementation" },
     { "icon": "fas fa-briefcase text-blue-600", "text": "Proven track record with businesses of all sizes" },

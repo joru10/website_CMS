@@ -2,7 +2,7 @@
   "strings": [
     {
       "key": "nav-services",
-      "value": "Services meh"
+      "value": "Services"
     },
     {
       "key": "nav-about",
@@ -150,7 +150,7 @@
     },
     {
       "key": "cta-consultation",
-      "value": "-"
+      "value": "Schedule a Free Consultation"
     },
     {
       "key": "contact-submit",
