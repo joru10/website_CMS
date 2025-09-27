@@ -192,7 +192,7 @@ function validateContentLocalization() {
     return;
   }
 
-  const collections = ['blog', 'news', 'education', 'cases', 'testimonials', 'services'];
+  const collections = ['blog', 'news', 'education', 'cases', 'services'];
   collections.forEach((collection) => {
     const collectionDir = path.join(CONTENT_DIR, collection);
     const manifestPath = path.join(collectionDir, 'manifest.json');

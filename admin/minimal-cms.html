@@ -477,33 +477,6 @@
           ]
         },
         {
-          name: 'testimonials',
-          label: 'Testimonials',
-          label_singular: 'Testimonial',
-          folder: 'content/testimonials',
-          create: true,
-          slug: '{{slug}}',
-          format: 'json',
-          path: '{{slug}}/index',
-          i18n: true,
-          fields: [
-            { label: 'Name', name: 'name', widget: 'string', i18n: 'duplicate' },
-            { label: 'Title/Role', name: 'role', widget: 'string', required: false, i18n: true },
-            { label: 'Company', name: 'company', widget: 'string', required: false, i18n: 'duplicate' },
-            { label: 'Avatar', name: 'avatar', widget: 'image', required: false, i18n: 'duplicate' },
-            { label: 'Badge (e.g., sector • size)', name: 'badge', widget: 'string', required: false, i18n: true },
-            { label: 'Delivery (e.g., 2 weeks delivery)', name: 'delivery', widget: 'string', required: false, i18n: true },
-            { label: 'Stars (1-5)', name: 'stars', widget: 'number', min: 1, max: 5, default: 5, i18n: 'duplicate' },
-            { label: 'Quote', name: 'quote', widget: 'text', i18n: true },
-            { label: 'Metric 1 Label', name: 'metric1_label', widget: 'string', required: false, i18n: true },
-            { label: 'Metric 1 Value', name: 'metric1_value', widget: 'string', required: false, i18n: true },
-            { label: 'Metric 2 Label', name: 'metric2_label', widget: 'string', required: false, i18n: true },
-            { label: 'Metric 2 Value', name: 'metric2_value', widget: 'string', required: false, i18n: true },
-            { label: 'Social Note (e.g., Verified on LinkedIn)', name: 'social_note', widget: 'string', required: false, i18n: true },
-            { label: 'LinkedIn URL', name: 'linkedin_url', widget: 'string', required: false, i18n: 'duplicate' }
-          ]
-        },
-        {
           name: 'partners',
           label: 'Partners',
           label_singular: 'Partner',
