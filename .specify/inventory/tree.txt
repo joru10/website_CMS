@@ -1,0 +1,212 @@
+.
+├── .DS_Store
+├── .env
+├── .gitignore
+├── .netlify
+│   ├── blobs-serve
+│   ├── functions-internal
+│   ├── state.json
+│   └── v1
+│       └── functions
+├── .specify
+│   └── inventory
+│       ├── files.txt
+│       └── tree.txt
+├── .windsurf
+│   └── workflows
+│       ├── analyze.md
+│       ├── clarify.md
+│       ├── constitution.md
+│       ├── implement.md
+│       ├── plan.md
+│       ├── specify.md
+│       └── tasks.md
+├── DEVELOPMENT_PLAN.md
+├── FINAL_INSTRUCTIONS.md
+├── admin
+│   ├── _archive
+│   │   ├── clean-admin.html
+│   │   ├── clean-test.html
+│   │   ├── cms-load-test.html
+│   │   ├── cms-test.html
+│   │   ├── config.yml.bak
+│   │   ├── minimal-cms.html
+│   │   ├── oauth-debug.html
+│   │   ├── oauth-simple.html
+│   │   ├── oauth-test.html
+│   │   ├── official-cms.html
+│   │   ├── react-test.html
+│   │   ├── simple-cms.html
+│   │   ├── simple-test.html
+│   │   ├── standard-cms.html
+│   │   ├── static-test.html
+│   │   ├── test-clean.html
+│   │   ├── test-cms.html
+│   │   ├── test-oauth.html
+│   │   ├── test-simple.html
+│   │   ├── working-cms.html
+│   │   └── working-oauth.html
+│   ├── callback.html
+│   ├── index.html
+│   └── minimal-cms.html
+├── cases.html
+├── config.yml.bak
+├── content
+│   ├── .DS_Store
+│   ├── about
+│   │   ├── index.en.json
+│   │   ├── index.es.json
+│   │   └── index.fr.json
+│   ├── blog
+│   │   ├── getting-started-with-ai
+│   │   │   ├── index.en.md
+│   │   │   ├── index.es.md
+│   │   │   └── index.fr.md
+│   │   ├── hello-world
+│   │   │   ├── index.en.md
+│   │   │   ├── index.es.md
+│   │   │   └── index.fr.md
+│   │   └── manifest.json
+│   ├── cases
+│   │   ├── case-001
+│   │   │   ├── index.en.json
+│   │   │   ├── index.es.json
+│   │   │   └── index.fr.json
+│   │   ├── manifest.json
+│   │   ├── transition-to-ai-for-office-administration
+│   │   │   ├── index.en.json
+│   │   │   ├── index.es.json
+│   │   │   └── index.fr.json
+│   │   └── turutururu
+│   │       ├── index.en.json
+│   │       ├── index.es.json
+│   │       └── index.fr.json
+│   ├── contact
+│   │   ├── settings.en.json
+│   │   ├── settings.es.json
+│   │   └── settings.fr.json
+│   ├── education
+│   │   ├── intro-to-ai
+│   │   │   ├── index.en.md
+│   │   │   ├── index.es.md
+│   │   │   └── index.fr.md
+│   │   ├── manifest.json
+│   │   └── prompt-engineering-basics
+│   │       ├── index.en.md
+│   │       ├── index.es.md
+│   │       └── index.fr.md
+│   ├── intro
+│   │   ├── index.en.json
+│   │   ├── index.es.json
+│   │   └── index.fr.json
+│   ├── news
+│   │   ├── manifest.json
+│   │   ├── rapidai-named-best-sme-consultat-for-ai-transitioning-in-france
+│   │   │   ├── index.en.md
+│   │   │   ├── index.es.md
+│   │   │   └── index.fr.md
+│   │   ├── rapidai-named-best-sme-consultat-for-ai-transitioning-in-france.en.md
+│   │   ├── rapidai-named-best-sme-consultat-for-ai-transitioning-in-france.es.md
+│   │   ├── rapidai-named-best-sme-consultat-for-ai-transitioning-in-france.fr.md
+│   │   ├── weekly-001
+│   │   │   ├── index.en.md
+│   │   │   ├── index.es.md
+│   │   │   └── index.fr.md
+│   │   └── weekly-002
+│   │       ├── index.en.md
+│   │       ├── index.es.md
+│   │       └── index.fr.md
+│   ├── partners
+│   │   ├── manifest.json
+│   │   ├── partner-001
+│   │   │   ├── index.en.json
+│   │   │   ├── index.es.json
+│   │   │   └── index.fr.json
+│   │   └── partner-002
+│   │       ├── index.en.json
+│   │       ├── index.es.json
+│   │       └── index.fr.json
+│   ├── resources_intro
+│   │   ├── index.en.json
+│   │   ├── index.es.json
+│   │   └── index.fr.json
+│   ├── services
+│   │   ├── manifest.json
+│   │   ├── service1
+│   │   │   ├── index.en.md
+│   │   │   ├── index.es.md
+│   │   │   └── index.fr.md
+│   │   ├── service2
+│   │   │   ├── index.en.md
+│   │   │   ├── index.es.md
+│   │   │   └── index.fr.md
+│   │   └── service3
+│   │       ├── index.en.md
+│   │       ├── index.es.md
+│   │       └── index.fr.md
+│   └── values
+│       ├── index.en.json
+│       ├── index.es.json
+│       └── index.fr.json
+├── content.json
+├── content_generation
+│   ├── docs
+│   ├── scripts
+│   └── src
+├── docs
+│   └── CONTENT_QUEUE.md
+├── education.html
+├── index.html
+├── input
+│   └── from_user.md
+├── logs
+│   └── last-response.md
+├── netlify
+│   └── functions
+│       └── oauth.js
+├── netlify-forms-detect.html
+├── netlify.toml
+├── news.html
+├── oauth-provider
+│   ├── .env
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── server.cjs
+│   ├── server.js
+│   ├── simple-server.mjs
+│   └── test-server.js
+├── package-lock.json
+├── package.json
+├── public
+│   └── test-auth.html
+├── queues
+│   └── content-seed.yaml
+├── reference website
+├── render.yaml
+├── script.js
+├── scripts
+│   ├── cms-diagnostics.js
+│   ├── generate-content.js
+│   ├── generate-manifests.js
+│   └── test-translations.js
+├── standalone-oauth-test.html
+├── start.sh
+├── static
+│   ├── .DS_Store
+│   └── uploads
+│       ├── about-jose.png
+│       ├── hero-rapidia.png
+│       └── hero-rapidia2.png
+├── styles.css
+├── test-cms-standalone.html
+├── test.html
+├── translations
+│   ├── TRANSLATION_NOTES.md
+│   ├── en.json
+│   ├── en_1754388933.bak
+│   ├── es.json
+│   ├── es_1754389373.bak
+│   └── fr.json
+└── windsurf_deployment.yaml
+
+55 directories, 155 files
