@@ -16,3 +16,6 @@ oauth-provider/.env
 
 # Local Netlify folder
 .netlify
+
+# Local Windsurf agent state
+.windsurf/
