@@ -31,7 +31,7 @@
 - Phase 3-4: Implementation execution (manual or via tools)
 
 ## Summary
-Deliver an autonomous-yet-supervised content factory that ingests daily AI news, plans SME-focused narratives, drafts multilingual assets, enforces quality gates, and publishes via Git PRs into the RapidAI website. ACE orchestrates agents (ingestion, planner, writers, fact-check, SEO, assets, translator, QA) on a CET schedule with human review before publishing.
+Deliver an autonomous-yet-supervised content factory that ingests AI news, scores opportunities, and produces track-specific assets (News Digest, Blog Insight, Use-Case Spotlight) with multilingual drafts, manual insert support, candidate review UX, and automated publishing via Git PR. ACE orchestrates ingestion, scoring, planning, writing, QA, and reviewer workflows aligned to CET cadences spelled out in the PRD.
 
 ## Technical Context
 **Language/Version**: Python 3.11 (orchestrator, agents), FastAPI 0.111 (review UI/API), HTMX frontend, APScheduler 3.x; JavaScript build scripts for publishing hooks.  
@@ -40,9 +40,9 @@ Deliver an autonomous-yet-supervised content factory that ingests daily AI news,
 **Testing**: pytest for orchestrator modules, integration tests for pipelines, unit tests for translators/fact-checkers, contract tests for publishing API.  
 **Target Platform**: Self-hosted containers (Docker Compose) running on developer workstation or lightweight server; Netlify remains static delivery target.  
 **Project Type**: Multi-component web/back-end automation (Python services + static site integration).  
-**Performance Goals**: Draft generation within 15 minutes per run; News Digest ready by 07:00 CET; readability ≥60; translation QE ≥0.7.  
+**Performance Goals**: Draft generation within 15 minutes per run; News Digest ready for review by 07:00 CET and auto-schedulable for 09:00; Blog candidate list available Friday 16:00 CET; Use-Case candidates Monday 09:00 CET; readability ≥60; translation QE ≥0.7.  
 **Constraints**: Local models first (LMStudio, LibreTranslate); stay within constitution mandates (CMS-driven content, localization parity, PKCE OAuth); schedule reliability (CET).  
-**Scale/Scope**: Three content pipelines (ND, BI, US) across EN/ES/FR with daily + weekly cadence; backlog capacity ≥7 days.
+**Scale/Scope**: Three content pipelines (ND daily weekdays, BI weekly 1–2x, US weekly) across EN/ES/FR; backlog capacity ≥7 days; candidate pools capped at 5 (blog) and 3 (use-case).
 
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
@@ -103,32 +103,33 @@ content/
 **Structure Decision**: Multi-component workspace under `ace/` hosting Python services and reviewer UI, plus scripts for manual runs; generated content committed under existing `content/` hierarchy.
 
 ## Phase 0: Outline & Research
-1. Gather open questions (RSS allowlist, hosting, branding) and assign owners.
-2. Evaluate tooling feasibility: LMStudio throughput, LibreTranslate vs CTranslate2, Qdrant deployment.
-3. Prototype ingestion against news.smol.ai and sample RSS feeds to validate parsing, dedupe, and rate limits.
-4. Document findings, risks, and decisions in `research.md`.
+1. Gather open questions (RSS allowlist, manual seed workflows, hosting, branding) and assign owners.
+2. Evaluate tooling feasibility: LMStudio throughput, LibreTranslate vs CTranslate2, Qdrant deployment, scoring pipeline performance.
+3. Prototype ingestion against news.smol.ai, curated RSS feeds, and manual insert flow to validate dedupe and metadata capture.
+4. Model Business-Value scoring using historical corpus samples; confirm threshold settings (≥65 blog, ≥60 use-case).
+5. Document findings, risks, and decisions in `research.md`.
 
-**Output**: `research.md` with source inventory, model selections, infra decisions, and unresolved clarifications.
+**Output**: `research.md` with source inventory, manual insert design, scoring formulas, infra decisions, and unresolved clarifications.
 
 ## Phase 1: Design & Contracts
 *Prerequisites: research.md complete*
 
-1. Define data entities & schemas: job schedule, draft package, reviewer action, audit log, asset, translation, quality gate results.
-2. Design reviewer API (FastAPI) routes and response contracts; capture in `/contracts/reviewer-openapi.yaml` if warranted.
-3. Outline pipeline state transitions and sequence diagrams; translate into `data-model.md`.
-4. Write `quickstart.md` covering Docker dependencies, environment configuration, running orchestrator, reviewing drafts, publishing dry run.
+1. Define data entities & schemas: job schedule, candidate pool (with business-value scoring, seed news IDs), manual insert records, draft packages per track, review actions, audit logs, assets, translation metrics, quality gate results.
+2. Design reviewer API (FastAPI) routes for News board (manual insert, reorder), Blog/Use-Case candidate tables, scheduling actions; capture in `/contracts/reviewer-openapi.yaml` if warranted.
+3. Outline pipeline state transitions (ingested → planned → drafted → QA-passed → awaiting-approval → scheduled → published) per track; translate into `data-model.md` with track-specific metadata.
+4. Write `quickstart.md` covering Docker dependencies, scheduling windows, running candidate reviews (Fri 16:00 CET, Mon 09:00 CET), manual insert workflow, and publishing dry run.
 5. Update agent context via `.specify/scripts/bash/update-agent-context.sh windsurf` after documenting major tech decisions.
 
 ## Phase 2: Task Planning Approach
 *This section describes what the /tasks command will do - DO NOT execute during /plan*
 
 **Task Generation Strategy**:
-- Map tasks across phases (Foundations, News Digest pipeline, Blog/Use-Case, SEO/Analytics, Polish) mirroring PRD schedule.
-- Include setup tasks (Docker env, LMStudio config, Qdrant bootstrap), pipeline-specific development, QA automation, publishing integration, reviewer UI build, Netlify hooks.
+- Map tasks across phases (Foundations, News Digest pipeline, Blog candidate engine, Use-Case pipeline, Review UX, SEO/Analytics, Polish) mirroring PRD timeline.
+- Include setup tasks (Docker env, LMStudio config, Qdrant bootstrap), scoring implementation, candidate UX, manual insert features, QA automation, publishing integration, Netlify hooks.
 - Mark tasks for parallel execution when they touch distinct modules (`orchestrator/agents/*` vs `reviewer-ui/`).
 
 **Ordering Strategy**:
-- Sequential by phase; ensure foundational infra precedes pipeline builds; QA/SEO after content generators work; analytics after publishing pipeline.
+- Sequential by phase; ensure foundational infra precedes pipeline builds; enable News track first, then candidate scoring for Blog/Use-Case, followed by review UX and analytics.
 
 **Estimated Output**: ~25 tasks with sub-phase markers.
 

@@ -58,37 +58,43 @@ When creating this spec from a user prompt:
 As the RapidAI content lead, I want an autopilot engine that assembles daily and weekly multilingual content packages (News Digest, Blog Insight, Use-Case Spotlight) so we can grow leads and social reach without manually drafting every piece.
 
 ### Acceptance Scenarios
-1. **Given** a weekday morning at 07:00 CET, **When** the system finishes its News Digest run, **Then** a human reviewer sees a ready-to-approve English draft with ≥4 curated items, citations, and SME relevance notes along with pending translations for ES/FR.
-2. **Given** a scheduled Blog Insight slot, **When** the planner selects a trend from recent digests, **Then** the engine presents a 1,000–1,500 word draft following the BI template with action items and footnotes.
-3. **Given** reviewer approval of any content type, **When** the publish action is triggered, **Then** the site receives Markdown files (EN/ES/FR) via Git PR with front-matter, SEO metadata, JSON-LD, assets, and RSS/LinkedIn payloads ready.
+1. **Given** a weekday morning at 07:00 CET, **When** the News Digest pipeline completes, **Then** the reviewer dashboard presents 4–8 curated items (with inline add/remove/reorder controls, SME why-it-matters copy, and ≥2 corroborating links each) ready for approval and pre-translated into ES/FR.
+2. **Given** a Friday 16:00 CET candidate review session, **When** the Blog Insight scorer evaluates the prior week’s news pool, **Then** the reviewer sees 3–5 candidates with business-value scores ≥65, outlines, and suggested search terms, and can approve one for drafting.
+3. **Given** a Monday 09:00 CET Use-Case Spotlight review, **When** the system proposes 2–3 candidates combining seed news and manual suggestions, **Then** the reviewer can approve one with ROI framing to trigger full drafts and translations by Tuesday 16:00 CET.
+4. **Given** any track’s draft passes QA gates, **When** the reviewer approves and schedules publication, **Then** the system creates a Git PR with type-specific front-matter (including candidate scores/seed IDs), JSON-LD, assets, RSS entries, and LinkedIn copy queued for Netlify deployment.
 
 ### Edge Cases
-- What happens when sources fail or provide duplicate stories? The engine must dedupe items and fall back to alternate feeds before surfacing drafts.
-- How does the system behave if readability, fact-check, or QE scores fail thresholds? Drafts remain in "review" state with flagged issues and do not advance to publishing until resolved.
-- What if translation quality drops below configured confidence? The reviewer must receive warnings and the content remains pending.
+- What happens when sources fail or provide duplicate stories? The engine must dedupe items, pull from overflow RSS caches, and invite manual inserts before promoting drafts.
+- How does the system behave when Blog/Use-Case candidate scores fall below thresholds? The reviewer is notified with fallback suggestions (extended window, manual seed) and no auto-draft occurs until approval.
+- What if translation quality drops below configured confidence? The reviewer must receive warnings with per-segment QE scores; drafts stay in "QA-passed" but blocked from scheduling.
+- How should the system respond if candidate traceability (seed news IDs) is missing? Publishing must be blocked until provenance links are re-established.
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
-- **FR-001**: The engine MUST generate News Digest drafts Monday–Friday with 4–8 curated items, each containing summary, SME relevance, and ≥2 cited sources.
-- **FR-002**: The engine MUST produce Blog Insights and Use-Case Spotlights on the defined cadence, adhering to the specified section templates and word counts.
-- **FR-003**: All drafts MUST pass governance gates (fact-check, readability ≥60, link health, duplicate detection, toxicity skim) before they can enter human review.
-- **FR-004**: Approved content MUST be published via Git PR containing Markdown (EN/ES/FR), front-matter, SEO metadata, schema blocks, assets, and RSS/LinkedIn payloads.
-- **FR-005**: A reviewer dashboard MUST expose pending items, blockers, schedules, and allow approve/schedule/edit actions.
-- **FR-006**: All published content MUST be indexed into the RAG store for future retrieval and internal linking suggestions.
-- **FR-007**: The system MUST maintain audit logs covering ingestion sources, decision scores, reviewer actions, and publishing outcomes.
+- **FR-001**: The engine MUST deliver News Digest drafts Monday–Friday with 4–8 items sourced from news.smol.ai, configured RSS feeds, and optional manual inserts, each containing "what happened", "why it matters", and ≥2 corroborating links.
+- **FR-002**: The engine MUST surface Blog Insight candidates weekly (3–5 options with Business-Value Score ≥65) and generate approved drafts following the BI template with internal links to related News/Use-Case content.
+- **FR-003**: The engine MUST surface Use-Case Spotlight candidates weekly (2–3 options with Business-Value Score ≥60) incorporating ROI framing, manual suggestions, and publish selected drafts following the US template.
+- **FR-004**: All tracks MUST enforce track-specific workflows (candidate pool, manual insert step, state transitions) and allow reviewers to approve, hold, or edit items through the UI.
+- **FR-005**: Quality gates MUST include readability ≥60, link health, duplicate detection across recent corpus, translation QE ≥0.7, schema validation (NewsArticle/BlogPosting/CaseStudy), and advisory flagging for unsupported claims.
+- **FR-006**: Publishing MUST create Git PRs containing EN/ES/FR Markdown with type-aware front-matter (`track_meta` fields, candidate scores, seed IDs), JSON-LD snippets, assets, RSS updates, and LinkedIn share copy.
+- **FR-007**: All published artifacts MUST be indexed into the RAG store with track tags and provenance for future scoring and internal link suggestions.
+- **FR-008**: The reviewer dashboard MUST provide track-specific views (News board with manual insert, Blog/Use-Case candidate tables with scores and actions) and reflect state transitions in real time.
 
 *Open clarifications:*
-- **FR-008**: Deployment model for reviewer UI and orchestration services [NEEDS CLARIFICATION: confirm hosting preference—local docker vs managed environment].
-- **FR-009**: Final list of approved RSS feeds and search endpoints [NEEDS CLARIFICATION: pending content team confirmation].
-- **FR-010**: Branding assets for hero/banner generator [NEEDS CLARIFICATION: confirm colors/fonts or provide defaults].
+- **FR-009**: Deployment model for reviewer UI and orchestration services [NEEDS CLARIFICATION: confirm hosting preference—local docker vs managed environment].
+- **FR-010**: Final RSS/search allowlist and manual seed workflows [NEEDS CLARIFICATION: pending content team confirmation].
+- **FR-011**: Branding assets and typography for hero/banner generator [NEEDS CLARIFICATION: design team input required].
+- **FR-012**: Whether BI/US drafts should support MDX components (charts/diagrams) in addition to Markdown [NEEDS CLARIFICATION].
 
 ### Key Entities *(include if feature involves data)*
-- **Content Jobs**: Scheduled runs describing cadence, type (ND/BI/US), target publish time, and status (draft/review/approved/scheduled/published).
-- **Draft Packages**: Bundles of outlines, full drafts, citations, assets, SEO metadata, translations, and quality gate metrics per content type.
-- **Source Library**: Catalog of ingestion connectors, feeds, cached articles, and dedupe fingerprints.
-- **Review Queue**: Human-facing backlog with approvals, comments, and scheduling actions.
-- **Publishing Artifacts**: Git PR metadata, RSS entries, LinkedIn copy, schema JSON, asset references, and audit logs.
+- **Content Jobs**: Scheduled runs describing cadence, track (news/blog/use-case), target times, and states.
+- **Candidate Pool**: Ranked list of potential Blog/Use-Case topics with business-value scores, seed news IDs, and reviewer decisions.
+- **Draft Packages**: Bundles of outlines, full drafts, track templates, translations, quality metrics, and provenance metadata.
+- **Manual Insert Records**: Reviewer-submitted News items with source metadata, priority, and inclusion status.
+- **Source Library**: Catalog of ingestion connectors, feeds, cached articles, dedupe fingerprints, and search snapshots.
+- **Review Queue**: Track-specific UI states, manual insert buffers, candidate selection logs.
+- **Publishing Artifacts**: Git PR metadata, RSS entries, LinkedIn copy, schema JSON, asset references, audit logs.
 
 ---
 
