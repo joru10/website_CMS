@@ -14,6 +14,7 @@ from ..agents.ingestion.manual import ManualInsertAgent
 from ..agents.ingestion.rss import RSSIngestionAgent
 from ..agents.ingestion.smol import SmolNewsIngestionAgent
 from ..agents.processing.relevance import NewsCandidateScorer, dedupe_candidates
+from ..pipelines.news_digest import build_pipeline, assemble_digest_edition, render_markdown
 
 logger = structlog.get_logger(__name__)
 
@@ -74,4 +75,18 @@ def run_news_digest_job(config: ACEConfig) -> None:
         smol=len(smol_candidates),
     )
 
-    # TODO: integrate planner, writer, QA, and publishing pipeline stages.
+    pipeline = build_pipeline(config)
+    edition = assemble_digest_edition(pipeline.planner, top_candidates, track_slug="news")
+    result = render_markdown(pipeline.writer, edition, pipeline.publish_dir)
+
+    manual_selected_ids = [item.candidate_id for item in edition.items if item.candidate_id.startswith("manual:")]
+    if manual_selected_ids:
+        with SessionLocal() as session:
+            ManualInsertAgent(session).mark_selected(manual_selected_ids, status="accepted")
+
+    logger.info(
+        "news_digest_pipeline_result",
+        artifacts=result.metadata.get("artifact_count"),
+        readability=result.quality.readability,
+        manual_selected=len(manual_selected_ids),
+    )

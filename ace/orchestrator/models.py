@@ -31,6 +31,7 @@ class NewsCandidate:
 @dataclass(slots=True)
 class DigestItem:
     order: int
+    candidate_id: str
     headline: str
     what_happened: str
     why_it_matters: str
@@ -39,10 +40,13 @@ class DigestItem:
 
 @dataclass(slots=True)
 class DigestEdition:
+    title: str
+    slug: str
     track: str
+    generated_at: datetime
     locale_outputs: Dict[str, str]
     items: List[DigestItem]
-    metadata: Dict[str, str]
+    metadata: Dict[str, Any]
 
 
 @dataclass(slots=True)
@@ -65,6 +69,7 @@ class MarkdownArtifact:
 class PipelineResult:
     artifacts: List[MarkdownArtifact]
     quality: QualityReport
+    edition: DigestEdition
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
