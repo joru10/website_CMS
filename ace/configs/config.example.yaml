@@ -1,0 +1,61 @@
+# ACE Autopilot Content Engine configuration
+app:
+  timezone: "Europe/Madrid"
+  locale_defaults: ["en", "es", "fr"]
+  git:
+    repo_url: "https://github.com/joru10/website_CMS.git"
+    content_branch: "content/autogen"
+    main_branch: "main"
+    pr_base: "main"
+    author_name: "ACE Bot"
+    author_email: "ace@rapiai.ai"
+  notifications:
+    news_ready_email: "content@rapiai.ai"
+    manual_insert_alert: "content@rapiai.ai"
+    webhook_url: null
+
+tracks:
+  news:
+    source:
+      primary_url: "https://news.smol.ai/"
+      rss_allowlist:
+        - "https://www.eff.org/rss/updates.xml"
+        - "https://the-decoder.com/feed/"
+        - "https://ai.googleblog.com/feeds/posts/default"
+    review_ready: "07:00"
+    publish_time: "09:00"
+    items_min: 4
+    items_max: 8
+    require_corroboration: 2
+    allow_manual_inserts: true
+    cron:
+      ingest: "30 6 * * 1-5"
+      qa: "45 6 * * 1-5"
+      notify: "0 7 * * 1-5"
+  blog:
+    cadence:
+      - "Tue 10:00"
+      - "Thu 10:00"
+    candidates_window_days: 7
+    candidates_notify: "Fri 16:00"
+    min_business_value_score: 65
+    propose_count: 5
+  use_case:
+    cadence:
+      - "Wed 11:00"
+    candidates_window_days: 21
+    candidates_notify: "Mon 09:00"
+    min_business_value_score: 60
+    propose_count: 3
+    manual_suggestions_enabled: true
+
+storage:
+  sqlite_path: "ace.db"
+  qdrant:
+    host: "localhost"
+    port: 6333
+    collection: "ace-content"
+
+logging:
+  level: "INFO"
+  json: false

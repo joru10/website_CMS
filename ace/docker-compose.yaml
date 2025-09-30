@@ -1,0 +1,71 @@
+version: "3.9"
+
+services:
+  lmstudio:
+    image: lmstudio-community/lmstudio:latest
+    container_name: ace-lmstudio
+    ports:
+      - "8001:8080"
+    environment:
+      LMSTUDIO_DISABLE_TELEMETRY: "1"
+    restart: unless-stopped
+
+  libretranslate:
+    image: libretranslate/libretranslate:latest
+    container_name: ace-libretranslate
+    ports:
+      - "5000:5000"
+    environment:
+      LT_FRONTEND_LANGUAGE_SOURCE: "en"
+      LT_FRONTEND_LANGUAGE_TARGET: "es,fr"
+    restart: unless-stopped
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: ace-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    restart: unless-stopped
+
+  sqlite-web:
+    image: coleifer/sqlite-web
+    container_name: ace-sqlite-web
+    ports:
+      - "8081:8080"
+    environment:
+      SQLITE_DATABASE: "/data/ace.db"
+    volumes:
+      - ./storage:/data
+    depends_on:
+      - libretranslate
+    restart: unless-stopped
+
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    container_name: ace-umami
+    environment:
+      DATABASE_URL: "postgresql://umami:umami@postgres:5432/umami"
+      APP_SECRET: "change-me"
+    ports:
+      - "3001:3000"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: ace-postgres
+    environment:
+      POSTGRES_DB: umami
+      POSTGRES_USER: umami
+      POSTGRES_PASSWORD: umami
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  qdrant_data:
+  postgres_data:
