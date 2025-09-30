@@ -56,6 +56,13 @@ storage:
     port: 6333
     collection: "ace-content"
 
+publishing:
+  method: "git_pr"
+  paths:
+    news: "content/news"
+    blog: "content/insights"
+    use_case: "content/use-cases"
+
 logging:
   level: "INFO"
   json: false

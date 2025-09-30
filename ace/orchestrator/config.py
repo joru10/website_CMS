@@ -70,6 +70,17 @@ class StorageConfig(BaseModel):
     qdrant: Dict[str, Any] = Field(default_factory=dict)
 
 
+class PublishingPathsConfig(BaseModel):
+    news: str
+    blog: str
+    use_case: str
+
+
+class PublishingConfig(BaseModel):
+    method: str = "git_pr"
+    paths: PublishingPathsConfig
+
+
 class LoggingConfig(BaseModel):
     level: str = "INFO"
     json: bool = False
@@ -79,6 +90,7 @@ class ACEConfig(BaseModel):
     app: AppConfig
     tracks: Dict[str, TrackConfig]
     storage: StorageConfig
+    publishing: PublishingConfig
     logging: LoggingConfig = Field(default_factory=LoggingConfig)
 
 

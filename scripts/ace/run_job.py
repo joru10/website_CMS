@@ -11,6 +11,7 @@ import structlog
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from orchestrator.config import load_config, ConfigPaths  # noqa: E402
+from orchestrator.jobs.news_digest import run_news_digest_job  # noqa: E402
 
 logger = structlog.get_logger(__name__)
 
@@ -27,7 +28,10 @@ def main() -> None:
     config_path = args.config or ConfigPaths.default().config_file
     config = load_config(config_path)
     logger.info("job_start", job=args.job, config=str(config_path))
-    # TODO: invoke specific job orchestration once implemented
+    if args.job == "news_digest":
+        run_news_digest_job(config)
+    else:
+        raise ValueError(f"Unsupported job: {args.job}")
     logger.info("job_complete", job=args.job)
 
 
