@@ -9,11 +9,20 @@ from typing import List
 
 import structlog
 
-from ..config import ACEConfig
-from ..models import DigestEdition, MarkdownArtifact, NewsCandidate, PipelineResult, QualityReport
+from ..config import ACEConfig, TrackConfig
+from ..models import (
+    DigestEdition,
+    GitCommitFile,
+    GitCommitPayload,
+    MarkdownArtifact,
+    NewsCandidate,
+    PipelineResult,
+    QualityReport,
+)
 from ..storage import get_engine, get_sessionmaker
 from ..agents.processing.planner import DigestPlanner
 from ..agents.writer.digest import DigestWriter
+from ..utils.llm import LLMClient
 from textstat import textstat
 
 logger = structlog.get_logger(__name__)
@@ -22,6 +31,7 @@ logger = structlog.get_logger(__name__)
 @dataclass(slots=True)
 class PipelineContext:
     config: ACEConfig
+    track_config: TrackConfig
     sessionmaker: any
     planner: DigestPlanner
     writer: DigestWriter
@@ -37,11 +47,13 @@ def build_pipeline(config: ACEConfig) -> PipelineContext:
     SessionLocal = get_sessionmaker(engine)
 
     planner = DigestPlanner(items_max=track_cfg.items_max or 8, require_corroboration=track_cfg.require_corroboration)
-    writer = DigestWriter(locales=config.app.locale_defaults)
+    llm_client = LLMClient.from_config(config.app.llm)
+    writer = DigestWriter(locales=config.app.locale_defaults, llm=llm_client)
     publish_dir = Path(config.publishing.paths.news)
 
     return PipelineContext(
         config=config,
+        track_config=track_cfg,
         sessionmaker=SessionLocal,
         planner=planner,
         writer=writer,
@@ -77,7 +89,13 @@ def assemble_digest_edition(
     return edition
 
 
-def render_markdown(writer: DigestWriter, edition: DigestEdition, publish_dir: Path) -> PipelineResult:
+def render_markdown(
+    writer: DigestWriter,
+    edition: DigestEdition,
+    publish_dir: Path,
+    track_config: "TrackConfig",
+    config: ACEConfig,
+) -> PipelineResult:
     locale_outputs = writer.render(edition)
     artifacts = [
         MarkdownArtifact(
@@ -88,17 +106,53 @@ def render_markdown(writer: DigestWriter, edition: DigestEdition, publish_dir: P
         for locale, content in locale_outputs.items()
     ]
 
+    issues: List[str] = []
     try:
         readability = textstat.flesch_reading_ease(locale_outputs.get("en", ""))
     except Exception:  # pragma: no cover - textstat robustness
         readability = 0.0
 
+    readability_min = track_config.readability_min or 0.0
+    if readability_min and readability < readability_min:
+        issues.append(
+            f"Readability score {readability:.1f} is below threshold {readability_min:.1f}"
+        )
+
+    min_links = max(1, track_config.min_links_per_item)
+    for item in edition.items:
+        link_count = len([link for link in item.links if link.url])
+        if link_count < min_links:
+            issues.append(f"Item {item.candidate_id} has only {link_count} links (min {min_links})")
+
+    link_health_passed = not issues or all("links" not in issue for issue in issues)
+
     quality = QualityReport(
         readability=readability,
-        link_health_passed=True,
+        link_health_passed=link_health_passed,
         duplicate_flag=False,
-        translation_ready=False,
-        details={"note": "Quality metrics pending implementation"},
+        translation_ready=len(locale_outputs) == len(writer.locales),
+        details={
+            "publish_dir": str(publish_dir),
+            "readability_min": readability_min,
+        },
+        issues=issues,
+    )
+
+    branch_suffix = edition.slug
+    branch_name = f"{config.publishing.branch_prefix}/{branch_suffix}".replace("//", "/")
+    commit_message = config.publishing.pr_title_template.format(
+        date=edition.generated_at.strftime("%Y-%m-%d")
+    )
+    git_files = [GitCommitFile(path=artifact.path, content=artifact.content) for artifact in artifacts]
+    git_payload = GitCommitPayload(
+        branch_name=branch_name,
+        commit_message=commit_message,
+        files=git_files,
+        metadata={
+            "reviewers": config.publishing.reviewers,
+            "track": edition.track,
+            "slug": edition.slug,
+        },
     )
 
     return PipelineResult(
@@ -108,5 +162,7 @@ def render_markdown(writer: DigestWriter, edition: DigestEdition, publish_dir: P
         metadata={
             "artifact_count": len(artifacts),
             "publish_dir": str(publish_dir),
+            "readability": readability,
         },
+        git_payload=git_payload,
     )

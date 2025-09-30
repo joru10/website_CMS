@@ -56,6 +56,21 @@ class QualityReport:
     duplicate_flag: bool
     translation_ready: bool
     details: Dict[str, str] = field(default_factory=dict)
+    issues: List[str] = field(default_factory=list)
+
+
+@dataclass(slots=True)
+class GitCommitFile:
+    path: str
+    content: str
+
+
+@dataclass(slots=True)
+class GitCommitPayload:
+    branch_name: str
+    commit_message: str
+    files: List[GitCommitFile]
+    metadata: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(slots=True)
@@ -71,18 +86,5 @@ class PipelineResult:
     quality: QualityReport
     edition: DigestEdition
     metadata: Dict[str, Any] = field(default_factory=dict)
-
-
-@dataclass(slots=True)
-class GitCommitFile:
-    path: str
-    content: str
-
-
-@dataclass(slots=True)
-class GitCommitPayload:
-    branch_name: str
-    commit_message: str
-    files: List[GitCommitFile]
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    git_payload: GitCommitPayload | None = None
 

@@ -13,6 +13,10 @@ app:
     news_ready_email: "content@rapiai.ai"
     manual_insert_alert: "content@rapiai.ai"
     webhook_url: null
+  llm:
+    base_url: "http://localhost:11434"
+    model: "gpt-4o-mini"
+    temperature: 0.2
 
 tracks:
   news:
@@ -28,6 +32,8 @@ tracks:
     items_max: 8
     require_corroboration: 2
     allow_manual_inserts: true
+    readability_min: 55.0
+    min_links_per_item: 2
     cron:
       ingest: "30 6 * * 1-5"
       qa: "45 6 * * 1-5"
@@ -62,6 +68,10 @@ publishing:
     news: "content/news"
     blog: "content/insights"
     use_case: "content/use-cases"
+  branch_prefix: "ace/news"
+  pr_title_template: "ACE News Digest: {date}"
+  reviewers:
+    - "content-lead@rapiai.ai"
 
 logging:
   level: "INFO"

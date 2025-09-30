@@ -41,6 +41,8 @@ class TrackConfig(BaseModel):
     propose_count: Optional[int] = None
     manual_suggestions_enabled: bool = False
     cron: Optional[TrackCronConfig] = None
+    readability_min: Optional[float] = None
+    min_links_per_item: int = 2
 
 
 class GitConfig(BaseModel):
@@ -58,11 +60,19 @@ class NotificationsConfig(BaseModel):
     webhook_url: Optional[str] = None
 
 
+class LLMConfig(BaseModel):
+    base_url: str
+    model: str = "ChatGPT"
+    api_key: Optional[str] = None
+    temperature: float = 0.3
+
+
 class AppConfig(BaseModel):
     timezone: str = "Europe/Madrid"
     locale_defaults: List[str] = Field(default_factory=lambda: ["en", "es", "fr"])
     git: GitConfig
     notifications: NotificationsConfig = Field(default_factory=NotificationsConfig)
+    llm: Optional[LLMConfig] = None
 
 
 class StorageConfig(BaseModel):
@@ -79,6 +89,9 @@ class PublishingPathsConfig(BaseModel):
 class PublishingConfig(BaseModel):
     method: str = "git_pr"
     paths: PublishingPathsConfig
+    branch_prefix: str = "ace/news"
+    pr_title_template: str = "ACE News Digest: {date}"
+    reviewers: List[str] = Field(default_factory=list)
 
 
 class LoggingConfig(BaseModel):

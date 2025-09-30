@@ -77,7 +77,21 @@ def run_news_digest_job(config: ACEConfig) -> None:
 
     pipeline = build_pipeline(config)
     edition = assemble_digest_edition(pipeline.planner, top_candidates, track_slug="news")
-    result = render_markdown(pipeline.writer, edition, pipeline.publish_dir)
+    result = render_markdown(
+        pipeline.writer,
+        edition,
+        pipeline.publish_dir,
+        pipeline.track_config,
+        config,
+    )
+
+    if result.quality.issues:
+        logger.warning(
+            "news_digest_quality_blocked",
+            issues=result.quality.issues,
+            readability=result.quality.readability,
+        )
+        return
 
     manual_selected_ids = [item.candidate_id for item in edition.items if item.candidate_id.startswith("manual:")]
     if manual_selected_ids:
@@ -89,4 +103,6 @@ def run_news_digest_job(config: ACEConfig) -> None:
         artifacts=result.metadata.get("artifact_count"),
         readability=result.quality.readability,
         manual_selected=len(manual_selected_ids),
+        branch=result.git_payload.branch_name if result.git_payload else None,
+        reviewers=(result.git_payload.metadata.get("reviewers") if result.git_payload else []),
     )
