@@ -1,0 +1,170 @@
+
+# Implementation Plan: ACE Autopilot Content Engine
+
+**Branch**: `002-ace-autopilot-content` | **Date**: 2025-09-30 | **Spec**: [`specs/002-ace-autopilot-content/spec.md`](./spec.md)
+**Input**: Feature specification from `/specs/002-ace-autopilot-content/spec.md`
+
+## Execution Flow (/plan command scope)
+```
+1. Load feature spec from Input path
+   → If not found: ERROR "No feature spec at {path}"
+2. Fill Technical Context (scan for NEEDS CLARIFICATION)
+   → Detect Project Type from file system structure or context (web=frontend+backend, mobile=app+api)
+   → Set Structure Decision based on project type
+3. Fill the Constitution Check section based on the content of the constitution document.
+4. Evaluate Constitution Check section below
+   → If violations exist: Document in Complexity Tracking
+   → If no justification possible: ERROR "Simplify approach first"
+   → Update Progress Tracking: Initial Constitution Check
+5. Execute Phase 0 → research.md
+   → If NEEDS CLARIFICATION remain: ERROR "Resolve unknowns"
+6. Execute Phase 1 → contracts, data-model.md, quickstart.md, agent-specific template file (e.g., `CLAUDE.md` for Claude Code, `.github/copilot-instructions.md` for GitHub Copilot, `GEMINI.md` for Gemini CLI, `QWEN.md` for Qwen Code or `AGENTS.md` for opencode).
+7. Re-evaluate Constitution Check section
+   → If new violations: Refactor design, return to Phase 1
+   → Update Progress Tracking: Post-Design Constitution Check
+8. Plan Phase 2 → Describe task generation approach (DO NOT create tasks.md)
+9. STOP - Ready for /tasks command
+```
+
+**IMPORTANT**: The /plan command STOPS at step 7. Phases 2-4 are executed by other commands:
+- Phase 2: /tasks command creates tasks.md
+- Phase 3-4: Implementation execution (manual or via tools)
+
+## Summary
+Deliver an autonomous-yet-supervised content factory that ingests daily AI news, plans SME-focused narratives, drafts multilingual assets, enforces quality gates, and publishes via Git PRs into the RapidAI website. ACE orchestrates agents (ingestion, planner, writers, fact-check, SEO, assets, translator, QA) on a CET schedule with human review before publishing.
+
+## Technical Context
+**Language/Version**: Python 3.11 (orchestrator, agents), FastAPI 0.111 (review UI/API), HTMX frontend, APScheduler 3.x; JavaScript build scripts for publishing hooks.  
+**Primary Dependencies**: LangGraph (workflow orchestration), LMStudio (OpenAI-compatible LLM gateway), Sentence-Transformers/SimHash libs, Qdrant client, SQLite (via SQLAlchemy), LibreTranslate or CTranslate2, PIL, feedparser, requests.  
+**Storage**: Git repository (content), SQLite (jobs, approvals, audit logs), Qdrant (vector index), file store for generated assets under `static/uploads/ace/`.  
+**Testing**: pytest for orchestrator modules, integration tests for pipelines, unit tests for translators/fact-checkers, contract tests for publishing API.  
+**Target Platform**: Self-hosted containers (Docker Compose) running on developer workstation or lightweight server; Netlify remains static delivery target.  
+**Project Type**: Multi-component web/back-end automation (Python services + static site integration).  
+**Performance Goals**: Draft generation within 15 minutes per run; News Digest ready by 07:00 CET; readability ≥60; translation QE ≥0.7.  
+**Constraints**: Local models first (LMStudio, LibreTranslate); stay within constitution mandates (CMS-driven content, localization parity, PKCE OAuth); schedule reliability (CET).  
+**Scale/Scope**: Three content pipelines (ND, BI, US) across EN/ES/FR with daily + weekly cadence; backlog capacity ≥7 days.
+
+## Constitution Check
+*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+
+- **CMS-Driven Content Integrity**: Generated Markdown must land in `content/` via PR and remain CMS-managed. No direct production edits. ✅
+- **Localization Parity**: Pipelines emit EN/ES/FR with tuteo compliance, plus QA to flag gaps. ✅
+- **Secure OAuth & Secrets Hygiene**: Reviewer UI auth delegates to existing Netlify OAuth or local secure login; no secrets leak into frontend. ✅
+- **Deployment Confidence**: Tests for translation parity, pipeline simulations, and Netlify preview verification included before merge. ✅
+- **Progressive Enhancement & Accessibility**: Reviewer UI honors accessibility best practices and surfaces alt text/metadata for generated assets. ✅
+
+## Project Structure
+
+### Documentation (this feature)
+```
+specs/002-ace-autopilot-content/
+├── spec.md
+├── plan.md
+├── research.md           # Phase 0 deliverable: open questions, sources, risks
+├── data-model.md         # Phase 1: entities (jobs, drafts, reviews, assets, RAG)
+├── quickstart.md         # Phase 1: how to run orchestration stack locally
+├── contracts/            # (Optional) API contracts for reviewer/publisher endpoints
+└── tasks.md              # Phase 2: execution backlog
+```
+
+### Source Code (repository root)
+```
+ace/
+├── orchestrator/
+│   ├── jobs/                 # APScheduler + LangGraph flows per content type
+│   ├── agents/               # ingestion, planner, writer, fact-check, seo, translator
+│   ├── pipelines/            # reusable steps and quality gates
+│   ├── publishing/           # Git PR, RSS, LinkedIn integration
+│   ├── storage/              # SQLite, Qdrant wrappers
+│   └── tests/
+├── reviewer-ui/
+│   ├── app/                  # FastAPI endpoints + HTMX templates
+│   ├── static/
+│   └── tests/
+├── configs/
+│   ├── config.example.yaml
+│   └── prompts/
+├── assets/
+│   └── hero-templates/
+└── docker-compose.yaml       # LMStudio, LibreTranslate, Qdrant, services
+
+scripts/
+└── ace/
+    ├── run_job.py
+    ├── backfill.py
+    └── validate_content.py
+
+content/
+├── news/
+├── insights/
+└── use-cases/
+```
+
+**Structure Decision**: Multi-component workspace under `ace/` hosting Python services and reviewer UI, plus scripts for manual runs; generated content committed under existing `content/` hierarchy.
+
+## Phase 0: Outline & Research
+1. Gather open questions (RSS allowlist, hosting, branding) and assign owners.
+2. Evaluate tooling feasibility: LMStudio throughput, LibreTranslate vs CTranslate2, Qdrant deployment.
+3. Prototype ingestion against news.smol.ai and sample RSS feeds to validate parsing, dedupe, and rate limits.
+4. Document findings, risks, and decisions in `research.md`.
+
+**Output**: `research.md` with source inventory, model selections, infra decisions, and unresolved clarifications.
+
+## Phase 1: Design & Contracts
+*Prerequisites: research.md complete*
+
+1. Define data entities & schemas: job schedule, draft package, reviewer action, audit log, asset, translation, quality gate results.
+2. Design reviewer API (FastAPI) routes and response contracts; capture in `/contracts/reviewer-openapi.yaml` if warranted.
+3. Outline pipeline state transitions and sequence diagrams; translate into `data-model.md`.
+4. Write `quickstart.md` covering Docker dependencies, environment configuration, running orchestrator, reviewing drafts, publishing dry run.
+5. Update agent context via `.specify/scripts/bash/update-agent-context.sh windsurf` after documenting major tech decisions.
+
+## Phase 2: Task Planning Approach
+*This section describes what the /tasks command will do - DO NOT execute during /plan*
+
+**Task Generation Strategy**:
+- Map tasks across phases (Foundations, News Digest pipeline, Blog/Use-Case, SEO/Analytics, Polish) mirroring PRD schedule.
+- Include setup tasks (Docker env, LMStudio config, Qdrant bootstrap), pipeline-specific development, QA automation, publishing integration, reviewer UI build, Netlify hooks.
+- Mark tasks for parallel execution when they touch distinct modules (`orchestrator/agents/*` vs `reviewer-ui/`).
+
+**Ordering Strategy**:
+- Sequential by phase; ensure foundational infra precedes pipeline builds; QA/SEO after content generators work; analytics after publishing pipeline.
+
+**Estimated Output**: ~25 tasks with sub-phase markers.
+
+**IMPORTANT**: This phase is executed by the /tasks command, NOT by /plan
+
+## Phase 3+: Future Implementation
+*These phases are beyond the scope of the /plan command*
+**Phase 3**: Task execution (/tasks command creates tasks.md)  
+**Phase 4**: Implementation (execute tasks.md following constitutional principles)  
+**Phase 5**: Validation (run tests, execute quickstart.md, performance validation)
+
+## Complexity Tracking
+*Fill ONLY if Constitution Check has violations that must be justified*
+
+| Violation | Why Needed | Simpler Alternative Rejected Because |
+|-----------|------------|-------------------------------------|
+| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
+| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+
+
+## Progress Tracking
+*This checklist is updated during execution flow*
+
+**Phase Status**:
+- [ ] Phase 0: Research complete (/plan command)
+- [ ] Phase 1: Design complete (/plan command)
+- [ ] Phase 2: Task planning complete (/plan command - describe approach only)
+- [ ] Phase 3: Tasks generated (/tasks command)
+- [ ] Phase 4: Implementation complete
+- [ ] Phase 5: Validation passed
+
+**Gate Status**:
+- [x] Initial Constitution Check: PASS
+- [ ] Post-Design Constitution Check: PASS
+- [ ] All NEEDS CLARIFICATION resolved
+- [ ] Complexity deviations documented
+
+---
+*Based on Constitution v1.0.0 - See `.specify/memory/constitution.md`*
