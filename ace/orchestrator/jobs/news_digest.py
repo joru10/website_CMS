@@ -3,18 +3,20 @@
 from __future__ import annotations
 
 import asyncio
-from typing import List
+from pathlib import Path
+from typing import List, Optional
 
 import structlog
 
 from ..config import ACEConfig
-from ..models import NewsCandidate
+from ..models import NewsCandidate, PipelineResult
 from ..storage import get_engine, get_sessionmaker, init_db
 from ..agents.ingestion.manual import ManualInsertAgent
 from ..agents.ingestion.rss import RSSIngestionAgent
 from ..agents.ingestion.smol import SmolNewsIngestionAgent
 from ..agents.processing.relevance import NewsCandidateScorer, dedupe_candidates
 from ..pipelines.news_digest import build_pipeline, assemble_digest_edition, render_markdown
+from ..publishing.git import GitPublishingService, GitPublishingError, GitPublishingResult
 
 logger = structlog.get_logger(__name__)
 
@@ -100,6 +102,8 @@ def run_news_digest_job(config: ACEConfig) -> None:
         with SessionLocal() as session:
             ManualInsertAgent(session).mark_selected(manual_selected_ids, status="accepted")
 
+    publish_result = _publish_git_payload(result, config)
+
     logger.info(
         "news_digest_pipeline_result",
         artifacts=result.metadata.get("artifact_count"),
@@ -107,4 +111,35 @@ def run_news_digest_job(config: ACEConfig) -> None:
         manual_selected=len(manual_selected_ids),
         branch=result.git_payload.branch_name if result.git_payload else None,
         reviewers=(result.git_payload.metadata.get("reviewers") if result.git_payload else []),
+        published_branch=publish_result.branch if publish_result else None,
+        published_commit=publish_result.commit if publish_result else None,
+        pushed=publish_result.pushed if publish_result else False,
     )
+
+
+def _publish_git_payload(result: PipelineResult, config: ACEConfig) -> Optional[GitPublishingResult]:
+    payload = result.git_payload
+    if not payload:
+        logger.info("news_digest_no_git_payload")
+        return None
+
+    git_cfg = config.app.git
+    service = GitPublishingService(
+        repo_path=Path.cwd(),
+        remote="origin",
+        base_branch=git_cfg.main_branch,
+        push=False,
+        allow_dirty=False,
+    )
+    try:
+        publish_result = service.apply(payload)
+        logger.info(
+            "news_digest_git_applied",
+            branch=publish_result.branch,
+            commit=publish_result.commit,
+            pushed=publish_result.pushed,
+        )
+        return publish_result
+    except GitPublishingError as exc:
+        logger.error("news_digest_git_failed", error=str(exc))
+        return None

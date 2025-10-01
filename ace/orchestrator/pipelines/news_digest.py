@@ -1,90 +1,3 @@
-def _load_manifest_slugs(manifest_path: Path) -> List[str]:
-    if not manifest_path.exists():
-        return []
-    try:
-        data = json.loads(manifest_path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError as exc:
-        logger.warning("manifest_load_failed", path=str(manifest_path), error=str(exc))
-        return []
-    slugs = data.get("slugs", [])
-    return [str(slug) for slug in slugs if isinstance(slug, str)]
-
-
-def _build_rss_feed(
-    manifest_slugs: List[str],
-    publish_dir: Path,
-    edition: DigestEdition,
-    config: ACEConfig,
-    english_output: str,
-    max_items: int = 20,
-) -> str:
-    base_url = config.publishing.public_base_url or "https://example.com/news"
-    rss_abs_path = Path.cwd() / publish_dir / "rss.xml"
-
-    if rss_abs_path.exists():
-        try:
-            tree = ET.parse(rss_abs_path)
-            root = tree.getroot()
-        except ET.ParseError:
-            root = ET.Element("rss", version="2.0")
-    else:
-        root = ET.Element("rss", version="2.0")
-
-    channel = root.find("channel")
-    if channel is None:
-        channel = ET.SubElement(root, "channel")
-
-    _ensure_text(channel, "title", "RapidAI News Digest")
-    _ensure_text(channel, "link", base_url.rstrip("/"))
-    _ensure_text(channel, "description", "Automated ACE-generated AI news digest")
-    _ensure_text(channel, "language", config.app.locale_defaults[0] if config.app.locale_defaults else "en")
-
-    build_time = edition.generated_at.astimezone(timezone.utc)
-    _ensure_text(channel, "lastBuildDate", build_time.strftime("%a, %d %b %Y %H:%M:%S %z"))
-
-    slug = edition.slug
-    for item in list(channel.findall("item")):
-        guid_el = item.find("guid")
-        if guid_el is not None and guid_el.text == slug:
-            channel.remove(item)
-
-    description_text = _summarize_items(edition)
-    if not description_text:
-        description_text = english_output.strip() or f"Digest edition {slug}"
-
-    item_el = ET.Element("item")
-    ET.SubElement(item_el, "title").text = edition.title
-    ET.SubElement(item_el, "link").text = f"{base_url.rstrip('/')}/{slug}"
-    guid_el = ET.SubElement(item_el, "guid")
-    guid_el.text = slug
-    guid_el.set("isPermaLink", "false")
-    ET.SubElement(item_el, "pubDate").text = build_time.strftime("%a, %d %b %Y %H:%M:%S %z")
-    ET.SubElement(item_el, "description").text = description_text
-
-    channel.insert(0, item_el)
-
-    items = channel.findall("item")
-    for extra_item in items[max_items:]:
-        channel.remove(extra_item)
-
-    ET.indent(root, space="  ")
-    return ET.tostring(root, encoding="utf-8", xml_declaration=True).decode("utf-8")
-
-
-def _ensure_text(parent: ET.Element, tag: str, value: str) -> None:
-    element = parent.find(tag)
-    if element is None:
-        element = ET.SubElement(parent, tag)
-    element.text = value
-
-
-def _summarize_items(edition: DigestEdition) -> str:
-    parts = [
-        f"{item.headline}: {item.why_it_matters}"
-        for item in edition.items
-        if item.headline and item.why_it_matters
-    ]
-    return " \n".join(parts)
 """Pipeline assembly for News Digest."""
 
 from __future__ import annotations
@@ -98,6 +11,9 @@ from typing import List
 
 import structlog
 
+from ..agents.processing.planner import DigestPlanner
+from ..agents.quality import FactCheckAgent, LinkHealthChecker
+from ..agents.writer.digest import DigestWriter
 from ..config import ACEConfig, TrackConfig
 from ..models import (
     DigestEdition,
@@ -109,9 +25,6 @@ from ..models import (
     QualityReport,
 )
 from ..storage import get_engine, get_sessionmaker
-from ..agents.processing.planner import DigestPlanner
-from ..agents.writer.digest import DigestWriter
-from ..agents.quality import FactCheckAgent, LinkHealthChecker
 from ..utils.llm import LLMClient
 from textstat import textstat
 
@@ -295,3 +208,92 @@ def render_markdown(
         },
         git_payload=git_payload,
     )
+
+
+def _load_manifest_slugs(manifest_path: Path) -> List[str]:
+    if not manifest_path.exists():
+        return []
+    try:
+        data = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        logger.warning("manifest_load_failed", path=str(manifest_path), error=str(exc))
+        return []
+    slugs = data.get("slugs", [])
+    return [str(slug) for slug in slugs if isinstance(slug, str)]
+
+
+def _build_rss_feed(
+    manifest_slugs: List[str],
+    publish_dir: Path,
+    edition: DigestEdition,
+    config: ACEConfig,
+    english_output: str,
+    max_items: int = 20,
+) -> str:
+    base_url = config.publishing.public_base_url or "https://example.com/news"
+    rss_abs_path = Path.cwd() / publish_dir / "rss.xml"
+
+    if rss_abs_path.exists():
+        try:
+            tree = ET.parse(rss_abs_path)
+            root = tree.getroot()
+        except ET.ParseError:
+            root = ET.Element("rss", version="2.0")
+    else:
+        root = ET.Element("rss", version="2.0")
+
+    channel = root.find("channel")
+    if channel is None:
+        channel = ET.SubElement(root, "channel")
+
+    _ensure_text(channel, "title", "RapidAI News Digest")
+    _ensure_text(channel, "link", base_url.rstrip("/"))
+    _ensure_text(channel, "description", "Automated ACE-generated AI news digest")
+    _ensure_text(channel, "language", config.app.locale_defaults[0] if config.app.locale_defaults else "en")
+
+    build_time = edition.generated_at.astimezone(timezone.utc)
+    _ensure_text(channel, "lastBuildDate", build_time.strftime("%a, %d %b %Y %H:%M:%S %z"))
+
+    slug = edition.slug
+    for item in list(channel.findall("item")):
+        guid_el = item.find("guid")
+        if guid_el is not None and guid_el.text == slug:
+            channel.remove(item)
+
+    description_text = _summarize_items(edition)
+    if not description_text:
+        description_text = english_output.strip() or f"Digest edition {slug}"
+
+    item_el = ET.Element("item")
+    ET.SubElement(item_el, "title").text = edition.title
+    ET.SubElement(item_el, "link").text = f"{base_url.rstrip('/')}/{slug}"
+    guid_el = ET.SubElement(item_el, "guid")
+    guid_el.text = slug
+    guid_el.set("isPermaLink", "false")
+    ET.SubElement(item_el, "pubDate").text = build_time.strftime("%a, %d %b %Y %H:%M:%S %z")
+    ET.SubElement(item_el, "description").text = description_text
+
+    channel.insert(0, item_el)
+
+    items = channel.findall("item")
+    for extra_item in items[max_items:]:
+        channel.remove(extra_item)
+
+    ET.indent(root, space="  ")
+    return ET.tostring(root, encoding="utf-8", xml_declaration=True).decode("utf-8")
+
+
+def _ensure_text(parent: ET.Element, tag: str, value: str) -> None:
+    element = parent.find(tag)
+    if element is None:
+        element = ET.SubElement(parent, tag)
+    element.text = value
+
+
+def _summarize_items(edition: DigestEdition) -> str:
+    parts = [
+        f"{item.headline}: {item.why_it_matters}"
+        for item in edition.items
+        if item.headline and item.why_it_matters
+    ]
+    return " \n".join(parts)

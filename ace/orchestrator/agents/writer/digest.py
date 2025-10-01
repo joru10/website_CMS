@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from typing import Dict, List, Optional
 
 import structlog
@@ -53,9 +53,14 @@ SYSTEM_PROMPT = (
 class DigestWriter:
     locales: List[str]
     llm: Optional[LLMClient] = None
+    _env: Environment = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
-        self._env = Environment(loader=BaseLoader(), autoescape=False, trim_blocks=True, lstrip_blocks=True)
+        object.__setattr__(
+            self,
+            "_env",
+            Environment(loader=BaseLoader(), autoescape=False, trim_blocks=True, lstrip_blocks=True),
+        )
 
     def render(self, edition: DigestEdition) -> Dict[str, str]:
         prepared_items = [self._enhance_item(item) for item in edition.items]

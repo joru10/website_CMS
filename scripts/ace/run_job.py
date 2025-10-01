@@ -8,10 +8,11 @@ from pathlib import Path
 
 import structlog
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+ROOT_DIR = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT_DIR))
 
-from orchestrator.config import load_config, ConfigPaths  # noqa: E402
-from orchestrator.jobs.news_digest import run_news_digest_job  # noqa: E402
+from ace.orchestrator.config import load_config, ConfigPaths  # noqa: E402
+from ace.orchestrator.jobs.news_digest import run_news_digest_job  # noqa: E402
 
 logger = structlog.get_logger(__name__)
 
