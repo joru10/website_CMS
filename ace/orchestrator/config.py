@@ -92,6 +92,7 @@ class PublishingConfig(BaseModel):
     branch_prefix: str = "ace/news"
     pr_title_template: str = "ACE News Digest: {date}"
     reviewers: List[str] = Field(default_factory=list)
+    public_base_url: Optional[str] = None
 
 
 class LoggingConfig(BaseModel):

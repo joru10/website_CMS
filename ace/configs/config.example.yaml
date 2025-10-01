@@ -72,6 +72,7 @@ publishing:
   pr_title_template: "ACE News Digest: {date}"
   reviewers:
     - "content-lead@rapiai.ai"
+  public_base_url: "https://rapiai.ai/news"
 
 logging:
   level: "INFO"
