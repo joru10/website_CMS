@@ -22,6 +22,7 @@ from ..models import (
 from ..storage import get_engine, get_sessionmaker
 from ..agents.processing.planner import DigestPlanner
 from ..agents.writer.digest import DigestWriter
+from ..agents.quality import FactCheckAgent, LinkHealthChecker
 from ..utils.llm import LLMClient
 from textstat import textstat
 
@@ -36,6 +37,8 @@ class PipelineContext:
     planner: DigestPlanner
     writer: DigestWriter
     publish_dir: Path
+    link_checker: LinkHealthChecker
+    fact_checker: FactCheckAgent
 
 
 def build_pipeline(config: ACEConfig) -> PipelineContext:
@@ -50,6 +53,8 @@ def build_pipeline(config: ACEConfig) -> PipelineContext:
     llm_client = LLMClient.from_config(config.app.llm)
     writer = DigestWriter(locales=config.app.locale_defaults, llm=llm_client)
     publish_dir = Path(config.publishing.paths.news)
+    link_checker = LinkHealthChecker()
+    fact_checker = FactCheckAgent(min_unique_domains=track_cfg.require_corroboration or 2)
 
     return PipelineContext(
         config=config,
@@ -58,6 +63,8 @@ def build_pipeline(config: ACEConfig) -> PipelineContext:
         planner=planner,
         writer=writer,
         publish_dir=publish_dir,
+        link_checker=link_checker,
+        fact_checker=fact_checker,
     )
 
 
@@ -88,12 +95,13 @@ def assemble_digest_edition(
     )
     return edition
 
-
 def render_markdown(
     writer: DigestWriter,
     edition: DigestEdition,
     publish_dir: Path,
-    track_config: "TrackConfig",
+    link_checker: LinkHealthChecker,
+    fact_checker: FactCheckAgent,
+    track_config: TrackConfig,
     config: ACEConfig,
 ) -> PipelineResult:
     locale_outputs = writer.render(edition)
@@ -124,7 +132,14 @@ def render_markdown(
         if link_count < min_links:
             issues.append(f"Item {item.candidate_id} has only {link_count} links (min {min_links})")
 
-    link_health_passed = not issues or all("links" not in issue for issue in issues)
+    all_links = [link.url for item in edition.items for link in item.links if link.url]
+    link_report = link_checker.check_links(all_links)
+    if not link_report.ok:
+        issues.append(f"Broken links detected: {', '.join(link_report.broken_links)}")
+    fact_result = fact_checker.evaluate(edition)
+    issues.extend(fact_result.issues)
+
+    link_health_passed = link_report.ok
 
     quality = QualityReport(
         readability=readability,
@@ -134,6 +149,8 @@ def render_markdown(
         details={
             "publish_dir": str(publish_dir),
             "readability_min": readability_min,
+            "link_status_map": link_report.status_map,
+            "fact_check_domains": fact_result.unique_domains,
         },
         issues=issues,
     )
@@ -163,6 +180,9 @@ def render_markdown(
             "artifact_count": len(artifacts),
             "publish_dir": str(publish_dir),
             "readability": readability,
+            "broken_links": link_report.broken_links,
+            "manifest_path": str(publish_dir / "manifest.json"),
+            "slug": edition.slug,
         },
         git_payload=git_payload,
     )

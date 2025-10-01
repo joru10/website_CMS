@@ -81,6 +81,8 @@ def run_news_digest_job(config: ACEConfig) -> None:
         pipeline.writer,
         edition,
         pipeline.publish_dir,
+        pipeline.link_checker,
+        pipeline.fact_checker,
         pipeline.track_config,
         config,
     )
