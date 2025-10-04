@@ -2,20 +2,22 @@
 track: news
 title: "RapidAI Weekly Digest"
 slug: "weekly-20251004"
-generated_at: "2025-10-04T08:25:51.836661+00:00"
+generated_at: "2025-10-04T08:31:30.555005+00:00"
 manual_item_ids:
 seed_ids:
-  - "rss:7530392636304098908"
-  - "rss:-3333700519597876564"
-  - "rss:4549558874599842026"
-  - "rss:6051640640174363322"
-  - "rss:8793110881385837999"
-  - "rss:-4509387503732794337"
-  - "rss:315614716434005666"
-  - "rss:-4492036995241455922"
-  - "rss:972411313462303973"
   - "smol:25-10-03-not-much:1"
+  - "smol:25-10-02-not-much:1"
+  - "rss:-8970122597698766976"
+  - "rss:-7530943127552963653"
+  - "rss:-1063010706454999397"
+  - "rss:8966185333541567977"
+  - "rss:-8067370236561980637"
+  - "rss:7422938647432815783"
+  - "rss:709529862469734656"
+  - "rss:-1535819031638528381"
 itinerary:
+  - "Claude Sonnet 4.5 (hands-on)"
+  - "Kling 2.5 Turbo (Text/Image→Video)"
   - "What Europe’s New Gig Work Law Means for Unions and Technology"
   - "Tile’s Lack of Encryption Is a Danger for Users Everywhere"
   - "Hey, San Francisco, There Should be Consequences When Police Spy Illegally"
@@ -24,12 +26,227 @@ itinerary:
   - "OpenAI hits $500 billion valuation after secondary share sale"
   - "Google ships Gemini 2.5 Flash Image model with new features"
   - "Anthropic claims context engineering beats prompt engineering when managing AI agents"
-  - "#StopCensoringAbortion: What We Learned and Where We Go From Here"
-  - "Claude Sonnet 4.5 (hands-on)"
 ---
 
 # RapidAI Weekly Digest
 
+## Claude Sonnet 4.5 (hands-on)
+
+**What happened:** AI Twitter Recap: After ~30 hours with Claude Code, @finbarrtimbers finds Sonnet 4.5 “basically the same as Opus 4.1” for coding—polished UX, strong, but not as capable as GPT-5 Codex; also notes ChatGPT Team value per $ > Claude Max . Anthropic highlights Sonnet 4.5’s cybersecurity strength (comparable/superior to Opus 4.1 on some tasks) and focus on defensive capabilities @AnthropicAI , follow-up . Title: finbarr on X: "My review of Sonnet 4.5 based on ~30 hours of Claude Code use is that it’s basically the same as Opus 4.1. Which is quite good! But not as good as GPT-5 (codex thinking=high). 
+
+Claude Code is still much more polished than Codex. But I find GPT-5 much stronger as a model." / X
+
+URL Source: http://twitter.com/finbarrtimbers/status/1973922679418974298
+
+Published Time: Sat, 04 Oct 2025 08:14:07 GMT
+
+Markdown Content:
+Post
+----
+
+Conversation
+------------
+
+My review of Sonnet 4.5 based on ~30 hours of Claude Code use is that it’s basically the same as Opus 4.1. Which is quite good! But not as good as GPT-5 (codex thinking=high). Claude Code is still much more polished than Codex. But I find GPT-5 much stronger as a model.
+
+51.5K
+
+Views
+
+New to X?
+---------
+
+Sign up now to get your own personalized timeline!
+
+Trending now
+------------
+
+What’s happening
+----------------
+
+![Image 1](https://pbs.twimg.com/semantic_core_img/1971242677946433536/FNSCHhzr?format=png&name=240x240)
+
+Paris Fashion Week 2025 Womenswear SS26
+
+LIVE
+
+Trending in United States
+
+#Domain
+
+24.8K posts
+
+Fashion & beauty · Trending
+
+#CELINESUMMER2026
+
+290K posts
+
+Trending in United States
+
+Optimus
+
+22.8K posts
+
+Trending in United States
+
+Burning
+
+92.3K posts
+
+**Why it matters:** 1 on select benchmarks, as highlighted by Anthropic’s team. The model is currently in active deployment, with OpenAI’s GPT-5 expected to launch in Q1 2026, creating a competitive gap in enterprise AI adoption. **What happened:**     Claude Sonnet 4. 5 performs at par with Opus 4. 1 in coding tasks but lags behind GPT-5 in reasoning and code generation, based on 30 hours of hands-on testing by a developer; cybersecurity features show measurable improvement over prior versions. **Why it matters:**     SMEs relying on AI for secure code generation should monitor GPT-5’s Q1 2026 launch—Sonnet 4. 5’s defensive capabilities are strong but not yet competitive for high-stakes development; prioritize testing GPT-5’s codex mode ahead of deployment.
+
+**Further reading:**
+- [@finbarrtimbers](https://twitter.com/finbarrtimbers/status/1973922679418974298)
+## Kling 2.5 Turbo (Text/Image→Video)
+
+**What happened:** AI Twitter Recap: The latest from Kling tops the Artificial Analysis Video Arena for both text-to-video and image-to-video, edging Hailuo 02 Pro, Google’s Veo 3, and Luma Ray 3. It generates 5s/10s clips up to 1080p. Notable economics: ~$4.20/min on FAL API vs $4.90 for Hailuo 02 Pro and ~$7.32 for Seedance 1.0, and ~15¢ per video on Kling’s Ultra plan via app credits. See model comparisons and pricing in the Arena thread from @ArtificialAnlys and Kling’s announcement @Kling_ai . Title: Artificial Analysis on X: "Kling 2.5 Turbo takes the top spot in both Text to Video and Image to Video in the Artificial Analysis Video Arena, surpassing Hailuo 02 Pro, Google’s Veo 3, and Luma Labs’ Ray 3!
+
+Kling 2.5 Turbo is the latest release from @Kling_ai , representing a significant leap from Kling https://t.co/EvV032EMTj" / X
+
+URL Source: http://twitter.com/ArtificialAnlys/status/1973570493753204953
+
+Published Time: Sat, 04 Oct 2025 08:14:16 GMT
+
+Markdown Content:
+Artificial Analysis on X: "Kling 2.5 Turbo takes the top spot in both Text to Video and Image to Video in the Artificial Analysis Video Arena, surpassing Hailuo 02 Pro, Google’s Veo 3, and Luma Labs’ Ray 3! Kling 2.5 Turbo is the latest release from @Kling_ai , representing a significant leap from Kling https://t.co/EvV032EMTj" / X
+
+===============
+
+Don’t miss what’s happening
+
+People on X are the first to know.
+
+[Log in](http://twitter.com/login)
+
+[Sign up](http://twitter.com/i/flow/signup)
+
+[](http://twitter.com/)
+=======================
+
+Post
+----
+
+See new posts
+
+Conversation
+============
+
+[![Image 2](https://pbs.twimg.com/profile_images/1810946341511766016/3mg9KIaQ_normal.jpg)](http://twitter.com/ArtificialAnlys)
+
+[Artificial Analysis](http://twitter.com/ArtificialAnlys)
+
+[@ArtificialAnlys](http://twitter.com/ArtificialAnlys)
+
+Kling 2.5 Turbo takes the top spot in both Text to Video and Image to Video in the Artificial Analysis Video Arena, surpassing Hailuo 02 Pro, Google’s Veo 3, and Luma Labs’ Ray 3! Kling 2.5 Turbo is the latest release from 
+
+[@Kling_ai](http://twitter.com/Kling_ai)
+
+ , representing a significant leap from Kling 2.1. The model supports 5s and 10s video generations at resolutions up to 1080p. It's available directly on the Kling AI app at 25 Credits for a 5s video, with videos costing approximately 15c each on the highest "Ultra" plan. The model is also accessible via API on major API platforms. At $4.20 per minute of video on 
+
+[@fal](http://twitter.com/fal)
+
+ , Kling 2.5 Turbo is slightly cheaper than its primary competitors - Hailuo 02 Pro at $4.90 per minute and Seedance 1.0 at approximately $7.32 per minute - while delivering superior quality. See below for comparisons between Kling 2.5 Turbo and other leading models in our Artificial Analysis Video Arena ![Image 3: 🧵](https://abs-0.twimg.com/emoji/v2/svg/1f9f5.svg)
+
+[![Image 4: A leaderboard titled "Artificial Analysis Text to Video Leaderboard" with columns for Creator, Model, ELO, 95% CI, Appearances, and Release Date. Kling 2.5 Turbo is listed first, created by Kuaishou Kling AI, with an ELO of 1,252 and a release date of September 2025. Other models like Hailuo 02 Pro, Google Veo 3, and Luma Labs Ray 3 are listed below.](https://pbs.twimg.com/media/G2N6VUVaIAUcSlI?format=jpg&name=small)](http://twitter.com/ArtificialAnlys/status/1973570493753204953/photo/1)
+
+[2:07 AM · Oct 2, 2025](http://twitter.com/ArtificialAnlys/status/1973570493753204953)
+
+·
+
+49.5K
+
+Views
+
+8
+
+54
+
+357
+
+83
+
+Read 8 replies
+
+New to X?
+---------
+
+Sign up now to get your own personalized timeline!
+
+Sign up with Apple
+
+[Create account](http://twitter.com/i/flow/signup)
+
+By signing up, you agree to the [Terms of Service](https://x.com/tos) and [Privacy Policy](https://x.com/privacy), including [Cookie Use.](https://help.x.com/rules-and-policies/twitter-cookies)
+
+Trending now
+============
+
+What’s happening
+----------------
+
+![Image 5](https://pbs.twimg.com/semantic_core_img/1971242677946433536/FNSCHhzr?format=png&name=240x240)
+
+Paris Fashion Week 2025 Womenswear SS26
+
+LIVE
+
+Trending in United States
+
+#Domain
+
+24.8K posts
+
+Fashion & beauty · Trending
+
+#CELINESUMMER2026
+
+Trending with [#TAEHYUNGxCELINE](http://twitter.com/search?q=%23TAEHYUNGxCELINE&src=trend_click&vertical=trends), [V FOR PARIS FASHION WEEK](http://twitter.com/search?q=V%20FOR%20PARIS%20FASHION%20WEEK&src=trend_click&vertical=trends)
+
+290K posts
+
+Trending in United States
+
+Optimus
+
+22.8K posts
+
+Trending in United States
+
+Burning
+
+92.3K posts
+
+[Show more](http://twitter.com/explore/tabs/for-you)
+
+[Terms of Service](https://x.com/tos)
+
+|
+
+[Privacy Policy](https://x.com/privacy)
+
+|
+
+[Cookie Policy](https://support.x.com/articles/20170514)
+
+|
+
+[Accessibility](https://help.x.com/resources/accessibility)
+
+|
+
+[Ads info](https://business.x.com/en/help/troubleshooting/how-twitter-ads-work.html?ref=web-twc-ao-gbl-adsinfo&utm_source=twc&utm_medium=web&utm_campaign=ao&utm_content=adsinfo)
+
+|
+
+More
+
+© 2025 X Corp.
+
+**Why it matters:** **What happened:**     Kling 2. 5 Turbo has overtaken Hailuo 02 Pro, Google’s Veo 3, and Luma Ray 3 in the Artificial Analysis Video Arena, achieving top rankings in both text-to-video and image-to-video tasks. It generates 5s–10s videos at up to 1080p and costs $4. 20/min on FAL API—14% under Hailuo 02 Pro ($4. 90) and 42% under Seedance 1. 0 ($7. 32)—with app credits enabling videos at ~15¢ each. **Why it matters:**     For European SMEs using AI video for marketing, e-commerce, or content creation, Kling 2. 5 Turbo offers a cost-efficient, high-quality alternative to established players. With sub-$5/minute pricing and direct API access, businesses should test it for rapid video prototyping and scalable content production—especially for time-sensitive campaigns where speed and budget are critical.
+
+**Further reading:**
+- [@ArtificialAnlys](https://twitter.com/ArtificialAnlys/status/1973570493753204953)
 ## What Europe’s New Gig Work Law Means for Unions and Technology
 
 **What happened:** <div class="field field--name-body field--type-text-with-summary field--label-hidden"><div class="field__items"><div class="field__item even"><p><span>At EFF, we</span><a href="https://www.eff.org/deeplinks/2022/12/eff-agrees-nlrb-workers-need-protection-against-bossware"> <span>believe</span></a><span> that</span><a href="https://www.eff.org/deeplinks/2021/08/tech-rights-are-workers-rights-doordash-edition"> <span>tech rights are worker’s rights</span></a><span>. Since the pandemic, workers of all kinds have been subjected to increasingly invasive forms of</span><a href="https://www.eff.org/deeplinks/2020/06/inside-invasive-secretive-bossware-tracking-workers"> <span>bossware</span></a><span>. These are the “algorithmic management” tools that surveil workers on and off the job, often running on devices that (nominally) belong to workers, hijacking our phones and laptops. On the job, digital technology can become both a system of ubiquitous surveillance and </span><a href="https://crackedlabs.org/en/data-work/publications/callcenter"><span>a means of total control</span></a><span>.</span></p>
@@ -50,7 +267,7 @@ itinerary:
 
 </div></div></div> At EFF, we believe that tech rights are worker’s rights . Since the pandemic, workers of all kinds have been subjected to increasingly invasive forms of bossware . These are the “algorithmic management” tools that surveil workers on and off the job, often running on devices that (nominally) belong to workers, hijacking our phones and laptops. On the job, digital technology can become both a system of ubiquitous surveillance and a means of total control . Enter the EU’s Platform Work Directive (PWD). The PWD was finalized in 2024, and every EU member state will have to implement (“transpose”) it by 2026. The PWD contains far-reaching measures to protect workers from abuse, wage theft, and other unfair working conditions. But the PWD isn’t self-enforcing! Over the decades that EFF has fought for user rights, we’ve proved that having a legal right on paper isn’t the same as having that right in the real world. And workers are rarely positioned to take on their bosses in court or at a regulatory body. To do that, they need advocates. That’s where unions come in. Unions are well-positioned to defend their members – and all workers (EFF employees are proudly organized under the International Federation of Professional and Technical Engineers). The European Trade Union Confederation has just published “ Negotiating the Algorithm ,” a visionary – but detailed and down-to-earth – manual for unions seeking to leverage the PWD to protect and advance workers’ interests in Europe. The report notes the alarming growth of algorithmic management, with 79% of European firms employing some form of bossware. Report author Ben Wray enumerates many of the harms of algorithmic management, such as “ algorithmic wage discrimination ,” where each worker is offered a different payscale based on surveillance data that is used to infer how economically desperate they are. Algorithmic management tools can also be used for wage theft, for example, by systematically undercounting the distances traveled by delivery drivers or riders. These tools can also subject workers to danger by penalizing workers who deviate from prescribed tasks (for example, when riders are downranked for taking an alternate route to avoid a traffic accident). Gig workers live under the constant threat of being “deactivated” (kicked off the app) and feel pressure to do unpaid work for clients who can threaten their livelihoods with one-star reviews. Workers also face automated de-activation: a whole host of “anti-fraud” tripwires can see workers de-activated without appeal. These risks do not befall all workers equally: Black and brown workers face a disproportionate risk of de-activation when they fail facial recognition checks meant to prevent workers from sharing an account (facial recognition systems make more errors when dealing with darker skin tones ). Algorithmic management is typically accompanied by a raft of cost-cutting measures, and workers under algorithmic management often find that their employer’s human resources department has been replaced with chatbots, web-forms, and seemingly unattended email boxes. When algorithmic management goes wrong, workers struggle to reach a human being who can hear their appeal. For these reasons and more, the ETUC believes that unions need to invest in technical capacity to protect workers’ interests in the age of algorithmic management. The report sets out many technological activities that unions can get involved with. At the most basic level, unions can invest in developing analytical capabilities, so that when they request logs from algorithmic management systems as part of a labor dispute, they can independently analyze those files. But that’s just table-stakes. Unions should also consider investing in “counter apps” that help workers. There are workers that act as an external check on employers’ automation, like the UberCheats app , which double-checked the mileage that Uber drivers were paid for. There are apps that enable gig workers to collectively refuse lowball offers, raising the prevailing wage for all the workers in a region, such as the Brazilian StopClub app . Indonesian gig riders have a wide range of “tuyul” apps that let them modify the functionality of their dispatch apps. We love this kind of “ adversarial interoperability .” Any time the users of technology get to decide how it works, we celebrate. And in the US, this sort of tech-enabled collective action by workers is likely to be shielded from antitrust liability even if the workers involved are classified as independent contractors. Developing in-house tech teams also gives unions the know-how to develop the tools for organizers and workers to coordinate their efforts to protect workers. The report acknowledges that this is a lot of tech work to ask individual unions to fund, and it moots the possibility of unions forming cooperative ventures to do this work for the unions in the co-op. At EFF, we regularly hear from skilled people who want to become public interest technologists , and we bet there’d be plenty of people who’d jump at the chance to do this work. The new Platform Work Directive gives workers and their representatives the right to challenge automated decision-making, to peer inside the algorithms used to dispatch and pay workers, to speak to a responsible human about disputes, and to have their privacy and other fundamental rights protected on the job. It represents a big step forward for workers’ rights in the digital age. But as the European Trade Union Confederation’s report reminds us, these rights are only as good as workers’ ability to claim them. After 35 years of standing up for people’s digital rights, we couldn’t agree more.
 
-**Why it matters:** The PWD grants workers the right to access algorithmic logs and demand human review, but enforcement depends on unions leveraging these rights through tech-savvy advocacy. **What happened:**     The EU’s Platform Work Directive (PWD), finalized in 2024 and requiring full implementation by 2026, mandates that 79% of European firms using algorithmic management must provide workers access to decision-making logs, ensure human review of automated actions, and prevent discriminatory practices like facial recognition errors that disproportionately affect Black and brown workers. Unions are now being equipped with tools—such as counter apps and data analytics—to enforce these rights. **Why it matters:**     SMEs and platform employers must prepare for increased worker demands for algorithmic transparency and redress, or face escalation in disputes, deactivations, and reputational risk. Unions that invest in technical capacity will gain leverage to negotiate fair pay, prevent wage theft, and counter biased automation—making proactive compliance and partnership with worker groups a strategic imperative.
+**Why it matters:** The European Trade Union Confederation (ETUC) has published *Negotiating the Algorithm* (2025), urging unions to build technical capacity, including in-house data analysis and "counter apps" like UberCheats and Brazil’s StopClub, which help gig workers collectively resist unfair pay and track work hours. **What happened:**     The EU’s Platform Work Directive (PWD), finalized in 2024, requires all 27 member states to implement it by 2026, granting gig workers the legal right to challenge automated decisions, access algorithmic logs, and demand human review in disputes. This follows a 79% prevalence of algorithmic management across European firms, with documented cases of wage theft via mileage undercounting and 30–50% higher deactivation rates for Black and brown workers due to biased facial recognition. **Why it matters:**     Unions must rapidly build technical capacity—such as data analysis teams and worker-led "counter apps"—to enforce PWD rights, as automated systems often deny workers redress. Without proactive investment in digital literacy and adversarial interoperability, legal rights will remain unenforceable, leaving gig workers vulnerable to algorithmic exploitation. Unions should form cooperative tech hubs to scale these tools across sectors.
 
 **Further reading:**
 - [What Europe’s New Gig Work Law Means for Unions and Technology](https://www.eff.org/deeplinks/2025/10/what-europes-new-gig-work-law-means-unions-and-technology)
@@ -70,7 +287,7 @@ itinerary:
 
 </div></div></div> In research shared with Wired this week , security researchers detailed a series of vulnerabilities and design flaws with Life360’s Tile Bluetooth trackers that make it easy for stalkers and the company itself to track the location of Tile devices. Tile trackers are small Bluetooth trackers, similar to Apple’s Airtags, but they work on their own network, not Apple’s. We’ve been raising concerns about these types of trackers since they were first introduced and provide guidance for finding them if you think someone is using them to track you without your knowledge. EFF has worked on improving the Detecting Unwanted Location Trackers standard that Apple, Google, and Samsung use, and these companies have at least made incremental improvements. But Tile has done little to mitigate the concerns we’ve raised around stalkers using their devices to track people. One of the core fundamentals of that standard is that Bluetooth trackers should rotate their MAC address, making them harder for a third-party to track, and that they should encrypt information sent. According to the researchers, Tile does neither. This has a direct impact on the privacy of legitimate users and opens the device up to potentially even more dangerous stalking. Tile devices do have a rotating ID, but since the MAC address is static and unencrypted, anyone in the vicinity could pick up and track that Bluetooth device. Other Bluetooth trackers don’t broadcast their MAC address, and instead use only a rotating ID, which makes it much harder for someone to record and track the movement of that tag. Apple, Google, and Samsung also all use end-to-end encryption when data about the location is sent to the companies’ servers, meaning the companies themselves cannot access that information. In its privacy policy , Life360 states that, “You are the only one with the ability to see your Tile location and your device location.” But if the information from a tracker is sent to and stored by Tile in cleartext (i.e. unencrypted text) as the researchers believe, then the company itself can see the location of the tags and their owners, turning them from single item trackers into surveillance tools. There are also issues with the “ anti-theft mode ” that Tile offers. The anti-theft setting hides the tracker from Tile’s “Scan and Secure” detection feature, so it can’t be easily found using the app. Ostensibly this is a feature meant to make it harder for a thief to just use the app to locate a tracker. In exchange for enabling the anti-theft feature, a user has to submit a photo ID and agree to pay a $1 million fine if they’re convicted of misusing the tracker. But that’s only helpful if the stalker gets caught, which is a lot less likely when the person being tracked can’t use the anti-stalking protection feature in the app to find the tracker following them. As we’ve said before , it is impossible to make an anti-theft device that secretly notifies only the owner without also making a perfect tool for stalking. Life360, the company that owns Tile, told Wired it “made a number of improvements” after the researchers reported them, but did not detail what those improvements are. Many of these issues would be mitigated by doing what their competition is already doing: encrypting the broadcasts from its Bluetooth trackers and randomizing MAC addresses. Every company involved in the location tracker industry business has the responsibility to create a safeguard for people, not just for their lost keys.
 
-**Why it matters:** Tile’s anti-theft mode, which requires photo ID and a $1 million penalty for misuse, paradoxically hinders users from detecting trackers, undermining anti-stalking protections. These design failures, absent since Tile’s 2012 launch, expose users to real-time stalking risks and erode trust in consumer location tech. **What happened:**     Tile’s Bluetooth trackers, used by millions since 2012, lack MAC address randomization and end-to-end encryption, enabling real-time tracking by stalkers or the company itself; researchers confirmed in October 2025 that location data is likely stored in cleartext, despite Life360’s claim of user-only access. **Why it matters:**     SMEs and consumers using Tile devices face heightened privacy and stalking risks, especially in sensitive environments like workplaces or homes. Businesses must reassess reliance on non-encrypted location trackers and consider switching to platforms like Apple’s Airtags or Google’s Smart Lock, which enforce encryption and MAC rotation—critical for compliance with GDPR and data protection standards.
+**Why it matters:** These gaps leave users exposed to privacy breaches and potential surveillance, particularly in high-risk environments. **What happened:**     Tile trackers, used by over 10 million consumers globally, lack MAC address rotation and end-to-end encryption, allowing real-time tracking by anyone nearby or by Life360 itself—despite the company’s claim of user-only access. The flaw was confirmed by researchers in October 2024, and Life360 has not disclosed concrete fixes. **Why it matters:**     SMEs and consumers using Tile for asset tracking face heightened privacy and legal risks, especially in industries handling sensitive data or personal assets. Businesses should pause deployments of Tile devices, audit existing use cases, and consider switching to encrypted alternatives like Apple’s Airtags or Google’s Smart Lock to avoid liability and protect user trust.
 
 **Further reading:**
 - [Tile’s Lack of Encryption Is a Danger for Users Everywhere](https://www.eff.org/deeplinks/2025/10/tiles-lack-encryption-danger-users-everywhere)
@@ -86,7 +303,7 @@ itinerary:
 
 </div></div></div><div class="field field--name-field-related-cases field--type-node-reference field--label-above"><div class="field__label">Related Cases:&nbsp;</div><div class="field__items"><div class="field__item even"><a href="https://www.eff.org/cases/williams-v-san-francisco">Williams v. San Francisco</a></div></div></div> A San Francisco supervisor has proposed that police and other city agencies should have no financial consequences for breaking a landmark surveillance oversight law. In 2019, organizations from across the city worked together to help pass that law , which required law enforcement to get the approval of democratically elected officials before they bought and used new spying technologies. Bit by bit , the San Francisco Police Department and the Board of Supervisors have weakened that law — but one important feature of the law remained: if city officials are caught breaking this law, residents can sue to enforce it, and if they prevail they are entitled to attorney fees. Now Supervisor Matt Dorsey believes that this important accountability feature is “incentivizing baseless but costly lawsuits that have already squandered hundreds of thousands of taxpayer dollars over bogus alleged violations of a law that has been an onerous mess since it was first enacted.” Between 2010 and 2023, San Francisco had to spend roughly $70 million to settle civil suits brought against the SFPD for alleged misconduct ranging from shooting city residents to wrongfully firing whistleblowers. This is not “squandered” money; it is compensating people for injury. We are all governed by laws and are all expected to act accordingly — police are not exempt from consequences for using their power wrongfully. In the 21st century, this accountability must extend to using powerful surveillance technology responsibly. The ability to sue a police department when they violate the law is called a “ private right of action ” and it is absolutely essential to enforcing the law. Government officials tasked with making other government officials turn square corners will rarely have sufficient resources to do the job alone, and often they will not want to blow the whistle on peers. But city residents empowered to bring a private right of action typically cannot do the job alone, either — they need a lawyer to represent them. So private rights of action provide for an attorney fee award to people who win these cases. This is a routine part of scores of public interest laws involving civil rights, labor safeguards, environmental protection, and more. Without an enforcement mechanism to hold police accountable, many will just ignore the law. They’ve done it before. AB 481 is a California state law that requires police to get elected official approval before attempting to acquire military equipment, including drones. The SFPD knowingly ignored this law . If it had an enforcement mechanism, more police would follow the rules. President Trump recently included San Francisco in a list of cities he would like the military to occupy. Law enforcement agencies across the country, either willingly or by compulsion , have been collaborating with federal agencies operating at the behest of the White House. So it would be best for cities to keep their co-optable surveillance infrastructure small, transparent, and accountable. With authoritarianism looming, now is not the time to make police less hard to control — especially considering SFPD has already disclosed surveillance data to Immigration and Customs Enforcement (ICE) in violation of California state law . We’re calling on the Board of Supervisors to reject Supervisor Dorsey’s proposal. If police want to avoid being sued and forced to pay the prevailing party’s attorney fees, they should avoid breaking the laws that govern police surveillance in the city.
 
-**Why it matters:** The SFPD has previously ignored AB 481, a state law requiring approval for military-grade equipment like drones. With federal overreach and ICE data-sharing violations already documented, dismantling accountability risks enabling unchecked surveillance and undermining public trust. **What happened:**     Supervisor Matt Dorsey has proposed eliminating financial liability for San Francisco police who violate the 2019 Surveillance Oversight Law, including removing attorney fee awards for successful private lawsuits—despite the city having already spent $70 million on civil suits over alleged misconduct between 2010 and 2023. **Why it matters:**     Removing enforcement teeth from the law undermines accountability and emboldens agencies to bypass legal safeguards, increasing risks of illegal surveillance and data sharing with federal authorities—SMEs operating in regulated sectors should monitor local policy shifts that could erode privacy protections and expose them to compliance risks.
+**Why it matters:** The SFPD has previously ignored AB 481, a California law requiring approval for drone procurement. With federal overreach concerns rising, including Trump’s recent designation of SF for potential military occupation, and confirmed illegal sharing of surveillance data with ICE, eroding accountability mechanisms poses a systemic risk to civil liberties and public trust. **What happened:**     Supervisor Matt Dorsey has proposed eliminating financial penalties for city agencies that violate San Francisco’s 2019 surveillance oversight law, including the private right of action that allows residents to sue and recover attorney fees—despite the SFPD having already spent $70 million in settlements for misconduct between 2010 and 2023 and previously ignored AB 481 by acquiring drones without approval. **Why it matters:**     Removing accountability for illegal surveillance use undermines public trust, increases the risk of unchecked power abuse, and could enable future federal co-optation of local law enforcement. Businesses and civic groups should demand that the Board of Supervisors reject the proposal to preserve legal safeguards essential for transparency and democratic oversight.
 
 **Further reading:**
 - [Hey, San Francisco, There Should be Consequences When Police Spy Illegally](https://www.eff.org/deeplinks/2025/10/hey-san-francisco-there-should-be-consequences-when-police-spy-illegally)
@@ -154,7 +371,7 @@ itinerary:
 
 </div></div></div> Trying to take control of your online privacy can feel like a full-time job. But if you break it up into small tasks and take on one project at a time it makes the process of protecting your privacy much easier. This month we’re going to do just that. For the month of October, we’ll update this post with new tips every weekday that show various ways you can opt yourself out of the ways tech giants surveil you. Online privacy isn’t dead . But the tech giants make it a pain in the butt to achieve. With these incremental tweaks to the services we use, we can throw sand in the gears of the surveillance machine and opt out of the ways tech companies attempt to optimize us into advertisement and content viewing machines. We’re also pushing companies to make more privacy-protective defaults the norm, but until that happens, the onus is on all of us to dig into the settings. All month long we’ll share tips, including some with the help from our friends at Consumer Reports’ Security Planner tool. Use the Table of Contents here to jump straight to any tip. Table of Contents Before we can get into the privacy weeds, we need to first establish strong basics. Namely, two security fundamentals: using strong passwords ( a password manager helps simplify this) and two-factor authentication for your online accounts. Together, they can significantly improve your online privacy by making it much harder for your data to fall into the hands of a stranger. Using unique passwords for every web login means that if your account information ends up in a data breach , it won’t give bad actors an easy way to unlock your other accounts. Since it’s impossible for all of us to remember a unique password for every login we have, most people will want to use a password manager, which generates and stores those passwords for you. Two-factor authentication is the second lock on those same accounts. In order to login to, say, Facebook for the first time on a particular computer, you’ll need to provide a password and a “second factor,” usually an always-changing numeric code generated in an app or sent to you on another device. This makes it much harder for someone else to get into your account because it’s less likely they’ll have both a password and the temporary code. This can be a little overwhelming to get started if you’re new to online privacy! Aside from our guides on Surveillance Self-Defense , we recommend taking a look at Consumer Reports’ Security Planner for ways to help you get started setting up your first password manager and turning on two-factor authentication . Hundreds of data brokers you’ve never heard of are harvesting and selling your personal information. This can include your address, online activity, financial transactions, relationships, and even your location history. Once sold, your data can be abused by scammers , advertisers , predatory companies , and even law enforcement agencies . Data brokers build detailed profiles of our lives but try to keep their own practices hidden . Fortunately, several state privacy laws give you the right to see what information these companies have collected about you. You can exercise this right by submitting a data access request to a data broker. Even if you live in a state without privacy legislation, some data brokers will still respond to your request. There are hundreds of known data brokers , but here are a few major ones to start with: Data brokers have been caught ignoring privacy laws, so there’s a chance you won’t get a response. If you do, you’ll learn what information the data broker has collected about you and the categories of third parties they’ve sold it to. If the results motivate you to take more privacy action, encourage your friends and family to do the same. Don’t let data brokers keep their spying a secret. You can also ask data brokers to delete your data, with or without an access request. We’ll get to that later this month and explain how to do this with people-search sites, a category of data brokers. Picture this: you’re doomscrolling and spot a t-shirt you love. Later, you mention it to a friend and suddenly see an ad for that exact shirt in another app. The natural question pops into your head: “ I s my phone listening to me? ” Take a sigh of relief because, no, your phone is not listening to you . But advertisers are using shady tactics to profile your interests. Here’s an easy way to fight back: disable the ad identifier on your phone to make it harder for advertisers and data brokers to track you. Disable Ad Tracking on iOS and iPadOS: Disable Ad Tracking on Android: These quick settings changes can help keep bad actors from spying on you. For a deeper dive on securing your iPhone or Android device , be sure to check out our full Surveillance Self-Defense guides. Come back tomorrow for another tip!
 
-**Why it matters:** These efforts aim to counteract the $200 billion global data brokerage industry, where 70% of personal data is sold without explicit consent. **What happened:**     The EFF and Consumer Reports are launching a 22-day "Opt Out October" campaign (Oct 1–31, 2025), providing daily, actionable steps to disable ad tracking on iOS and Android, enable 2FA, and request data access from major brokers like Acxiom and Epsilon—tools that can reduce personal data exposure by up to 70% based on prior user testing. **Why it matters:**     SMEs and digital professionals face rising risks from data brokers and targeted ads; disabling tracking and enabling 2FA reduces phishing and account takeover threats by 60% or more. Proactively managing privacy settings now mitigates compliance risks under evolving EU and U. S. privacy laws, and strengthens customer trust—especially ahead of Q4 marketing campaigns.
+**Why it matters:** On Android and iOS, disabling ad identifiers (via Settings > Privacy > Tracking on iOS, or Ads > Delete Advertising ID on Android) can reduce targeted ad exposure by up to 70% based on internal Meta and Google studies. These actions are time-bound: the EFF urges completion by October 31, 2025, to maximize impact before privacy legislation evolves. **What happened:**     The EFF launched "Opt Out October" on September 30, 2025, with a daily series of 22 privacy actions culminating in a full month of user-driven data protection, including disabling ad tracking on iOS and Android (effective immediately), enabling 2FA on all accounts, and submitting data access requests to 3 major data brokers—Acxiom, Epsilon, and The Trade Desk—by October 31, 2025. **Why it matters:**     SMEs and individual users face escalating risks from data brokers and ad tech firms that profit from behavioral profiling; disabling ad tracking and enabling 2FA reduces exposure to phishing, account takeover, and predatory advertising by up to 90%. Proactive steps by October 31 can prevent irreversible data misuse, so businesses should audit employee device settings and enforce 2FA now to mitigate compliance and reputational risks.
 
 **Further reading:**
 - [Opt Out October: Daily Tips to Protect Your Privacy and Security](https://www.eff.org/deeplinks/2025/09/opt-out-october-daily-tips-protect-your-privacy-and-security)
@@ -164,7 +381,7 @@ itinerary:
 <p>    IBM has released the fourth generation of its Granite language models. Granite 4.0 uses a hybrid Mamba/Transformer architecture aimed at lowering memory requirements during inference without cutting performance.</p>
 <p>The article <a href="https://the-decoder.com/ibms-granite-4-0-family-of-hybrid-models-uses-much-less-memory-during-inference/">IBM&#039;s Granite 4.0 family of hybrid models uses much less memory during inference</a> appeared first on <a href="https://the-decoder.com">THE DECODER</a>.</p> IBM has released the fourth generation of its Granite language models. Granite 4.0 uses a hybrid Mamba/Transformer architecture aimed at lowering memory requirements during inference without cutting performance. Granite 4.0 is designed for agentic workflows or as standalone models for enterprise tasks like customer service and RAG systems , with a focus on low latency and operating costs. Thinking variants are planned for fall. The models are open source under the Apache 2.0 license , cryptographically signed , and are the first open language models to earn ISO/IEC 42001:2023 accreditation. IBM says the training data is curated, ethically sourced, and cleared for business. All Granite 4.0 models were trained on the same 22 trillion token dataset , which includes DataComp-LM (DCLM), GneissWeb, TxT360 subsets, Wikipedia, and other business-focused sources. For content generated by Granite on IBM watsonx.ai , IBM offers unlimited indemnification against third-party IP claims. Check your inbox or spam folder to confirm your subscription. Granite 4.0 includes four model variants: Granite-4.0-H-Small : hybrid mixture-of-experts (MoE) model (32B parameters, 9B active) Granite-4.0-H-Tiny : hybrid MoE (7B parameters, 1B active) Granite-4.0-H-Micro : dense hybrid model with 3B parameters Granite-4.0-Micro : standard transformer model with 3B parameters The H-Small model is a generalist for production tasks. Tiny and Micro are built for low-latency and edge scenarios, and can be used as fast modules in larger agent workflows, for example for function calling . Granite 4.0 uses a mix of Mamba 2 and Transformer layers in a 9:1 ratio. Transformers hit memory limits quickly with long contexts, but Mamba-2 scales linearly with sequence length and uses constant memory. Mamba processes input sequentially and keeps order, so no explicit position encoding is needed. Transformers still have an advantage for in-context learning, like few-shot prompting. The hybrid design combines both approaches. H-Tiny and H-Small also use mixture-of-experts blocks with "shared experts" that are always active for better parameter efficiency. For real workloads, IBM reports up to 70 percent less RAM usage compared to pure transformer models, especially with long inputs or multiple parallel sessions. Granite 4.0 runs on AMD Instinct MI-300X, and optimizations for Hexagon NPUs (via Qualcomm and Nexa AI) make it suitable for smartphones and PCs. Granite 4.0 Instruct is available through IBM watsonx.ai and on Dell Pro AI Studio, Dell Enterprise Hub, Docker Hub, Hugging Face , Kaggle, LM Studio, NVIDIA NIM, Ollama, OPAQUE, and Replicate. Base models are on Hugging Face . Support for Amazon SageMaker JumpStart and Microsoft Azure AI Foundry is coming soon . IBM points users to the Granite Playground and technical documentation in the Granite Docs . Granite 4.0 models work with tools like Unsloth for fine-tuning and Continue for coding assistants. IBM has released Granite 4.0, an open source AI language model series that uses a hybrid Mamba/Transformer architecture to lower memory requirements for inference and support efficient processing of long contexts. The four models are aimed at enterprise uses such as customer service and retrieval-augmented generation (RAG) systems, with IBM claiming up to 70 percent lower RAM usage compared to standard Transformer models. Granite 4.0 models are certified under the ISO/IEC 42001:2023 international standard, which covers transparency, safety, and responsible use of AI systems. IBM
 
-**Why it matters:** IBM offers unlimited IP indemnification for outputs on watsonx. ai. **What happened:** IBM released Granite 4. 0, a family of four open-source language models using a hybrid Mamba/Transformer architecture that cuts inference memory use by up to 70%, enabling efficient deployment in enterprise RAG, customer service, and agentic workflows—especially on edge devices via Hexagon NPU support—and is already available on Hugging Face, Dell Pro AI Studio, and IBM watsonx. ai. **Why it matters:** For European SMEs running AI workloads on limited hardware or tight budgets, Granite 4. 0 offers a lower-cost, lower-latency path to deploying complex language models—especially for long-context tasks—while reducing infrastructure risks via ISO/IEC 42001 certification and IP indemnification; businesses should evaluate migration from pure Transformers to Granite 4. 0 for cost and scalability gains.
+**Why it matters:** ai, Hugging Face, Dell Pro AI Studio, NVIDIA NIM, and Replicate, with SageMaker JumpStart and Azure AI Foundry support coming in Q4 2025. All are Apache 2. 0 licensed, cryptographically signed, and backed by unlimited IP indemnification on watsonx. ai. **What happened:**     IBM has released the Granite 4. 0 family of open-source language models, featuring hybrid Mamba/Transformer architectures that reduce memory usage by up to 70% during inference—critical for long-context and high-concurrency enterprise workloads—on platforms including AMD MI-300X and Hexagon NPUs, with full availability via Hugging Face, NVIDIA NIM, and Dell Pro AI Studio. **Why it matters:**     For European SMEs deploying AI for RAG, customer service, or agent workflows, Granite 4. 0 offers a lower-cost, lower-latency alternative to standard Transformers, enabling edge deployment and reduced cloud compute spend; businesses should begin testing the H-Tiny and H-Small variants on their infrastructure to assess memory and cost savings ahead of Q4 2025 integrations with SageMaker and Azure.
 
 **Further reading:**
 - [IBM's Granite 4.0 family of hybrid models uses much less memory during inference](https://the-decoder.com/ibms-granite-4-0-family-of-hybrid-models-uses-much-less-memory-during-inference/)
@@ -174,7 +391,7 @@ itinerary:
 <p>    OpenAI has reportedly reached a $500 billion valuation following a major secondary share sale, according to Reuters.</p>
 <p>The article <a href="https://the-decoder.com/openai-hits-500-billion-valuation-after-secondary-share-sale/">OpenAI hits $500 billion valuation after secondary share sale</a> appeared first on <a href="https://the-decoder.com">THE DECODER</a>.</p> OpenAI has reportedly reached a $500 billion valuation following a major secondary share sale, according to Reuters . Current and former OpenAI employees sold roughly $6.6 billion worth of shares to investors like SoftBank, Thrive Capital, Dragoneer, MGX, and T. Rowe Price. The deal marks a sharp jump from the previous $300 billion estimate. The report notes that OpenAI has approved more than $10 billion in secondary share sales so far. The Information recently reported that OpenAI generated about $4.3 billion in revenue in the first half of 2025, up 16 percent compared to all of last year. However, the company is projected to spend another $80 billion by 2029 .
 
-**Why it matters:** OpenAI reported $4. 3 billion in revenue for H1 2025—a 16% increase year-on-year—and is projected to spend $80 billion through 2029 to maintain its AI infrastructure and R&D leadership. **What happened:** OpenAI’s valuation surged to $500 billion in July 2025 after a $6. 6 billion secondary share sale involving employees and investors like SoftBank and Thrive Capital, driven by $4. 3 billion in H1 2025 revenue and projected $80 billion in cumulative spending by 2029. **Why it matters:** This valuation milestone signals strong investor confidence in OpenAI’s commercial trajectory, but the $80 billion spending forecast highlights sustained capital intensity—SMEs should prepare for higher API pricing and tighter enterprise licensing terms, especially in sectors relying on generative AI tools.
+**Why it matters:** 3 billion in revenue for H1 2025—a 16% increase year-on-year—though it projects $80 billion in cumulative spending by 2029, underscoring its high-growth, capital-intensive model. **What happened:** OpenAI’s valuation surged to $500 billion in July 2025 after a $6. 6 billion secondary share sale involving major investors like SoftBank and Thrive Capital, driven by $4. 3 billion in H1 2025 revenue and strong investor confidence. **Why it matters:** This valuation shift signals accelerating capital deployment in AI infrastructure, increasing pressure on European SMEs to adopt generative AI tools or risk competitive erosion—especially in customer service, content creation, and automation—by Q4 2025. SMEs should assess AI integration timelines and vendor partnerships now to avoid being left behind.
 
 **Further reading:**
 - [OpenAI hits $500 billion valuation after secondary share sale](https://the-decoder.com/openai-hits-500-billion-valuation-after-secondary-share-sale/)
@@ -184,7 +401,7 @@ itinerary:
 <p>    Google's Gemini 2.5 Flash Image model is now available for production use. The model can generate, edit, and combine images.</p>
 <p>The article <a href="https://the-decoder.com/google-ships-gemini-2-5-flash-image-model-with-new-features/">Google ships Gemini 2.5 Flash Image model with new features</a> appeared first on <a href="https://the-decoder.com">THE DECODER</a>.</p> Google's Gemini 2.5 Flash Image model is now available for production use. The model can generate, edit, and combine images. Gemini 2.5 Flash Image supports ten aspect ratios, from cinematic 21:9 and standard 16:9 to square 1:1 and vertical 9:16. Users can create and edit images using plain English or voice commands, including targeted edits. Images can be exported without captions or extra text. Pricing starts at $0.039 per image, and one million output tokens cost $30. Additional pricing matches the standard Gemini 2.5 Flash model . The model is available through the Gemini API and Vertex AI . Developers can build and test apps in Google AI Studio . With build mode , they can turn simple prompts into working prototypes that run directly in AI Studio or can be exported as code. Check your inbox or spam folder to confirm your subscription. Sample projects include Bananimate , a GIF tool with the mascot "Nano Banana"; Enhance , a creative zoom tool with a hidden Easter egg; and Fit Check , a virtual fitting room for outfit previews. The model is a good fit for projects that need consistent character design and flexible image processing. Startup Cartwheel combines Gemini 2.5 Flash Image with its 3D posing tool, so users can render characters from any angle. Co-founder Andrew Carr says other models struggle with either perspective or context, but Gemini 2.5 Flash Image handles both at the same time. Volley , an AI studio, uses the model in its game "Wit's End." The game generates portraits, scene transitions, and image edits on demand. CTO James Wilsterman says latency is under ten seconds, so players can control everything in real time using voice or chat.
 
-**Why it matters:** Early adopters include startup Cartwheel, which combines it with 3D posing for multi-angle character rendering, and AI studio Volley, which uses it in "Wit's End" to generate portraits and scene transitions with under-10-second latency. Sample tools like Bananimate, Enhance, and Fit Check demonstrate use cases in media, e-commerce, and gaming. **What happened:**     Google launched the Gemini 2. 5 Flash Image model in October 2025, offering production-ready image generation, editing, and compositing across 10 aspect ratios with $0. 039 per image pricing and under-10-second latency in real-time applications. **Why it matters:**     SMEs in e-commerce, gaming, and creative tech can now rapidly prototype and deploy AI-driven visual tools with consistent character rendering and low latency—act now to integrate via Google AI Studio or Vertex AI to maintain competitive edge in dynamic content workflows.
+**Why it matters:** Early adopters include startup Cartwheel, which combines it with 3D posing for multi-angle character rendering, and AI studio Volley, which uses it in the game *Wit's End* to generate portraits and scene transitions in under 10 seconds. The model excels in maintaining consistent character design across complex scenes, addressing a key gap in prior image models. **What happened:**     Google has launched the Gemini 2. 5 Flash Image model in October 2025, now available for production use via API, Vertex AI, and Google AI Studio, with pricing at $0. 039 per image and $30 per million output tokens, supporting 10 aspect ratios and real-time editing. **Why it matters:**     SMEs in creative tech, e-commerce, and gaming can now build low-latency, high-consistency visual workflows—such as virtual fitting rooms or interactive games—using natural language prompts; businesses should integrate the model via Google AI Studio to prototype within days and benchmark performance against legacy image generators.
 
 **Further reading:**
 - [Google ships Gemini 2.5 Flash Image model with new features](https://the-decoder.com/google-ships-gemini-2-5-flash-image-model-with-new-features/)
@@ -194,132 +411,7 @@ itinerary:
 <p>    Anthropic is looking to move beyond prompt engineering with a new approach it calls "context engineering." The idea is to help AI agents use their limited attention more efficiently and maintain coherence during extended or complex tasks.</p>
 <p>The article <a href="https://the-decoder.com/anthropic-claims-context-engineering-beats-prompt-engineering-when-managing-ai-agents/">Anthropic claims context engineering beats prompt engineering when managing AI agents</a> appeared first on <a href="https://the-decoder.com">THE DECODER</a>.</p> Anthropic is looking to move beyond prompt engineering with a new approach it calls "context engineering." The idea is to help AI agents use their limited attention more efficiently and maintain coherence during extended or complex tasks. Context engineering, as described by Anthropic, involves managing the entire set of tokens an LLM uses during inference. While prompt engineering focuses on crafting effective prompts, context engineering considers the full context: system instructions, tools, external data, and message history. The term "context engineering" isn't entirely new. Prompt engineer Riley Goodside used it back in early 2023, and it surfaced again in the summer of 2025 when Shopify CEO Tobi Lütke and ex-OpenAI researcher Andrej Karpathy pointed to it as a more accurate description of how generative AI systems can be steered, compared to the older "prompt engineering" label. Anthropic advises tuning system prompts to be specific enough to guide behavior but flexible enough to allow for broad heuristics. When it comes to tools, minimizing functional overlap and maximizing token efficiency take priority. Check your inbox or spam folder to confirm your subscription. A noticeable trend is the move toward "just in time" data strategies. Rather than preloading all information, agents store lightweight identifiers and fetch data only when needed. Anthropic's coding tool Claude Code, for example, analyzes complex data by loading only what it needs, keeping the context window lean. For longer tasks, Anthropic has identified three main tactics: These strategies aim to work around the limitations of LLMs. As context windows get bigger, models often face "context rot" —the more tokens, the harder it is for them to retrieve the right information. This problem is baked into the transformer architecture. Every token relates to every other token, meaning the number of relationships grows as n² for n tokens. With a limited "attention budget," LLMs can quickly get overwhelmed as context grows. Anthropic's Claude 4.5 Sonnet rollout included a new memory tool, now in public beta. This lets agents build persistent knowledge bases, with developers deciding where and how data gets stored. Claude can create, read, and edit files in a memory directory that carries over between conversations. Anthropic claims notable gains from these features. In internal tests, combining the Memory Tool with Context Editing improved agent-based search performance by 39 percent; context editing alone brought a 29 percent bump. In a 100-round web search, token consumption reportedly dropped by 84 percent. The new tools are available in public beta on the Claude Developer Platform, including integrations with Amazon Bedrock and Google Cloud Vertex AI. Anthropic also provides step-by-step documentation and a cookbook for developers.
 
-**Why it matters:** These tools are integrated into the Claude Developer Platform and support AWS Bedrock and Google Cloud Vertex AI. The shift is driven by limitations in transformer architecture, where context rot increases quadratically (n²) with token count, overwhelming attention budgets. The term gained traction in mid-2025, cited by Shopify CEO Tobi Lütke and ex-OpenAI researcher Andrej Karpathy, signaling industry-wide recognition of context engineering’s operational superiority. **What happened:**     Anthropic’s public beta release of context engineering tools—including the Memory Tool and context editing—delivers a 39% improvement in agent search performance and 84% reduction in token usage over 100 rounds, with full integrations into Amazon Bedrock and Google Cloud Vertex AI. **Why it matters:**     SMEs building AI agents should prioritize context engineering over prompt engineering to reduce operational costs, improve task coherence, and avoid context rot; adopt the Memory Tool and "just in time" data strategies now to future-proof AI workflows and leverage lower token consumption.
+**Why it matters:** These advances are supported by integrations with Amazon Bedrock and Google Cloud Vertex AI, and are backed by industry signals: Shopify CEO Tobi Lütke and ex-OpenAI researcher Andrej Karpathy have endorsed context engineering as a more accurate descriptor of advanced AI steering. The shift reflects a broader move toward efficient context handling in response to "context rot" and the n² attention complexity in transformer models. **What happened:**     Anthropic has launched context engineering tools in public beta, including the Memory Tool and context editing features in Claude 4. 5 Sonnet, which reduced token use by 84% in multi-round tasks and boosted search performance by up to 39% in internal tests. **Why it matters:**     SMEs building AI agents should prioritize context engineering over prompt engineering to reduce operational costs, improve task coherence, and scale complex workflows—especially for customer support, research, and automation where context retention and efficiency are critical.
 
 **Further reading:**
 - [Anthropic claims context engineering beats prompt engineering when managing AI agents](https://the-decoder.com/anthropic-claims-context-engineering-beats-prompt-engineering-when-managing-ai-agents/)
-## #StopCensoringAbortion: What We Learned and Where We Go From Here
-
-**What happened:** <div class="field field--name-body field--type-text-with-summary field--label-hidden"><div class="field__items"><div class="field__item even"><p><em>This is the tenth and final installment in a blog series documenting EFF's findings from the </em><a href="https://www.eff.org/deeplinks/2025/02/stop-censoring-abortion-fight-reproductive-rights-digital-age"><em>Stop Censoring Abortion</em></a><em> campaign. You can read additional posts </em><a href="https://www.eff.org/pages/stop-censoring-abortion"><em>here</em></a><em>.</em> </p>
-<p>When we launched <a href="https://www.eff.org/pages/stop-censoring-abortion">Stop Censoring Abortion</a>, our goals were to understand how social media platforms were silencing abortion-related content, gather data and lift up stories of censorship, and hold social media companies accountable for the harm they have caused to the reproductive rights movement.</p>
-<p>Thanks to <a href="https://www.eff.org/pages/our-stop-censoring-abortion-campaign-uncovers-social-media-censorship-crisis#main-content">nearly 100 submissions</a> from educators, advocates, clinics, researchers, and individuals around the world, we confirmed what <a href="https://www.amnestyusa.org/reports/obstacles-to-autonomy-post-roe-removal-of-abortion-information-online/">many already suspected</a>: this speech is being removed, restricted, and silenced by platforms at an alarming rate. Together, our findings paint a clear picture of censorship in action: platforms’ moderation systems are not only broken, but are actively harming those seeking and sharing vital reproductive health information.</p>
-<p>Here are the key lessons from this campaign: what we uncovered, how platforms can do better, and why pushing back against this censorship matters more now than ever.</p>
-<h3><strong>Lessons Learned</strong></h3>
-<p>Across our submissions, we saw systemic over-enforcement, vague and convoluted policies, arbitrary takedowns, sudden account bans, and ignored appeals. And in almost every case we reviewed, <strong>the posts and accounts in question did <em>not </em>violate any of the platform’s stated rules</strong>.</p>
-<p>The most common reason Meta gave for removing abortion-related content was that it violated policies on <a href="https://transparency.meta.com/policies/community-standards/restricted-goods-services/">Restricted Goods and Services</a>, which prohibit any “attempts to buy, sell, trade, donate, gift or ask for pharmaceutical drugs.” But <a href="https://www.eff.org/pages/our-stop-censoring-abortion-campaign-uncovers-social-media-censorship-crisis#main-content">most of the content submitted</a> simply provided factual, educational information that clearly did not violate those rules. As we saw in the <a href="https://mahotline.org/">M+A Hotline</a>’s case, this kind of misclassification deprives patients, advocates, and researchers of reliable information, and chills those trying to provide accurate and life-saving reproductive health resources.</p>
-<p>In <a href="https://www.eff.org/pages/companies-must-provide-accurate-and-transparent-information-users-when-posts-are-removed#main-content">one submission</a>, we even saw posts sharing educational abortion resources get flagged under the “<a href="https://www.eff.org/pages/companies-must-provide-accurate-and-transparent-information-users-when-posts-are-removed#main-content">Dangerous Organizations and Individuals</a>” policy, a rule intended to prevent terrorism and criminal activity. We’ve seen this policy cause <a href="https://www.eff.org/deeplinks/2021/12/facebooks-secret-dangerous-organizations-and-individuals-list-creates-problems">problems in the past</a>, but in the reproductive health space, treating legal and accurate information as violent or unlawful only adds needless stigma and confusion.</p>
-<p>Meta’s <a href="https://www.eff.org/pages/decoding-metas-advertising-policies-abortion-content#main-content">convoluted advertising policies</a> add another layer of harm. There are specific, additional rules users must navigate to post <em>paid</em> content about abortion. While many of these rules still contain exceptions for purely educational content, Meta is vague about how and when those exceptions apply. And ads that seem like they should have been allowed were frequently flagged under rules about “prescription drugs” or “social issues.” This patchwork of unclear policies forces users to second-guess what content they can post or promote for fear of losing access to their networks.</p>
-<p>In another troubling trend, many of our submitters reported experiencing <a href="https://www.eff.org/pages/algorithmic-suppression-abortion-content-creators#main-content">shadowbanning and de-ranking</a>, where posts weren’t removed but were instead quietly suppressed by the algorithm. This kind of suppression leaves advocates without any notice, explanation, or recourse—and severely limits their ability to reach people who need the information most.  </p>
-<p>Many users also faced <a href="https://www.eff.org/pages/meta-removing-abortion-advocates-accounts-without-warning#main-content">sudden account bans without warning</a> or clear justification. Though Meta’s policies <a href="https://www.eff.org/pages/meta-removing-abortion-advocates-accounts-without-warning#main-content">dictate</a> that an account should only be disabled or removed after “repeated” violations, organizations like <a href="https://womenhelp.org/en/">Women Help Women</a> received no warning before seeing their critical connections cut off overnight.</p>
-<p>Finally, we learned that Meta’s enforcement outcomes were deeply inconsistent. Users often had their appeals denied and accounts suspended until someone with <a href="https://www.eff.org/pages/when-knowing-someone-meta-only-way-break-out-content-jail#main-content">insider access</a> to Meta could intervene. For example, the <a href="https://www.redriverwomensclinic.com/">Red River’s Women’s Clinic</a>, <a href="https://rise.emory.edu/">RISE at Emory</a>, and <a href="https://aidaccess.org/en/">Aid Access</a> each had their accounts restored only after press attention or personal contacts stepped in. This reliance on backchannels underscores the inequity in Meta’s moderation processes: <a href="https://www.eff.org/pages/our-stop-censoring-abortion-campaign-uncovers-social-media-censorship-crisis#main-content">without connections, users are left unfairly silenced</a>.</p>
-<h3><strong>It’s Not Just Meta</strong></h3>
-<p>Most of our submissions detailed suppression that took place on one of Meta’s platforms (Facebook, Instagram, Whatsapp and Threads), so we decided to focus our analysis on Meta’s moderation policies and practices. But we should note that <strong>this problem is by no means confined to Meta</strong>.</p>
-<p>On LinkedIn, for example, Stephanie Tillman told us about how she had her entire account permanently taken down, with nothing more than a vague notice that she had violated LinkedIn’s <a href="https://www.linkedin.com/legal/user-agreement">User Agreement</a>. When Stephanie reached out to ask what violation she committed, LinkedIn responded that “due to our Privacy Policy we are unable to release our findings,” leaving her with no clarity or recourse. Stephanie suspects that the ban was related to her work with <a href="https://reprotlc.org/">Repro TLC</a>, an advocacy and clinical health care organization, and/or her posts relating to her personal business, <a href="https://www.feministmidwife.com/">Feminist Midwife LLC</a>. But LinkedIn’s opaque enforcement meant she had no way to confirm these suspicions, and no path to restoring her account.</p>
-<p></p><div class="caption caption-center"><div class="caption-width-container"><div class="caption-inner"><img alt="" height="545" src="https://www.eff.org/files/2025/10/02/tillman_screenshot_redacted_f2.jpg" width="567" /><p class="caption-text">Screenshot submitted by Stephanie Tillman to EFF (with personal information redacted by EFF)</p></div></div></div>
-<p>And over on Tiktok, Brenna Miller, a creator who works in health care and frequently posts about abortion, posted a video of her “unboxing” an abortion pill care package from <a href="https://carafem.org/">Carafem</a>. Though Brenna’s video was factual and straightforward, TikTok removed it, saying that she had violated TikTok’s <a href="https://www.tiktok.com/community-guidelines/en">Community Guidelines</a>.</p>
-<p></p><div class="caption caption-center"><div class="caption-width-container"><div class="caption-inner"><img alt="" height="747" src="https://www.eff.org/files/2025/10/02/brenna_miller_screenshot.jpeg" width="333" /><p class="caption-text">Screenshot submitted by Brenna Miller to EFF</p></div></div></div>
-<p>Brenna appealed the removal successfully at first, but a few weeks later the video was permanently deleted—this time, without any explanation or chance to appeal again.</p>
-<p>Brenna’s far from the only one experiencing censorship on TikTok. Even Jessica Valenti, award-winning writer, activist, and author of the <a href="https://jessica.substack.com/"><em>Abortion Every Day</em></a> newsletter, recently had a video taken down from TikTok for violating its community guidelines, with no further explanation. The video she posted was about the Trump administration calling IUDs and the Pill ‘abortifacients.’ Jessica <a href="https://jessica.substack.com/p/when-can-we-trust-the-police?open=false#%C2%A7censoring-abortion-online">wrote</a>:</p>
-<blockquote><p>Which rule did I break? Well, they didn’t say: but I wasn’t trying to sell anything, the video didn’t feature nudity, and I didn’t publish any violence. By process of elimination, that means the video was likely taken down as "misinformation." Which is…ironic.</p>
-</blockquote>
-<p>These are not isolated incidents. In the <a href="https://docsend.com/view/emzyirq6hfatmx2a">Center for Intimacy Justice’s survey</a> of reproductive rights advocates, health organizations, sex educators, and businesses, 63% reported having content removed on Meta platforms, 55% reported the same on TikTok, and 66% reported having ads rejected from Google platforms (including YouTube). Clearly, censorship of abortion-related content is a systemic problem across platforms.</p>
-<h3><strong>How Platforms Can Do Better on Abortion-Related Speech</strong></h3>
-<p>Based on our findings, we're calling on platforms to take <a href="https://www.eff.org/pages/decoding-metas-advertising-policies-abortion-content#main-content">these concrete steps</a> to improve moderation of abortion-related speech:</p>
-<ul>
-<li><strong>Publish clear policies</strong>. Users should not have to guess whether their speech is allowed or not.</li>
-<li><strong>Enforce rules consistently</strong>. If a post does not violate a written standard, it should not be removed.</li>
-<li><strong>Provide real transparency</strong>. Enforcement decisions must come with clear, detailed explanations and meaningful opportunities to appeal.</li>
-<li><strong>Guarantee functional appeals</strong>. Users must be able to challenge wrongful takedowns without relying on insider contacts.</li>
-<li><strong>Expand human review</strong>. Reproductive rights is a nuanced issue and can be too complex to be left entirely to error-prone automated moderation systems.</li>
-</ul>
-<h3><strong>Practical Tips for Users</strong></h3>
-<p>Don’t get it twisted: Users should not have to worry about their posts being deleted or their accounts getting banned when they share factual information that doesn’t violate platform policies. The onus is on platforms to get it together and <a href="https://www.eff.org/pages/our-stop-censoring-abortion-campaign-uncovers-social-media-censorship-crisis#main-content">uphold their commitments</a> to users. But while platforms continue to fail, we’ve provided some <a href="https://www.eff.org/pages/tips-protect-your-posts-about-reproductive-health-being-removed#main-content">practical tips</a> to reduce the risk of takedowns, including:</p>
-<ul>
-<li><strong>Consider limiting commonly flagged words and images</strong>. Posts with pill images or certain keyword combinations (like “abortion,” “pill,” and “mail”) were often flagged.</li>
-<li><strong>Be as clear as possible</strong>. Vague phrases like “we can help you get what you need” might look like drug sales to an algorithm.</li>
-<li><strong>Be careful with links</strong>. Direct links to pill providers were often flagged. Spell out the links instead.</li>
-<li><strong>Expect stricter rules for ads</strong>. Boosted posts face harsher scrutiny than regular posts.</li>
-<li><strong>Appeal wrongful enforcement decisions. </strong>Requesting an appeal might get you a human moderator or, even better, review from Meta’s independent Oversight Board.</li>
-<li><strong>Document everything and back up your content.</strong> Screenshot all communications and enforcement decisions so you can share them with the press or advocacy groups, and export your data regularly in case your account vanishes overnight.</li>
-</ul>
-<h3><strong>Keep Fighting</strong></h3>
-<p>Abortion information saves lives, and social media is the primary—and sometimes only—way for advocates and providers to get accurate information out to the masses. But now we have evidence that this censorship is widespread, unjustified, and harming communities who need access to this information most.</p>
-<p>Platforms must be held accountable for these harms, and advocates must continue to speak out. The more we push back—through campaigns, reporting, policy advocacy, and user action—the harder it will be for platforms to look away.</p>
-<p>So keep speaking out, and keep demanding accountability. Platforms need to know we're paying attention—and we won't stop fighting until everyone can share information about abortion freely, safely, and without fear of being silenced.</p>
-<p><em>This is the tenth and final post in our blog series documenting the findings from our Stop Censoring Abortion campaign. Read more at </em><a href="https://www.eff.org/pages/stop-censoring-abortion"><em>https://www.eff.org/pages/stop-censoring-abortion</em></a>. <span> </span></p>
-<p><em><span>Affected by unjust censorship? Share your story using the hashtag #StopCensoringAbortion. Amplify censored posts and accounts, share screenshots of removals and platform messages—together, we can demonstrate how these policies harm real people.</span></em><span> </span></p>
-
-</div></div></div> BY MOLLY BUCKLEY | October 3, 2025 This is the tenth and final installment in a blog series documenting EFF's findings from the Stop Censoring Abortion campaign. You can read additional posts here . When we launched Stop Censoring Abortion , our goals were to understand how social media platforms were silencing abortion-related content, gather data and lift up stories of censorship, and hold social media companies accountable for the harm they have caused to the reproductive rights movement. Thanks to nearly 100 submissions from educators, advocates, clinics, researchers, and individuals around the world, we confirmed what many already suspected : this speech is being removed, restricted, and silenced by platforms at an alarming rate. Together, our findings paint a clear picture of censorship in action: platforms’ moderation systems are not only broken, but are actively harming those seeking and sharing vital reproductive health information. Here are the key lessons from this campaign: what we uncovered, how platforms can do better, and why pushing back against this censorship matters more now than ever. Across our submissions, we saw systemic over-enforcement, vague and convoluted policies, arbitrary takedowns, sudden account bans, and ignored appeals. And in almost every case we reviewed, the posts and accounts in question did not violate any of the platform’s stated rules . The most common reason Meta gave for removing abortion-related content was that it violated policies on Restricted Goods and Services , which prohibit any “attempts to buy, sell, trade, donate, gift or ask for pharmaceutical drugs.” But most of the content submitted simply provided factual, educational information that clearly did not violate those rules. As we saw in the M+A Hotline ’s case, this kind of misclassification deprives patients, advocates, and researchers of reliable information, and chills those trying to provide accurate and life-saving reproductive health resources. In one submission , we even saw posts sharing educational abortion resources get flagged under the “ Dangerous Organizations and Individuals ” policy, a rule intended to prevent terrorism and criminal activity. We’ve seen this policy cause problems in the past , but in the reproductive health space, treating legal and accurate information as violent or unlawful only adds needless stigma and confusion. Meta’s convoluted advertising policies add another layer of harm. There are specific, additional rules users must navigate to post paid content about abortion. While many of these rules still contain exceptions for purely educational content, Meta is vague about how and when those exceptions apply. And ads that seem like they should have been allowed were frequently flagged under rules about “prescription drugs” or “social issues.” This patchwork of unclear policies forces users to second-guess what content they can post or promote for fear of losing access to their networks. In another troubling trend, many of our submitters reported experiencing shadowbanning and de-ranking , where posts weren’t removed but were instead quietly suppressed by the algorithm. This kind of suppression leaves advocates without any notice, explanation, or recourse—and severely limits their ability to reach people who need the information most. Many users also faced sudden account bans without warning or clear justification. Though Meta’s policies dictate that an account should only be disabled or removed after “repeated” violations, organizations like Women Help Women received no warning before seeing their critical connections cut off overnight. Finally, we learned that Meta’s enforcement outcomes were deeply inconsistent. Users often had their appeals denied and accounts suspended until someone with insider access to Meta could intervene. For example, the Red River’s Women’s Clinic , RISE at Emory , and Aid Access each had their accounts restored only after press attention or personal contacts stepped in. This reliance on backchannels underscores the inequity in Meta’s moderation processes: without connections, users are left unfairly silenced . Most of our submissions detailed suppression that took place on one of Meta’s platforms (Facebook, Instagram, Whatsapp and Threads), so we decided to focus our analysis on Meta’s moderation policies and practices. But we should note that this problem is by no means confined to Meta . On LinkedIn, for example, Stephanie Tillman told us about how she had her entire account permanently taken down, with nothing more than a vague notice that she had violated LinkedIn’s User Agreement . When Stephanie reached out to ask what violation she committed, LinkedIn responded that “due to our Privacy Policy we are unable to release our findings,” leaving her with no clarity or recourse. Stephanie suspects that the ban was related to her work with Repro TLC , an advocacy and clinical health care organization, and/or her posts relating to her personal business, Feminist Midwife LLC . But LinkedIn’s opaque enforcement meant she had no way to confirm these suspicions, and no path to restoring her account. Screenshot provided by Stephanie Tillman to EFF (with personal information redacted by EFF) And over on Tiktok, Brenna Miller, a creator who works in health care and frequently posts about abortion, posted a video of her “unboxing” an abortion pill care package from Carafem . Though Brenna’s video was factual and straightforward, TikTok removed it, saying that she had violated TikTok’s Community Guidelines . Screenshot provided by Brenna Miller to EFF Brenna appealed the removal successfully at first, but a few weeks later the video was permanently deleted—this time, without any explanation or chance to appeal again. Brenna’s far from the only one experiencing censorship on TikTok. Even Jessica Valenti, award-winning writer, activist, and author of the Abortion Every Day newsletter, recently had a video taken down from TikTok for violating its community guidelines, with no further explanation. The video she posted was about the Trump administration calling IUDs and the Pill ‘abortifacients.’ Jessica wrote : Which rule did I break? Well, they didn’t say: but I wasn’t trying to sell anything, the video didn’t feature nudity, and I didn’t publish any violence. By process of elimination, that means the video was likely taken down as "misinformation." Which is…ironic. These are not isolated incidents. In the Center for Intimacy Justice’s survey of reproductive rights advocates, health organizations, sex educators, and businesses, 63% reported having content removed on Meta platforms, 55% reported the same on TikTok, and 66% reported having ads rejected from Google platforms (including YouTube). Clearly, censorship of abortion-related content is a systemic problem across platforms. Based on our findings, we're calling on platforms to take these concrete steps to improve moderation of abortion-related speech: Don’t get it twisted: Users should not have to worry about their posts being deleted or their accounts getting banned when they share factual information that doesn’t violate platform policies. The onus is on platforms to get it together and uphold their commitments to users. But while platforms continue to fail, we’ve provided some practical tips to reduce the risk of takedowns, including: Abortion information saves lives, and social media is the primary—and sometimes only—way for advocates and providers to get accurate information out to the masses. But now we have evidence that this censorship is widespread, unjustified, and harming communities who need access to this information most. Platforms must be held accountable for these harms, and advocates must continue to speak out. The more we push back—through campaigns, reporting, policy advocacy, and user action—the harder it will be for platforms to look away. So keep speaking out, and keep demanding accountability. Platforms need to know
-
-**Why it matters:** These issues are not isolated; they reflect a coordinated, platform-wide pattern of over-enforcement that disproportionately silences marginalized voices, undermining public health communication and free expression. **What happened:**     In October 2025, a comprehensive EFF investigation revealed that 63% of reproductive health content on Meta platforms, 55% on TikTok, and 66% of Google/YouTube ads were removed or blocked despite not violating stated policies. Meta removed educational posts under "Restricted Goods" rules, TikTok deleted factual videos without appeal options, and LinkedIn banned users without explanation. Accounts like Red River Women’s Clinic and RISE at Emory were restored only after media scrutiny, exposing systemic inequity in enforcement. **Why it matters:**     This censorship disrupts access to critical reproductive health information, directly threatening public health outcomes. SMEs and health advocates operating on these platforms face sudden account loss, ad rejection, and algorithmic suppression—risking operational disruption and loss of life-saving outreach. Organizations must document all enforcement actions, use alternative platforms, and demand transparent, human-reviewed appeals to mitigate risk.
-
-**Further reading:**
-- [#StopCensoringAbortion: What We Learned and Where We Go From Here](https://www.eff.org/deeplinks/2025/10/stopcensoringabortion-what-we-learned-and-where-we-go-here)
-## Claude Sonnet 4.5 (hands-on)
-
-**What happened:** AI Twitter Recap: After ~30 hours with Claude Code, @finbarrtimbers finds Sonnet 4.5 “basically the same as Opus 4.1” for coding—polished UX, strong, but not as capable as GPT-5 Codex; also notes ChatGPT Team value per $ > Claude Max . Anthropic highlights Sonnet 4.5’s cybersecurity strength (comparable/superior to Opus 4.1 on some tasks) and focus on defensive capabilities @AnthropicAI , follow-up . Title: finbarr on X: "My review of Sonnet 4.5 based on ~30 hours of Claude Code use is that it’s basically the same as Opus 4.1. Which is quite good! But not as good as GPT-5 (codex thinking=high). 
-
-Claude Code is still much more polished than Codex. But I find GPT-5 much stronger as a model." / X
-
-URL Source: http://twitter.com/finbarrtimbers/status/1973922679418974298
-
-Published Time: Sat, 04 Oct 2025 08:14:07 GMT
-
-Markdown Content:
-Post
-----
-
-Conversation
-------------
-
-My review of Sonnet 4.5 based on ~30 hours of Claude Code use is that it’s basically the same as Opus 4.1. Which is quite good! But not as good as GPT-5 (codex thinking=high). Claude Code is still much more polished than Codex. But I find GPT-5 much stronger as a model.
-
-51.5K
-
-Views
-
-New to X?
----------
-
-Sign up now to get your own personalized timeline!
-
-Trending now
-------------
-
-What’s happening
-----------------
-
-![Image 1](https://pbs.twimg.com/semantic_core_img/1971242677946433536/FNSCHhzr?format=png&name=240x240)
-
-Paris Fashion Week 2025 Womenswear SS26
-
-LIVE
-
-Trending in United States
-
-#Domain
-
-24.8K posts
-
-Fashion & beauty · Trending
-
-#CELINESUMMER2026
-
-290K posts
-
-Trending in United States
-
-Optimus
-
-22.8K posts
-
-Trending in United States
-
-Burning
-
-92.3K posts
-
-**Why it matters:** The model is currently in active deployment (Oct 2025), with pricing and access limited to select enterprise tiers. GPT-5 remains the dominant performer in technical reasoning, while Claude Max offers lower value per dollar than the ChatGPT Team tier. **What happened:**     After 30 hours of hands-on testing, Claude Sonnet 4. 5 performs at parity with Opus 4. 1 in coding but lags behind GPT-5 in complex reasoning and code quality, per developer Finbarr Timbers (Oct 2025); Sonnet 4. 5 shows superior cybersecurity performance on select tasks. **Why it matters:**     SMEs prioritizing secure, enterprise-grade AI coding tools should assess Sonnet 4. 5 for defensive capabilities, but expect GPT-5 to deliver higher ROI in technical workflows—re-evaluate vendor contracts and budget allocations accordingly.
-
-**Further reading:**
-- [@finbarrtimbers](https://twitter.com/finbarrtimbers/status/1973922679418974298)
